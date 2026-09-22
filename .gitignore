@@ -1,3 +1,4 @@
+.env
 bin/
 obj/
 /packages/
@@ -5,6 +6,3 @@ riderModule.iml
 /_ReSharper.Caches/
 # Project exclude paths
 /app/wwwroot/lib/bootstrap/dist/
-/app/wwwroot/lib/jquery/dist/
-/app/wwwroot/lib/jquery-validation/dist/
-/app/wwwroot/lib/jquery-validation-unobtrusive/dist/
