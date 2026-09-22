@@ -19,7 +19,7 @@ namespace app.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Username = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Email = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
-                    PasswordHash = table.Column<string>(type: "character varying(60)", maxLength: 60, nullable: false)
+                    PasswordHash = table.Column<string>(type: "character varying(75)", maxLength: 75, nullable: false)
                 },
                 constraints: table =>
                 {

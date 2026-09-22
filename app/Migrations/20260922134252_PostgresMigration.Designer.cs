@@ -12,7 +12,7 @@ using app.DAL;
 namespace app.Migrations
 {
     [DbContext(typeof(GrupperingTypeContext))]
-    [Migration("20260922130726_PostgresMigration")]
+    [Migration("20260922134252_PostgresMigration")]
     partial class PostgresMigration
     {
         /// <inheritdoc />
@@ -38,8 +38,8 @@ namespace app.Migrations
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasMaxLength(60)
-                        .HasColumnType("character varying(60)");
+                        .HasMaxLength(75)
+                        .HasColumnType("character varying(75)");
 
                     b.Property<string>("Username")
                         .IsRequired()
