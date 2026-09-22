@@ -4,4 +4,11 @@
     build:
       context: .
       dockerfile: app/Dockerfile
-
+  postgres:
+    image: postgres:18-alpine
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_USER=${DB_USER}
