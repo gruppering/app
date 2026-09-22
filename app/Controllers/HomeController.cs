@@ -61,6 +61,14 @@ public class HomeController(UserService userService) : Controller
         return View();
     }
     
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        await HttpContext.SignOutAsync();
+        return RedirectToAction("Login", "Home");
+    }
+
+    
 
     [HttpGet("error")]
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
