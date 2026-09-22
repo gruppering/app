@@ -1,16 +1,14 @@
-using app.DAL;
 using app.Models;
-using Microsoft.EntityFrameworkCore;
+using app.Repositories;
 
 namespace app.Services;
 
-public class UserService(GrupperingTypeContext typeContext)
+public class UserService(IUserRepository userRepository)
 {
 
     public GrupperingUser? GetUserByUsername(string username)
     {
-        var user = typeContext.Users.Include(u => u.Roles).FirstOrDefault(u => u.Username == username);
-        return user;
+        return userRepository.GetUserByUsername(username);
     }
     
     /**
@@ -24,9 +22,9 @@ public class UserService(GrupperingTypeContext typeContext)
     /**
      * Creates a new user and adds them to the db, returns null if username already exists.
      */
-    public GrupperingUser? Signup(string username,string email, string password)
+    public async Task<GrupperingUser?> Signup(string username,string email, string password)
     {
-        if (typeContext.Users.Any(u => u.Username == username))
+        if (userRepository.UserExistsWithUsername(username))
             return null;
         
         var user = new GrupperingUser
@@ -36,8 +34,7 @@ public class UserService(GrupperingTypeContext typeContext)
             Password = BCrypt.Net.BCrypt.HashPassword(password),
             Roles = [new GrupperingUserRole("ROLE_USER")]
         };
-        var createdUser = typeContext.Users.Add(user);
-        typeContext.SaveChanges();
-        return createdUser.Entity;
+        
+        return await userRepository.Save(user);
     }
 }
