@@ -1,19 +1,24 @@
 using app.DAL;
 using app.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace app.Services;
 
 public class UserService(GrupperingTypeContext typeContext)
 {
 
-    /**
-     * Verifies if the specified user and password is correct, if it can't find the specified user, it returns false,
-     * using this fancy return statement suggested by the IDE.
-     */
-    public bool Authenticate(string username,string password)
+    public GrupperingUser? GetUserByUsername(string username)
     {
-        var user = typeContext.Users.FirstOrDefault(u => u.Username == username);
-        return user is not null && BCrypt.Net.BCrypt.Verify(password,user.Password);
+        var user = typeContext.Users.Include(u => u.Roles).FirstOrDefault(u => u.Username == username);
+        return user;
+    }
+    
+    /**
+     * Verifies if the password matches the password with the supplied user.
+     */
+    public bool VerifyPasswordMatches(GrupperingUser user,string passwordToCheck)
+    {
+        return BCrypt.Net.BCrypt.Verify(passwordToCheck,user.Password);
     }
 
     /**
@@ -28,7 +33,8 @@ public class UserService(GrupperingTypeContext typeContext)
         {
             Username = username,
             Email = email,
-            Password = BCrypt.Net.BCrypt.HashPassword(password)
+            Password = BCrypt.Net.BCrypt.HashPassword(password),
+            Roles = [new GrupperingUserRole("ROLE_USER")]
         };
         var createdUser = typeContext.Users.Add(user);
         typeContext.SaveChanges();
