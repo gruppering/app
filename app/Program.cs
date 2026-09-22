@@ -7,14 +7,30 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Loads environment variables from .env file.
+if (File.Exists("../.env"))
+{
+    DotNetEnv.Env.Load("../.env");
+}
+else // Assumes the 
+{
+    Environment.SetEnvironmentVariable("DB_HOST","localhost");
+    Environment.SetEnvironmentVariable("POSTGRES_PORT","5455");
+    Environment.SetEnvironmentVariable("DB_NAME","gruppering");
+    Environment.SetEnvironmentVariable("DB_USER","grouper");
+    Environment.SetEnvironmentVariable("DB_PASSWORD","Insecure");
+}
 
-// Adds DbContext and configures sqlite location.
+// Adds DbContext and configures 
 builder.Services.AddDbContext<GrupperingTypeContext>(options =>
 {
-    var folder = Environment.SpecialFolder.LocalApplicationData;
-    var path = Environment.GetFolderPath(folder);
-    options.UseSqlite($"Data Source={Path.Join(path, "gruppering.db")}");
+    options.UseNpgsql($"Server={Environment.GetEnvironmentVariable("DB_HOST")};" +
+                      $"Port={Environment.GetEnvironmentVariable("POSTGRES_PORT")};" +
+                      $"Database={Environment.GetEnvironmentVariable("DB_NAME")};" +
+                      $"User Id={Environment.GetEnvironmentVariable("DB_USER")};" +
+                      $"Password={Environment.GetEnvironmentVariable("DB_PASSWORD")};");
 });
+
 builder.Services.AddScoped<IUserRepository,UserRepository>();
 builder.Services.AddScoped<UserService>();
 
