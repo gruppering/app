@@ -8,9 +8,14 @@ hvor man kan finne, opprette grupper eller opprette courses etter ønsker.
 ! Foreløpig er ikke bootstrap og jquery med i repoet by default, 
 skal fikse det så fort jeg kan, men disse må legges til manuelt foreløpig for at frontend funker.
 
+Hvis dotnet-ef ikke er installert
+`dotnet tool install dotnet-ef --version "10.*"`
+
 `dotnet build`
 
-## Run
+Når postgres kjører
+
+`dotnet ef database update`
 
 ## Testing
 `dotnet test`
