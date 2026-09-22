@@ -25,13 +25,11 @@ public class HomeController(UserService userService) : Controller
     [AllowAnonymous]
     public async Task<IActionResult> Login( [FromForm]string username, [FromForm]string password)
     {
-        if (userService.Authenticate(username, password))
+        var user = userService.GetUserByUsername(username);
+        if (user is not null && userService.VerifyPasswordMatches(user, password))
         {
-            var claims = new List<Claim>
-            {
-                new (ClaimTypes.Name, username),
-                new (ClaimTypes.Role, "ROLE_USER")
-            };
+            List<Claim> claims = user.Roles.ConvertAll(role => new Claim(ClaimTypes.Role, role.Role));
+            claims.Add(new Claim(ClaimTypes.Name,user.Username));
             var claimsIdentity = new ClaimsIdentity(claims, "cookie");
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
             return RedirectToAction("Index", "Home");
@@ -50,7 +48,7 @@ public class HomeController(UserService userService) : Controller
     {
         if (userService.Signup(username, email, password) != null)
         {
-            var claims = new List<Claim> // This is a horrible temporary solution, must fix!
+            var claims = new List<Claim>
             {
                 new (ClaimTypes.Name, username),
                 new (ClaimTypes.Role, "ROLE_USER")
