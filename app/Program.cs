@@ -1,7 +1,7 @@
 using app.DAL;
+using app.Repositories;
 using app.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +15,7 @@ builder.Services.AddDbContext<GrupperingTypeContext>(options =>
     var path = Environment.GetFolderPath(folder);
     options.UseSqlite($"Data Source={Path.Join(path, "gruppering.db")}");
 });
+builder.Services.AddScoped<IUserRepository,UserRepository>();
 builder.Services.AddScoped<UserService>();
 
 builder.Services.AddControllersWithViews(options =>
