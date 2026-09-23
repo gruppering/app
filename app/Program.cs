@@ -12,7 +12,7 @@ if (File.Exists("../.env"))
 {
     DotNetEnv.Env.Load("../.env");
 }
-else // Assumes the 
+else // Then assumes the .env file isn't present, but the Postgres container is running, therefore trying the same default credentials as in the compose files.
 {
     Environment.SetEnvironmentVariable("DB_HOST","localhost");
     Environment.SetEnvironmentVariable("POSTGRES_PORT","5455");
