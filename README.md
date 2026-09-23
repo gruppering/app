@@ -13,9 +13,13 @@ Hvis dotnet-ef ikke er installert
 
 `dotnet build`
 
-Når postgres kjører
+
+## Run 
+`docker compose -f compose.dev.yaml up -d`
 
 `dotnet ef database update`
+
+`dotnet run`
 
 ## Testing
 `dotnet test`
