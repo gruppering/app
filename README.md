@@ -5,8 +5,6 @@ En gruppematching-plattform for både studenter og lærere,
 hvor man kan finne, opprette grupper eller opprette courses etter ønsker.
 
 ## Build
-! Foreløpig er ikke bootstrap og jquery med i repoet by default, 
-skal fikse det så fort jeg kan, men disse må legges til manuelt foreløpig for at frontend funker.
 
 Hvis dotnet-ef ikke er installert
 `dotnet tool install dotnet-ef --version "10.*"`
