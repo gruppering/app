@@ -2,29 +2,4 @@
     ViewData["Title"] = "Login";
 }
 
-<div class="text-center">
-    @if(ViewBag.Error != null)
-    {
-        <span>@ViewBag.Error</span>
-    }
-    <h1 class="display-4">Signup</h1>
-    <form action="/signup" method="post">
-        <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
-            <input type="text" class="form-control" id="username" aria-describedby="username" name="username">
-        </div>
-        <div class="mb-3">
-            <label for="email" class="form-label">E-Mail</label>
-            <input type="email" class="form-control" id="email" aria-describedby="email" name="email">
-        </div>
-        <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" name="password">
-        </div>
-        <div class="mb-3">
-            <label for="passwordRepeat" class="form-label">Repeat Password</label>
-            <input type="password" class="form-control" id="passwordRepeat" name="passwordRepeat">
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-</div>
+<partial name="_SignupForm" />
