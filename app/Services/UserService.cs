@@ -22,7 +22,7 @@ public class UserService(IUserRepository userRepository)
     /**
      * Creates a new user and adds them to the db, returns null if username already exists.
      */
-    public async Task<GrupperingUser?>? Signup(string username,string email, string password)
+    public async Task<GrupperingUser?> Signup(string username,string email, string password)
     {
         if (userRepository.UserExistsWithUsername(username))
             return null;

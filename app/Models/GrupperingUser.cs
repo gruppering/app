@@ -8,14 +8,14 @@ namespace app.Models;
 public class GrupperingUser
 {
     [Column(TypeName = "uuid")]
-    public Guid Id { get; set; } = Guid.CreateVersion7();
+    public Guid Id { get; set; }
 
     [MaxLength(50)]
     public string Username { get; set; } = string.Empty;
 
     [MaxLength(150)] [EmailAddress] public string Email { get; set; } = string.Empty;
     
-    [MaxLength(60)]
+    [MaxLength(75)]
     public string PasswordHash { get; set; } = string.Empty;
 
     public List<GrupperingUserRole> Roles { get; set; } = [];

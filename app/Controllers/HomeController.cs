@@ -46,7 +46,7 @@ public class HomeController(UserService userService) : Controller
     [AllowAnonymous]
     public async Task<IActionResult> Signup( [FromForm]string username,[FromForm] string email, [FromForm]string password)
     {
-        if (userService.Signup(username, email, password) != null)
+        if (await userService.Signup(username, email, password) != null)
         {
             var claims = new List<Claim>
             {
