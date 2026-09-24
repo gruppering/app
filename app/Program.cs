@@ -34,6 +34,9 @@ builder.Services.AddDbContext<GrupperingTypeContext>(options =>
 builder.Services.AddScoped<IUserRepository,UserRepository>();
 builder.Services.AddScoped<UserService>();
 
+builder.Services.AddScoped<ICourseRepository,CourseRepository>();
+builder.Services.AddScoped<CourseService>();
+
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add(new AuthorizeFilter());
