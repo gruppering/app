@@ -31,8 +31,11 @@ builder.Services.AddDbContext<GrupperingTypeContext>(options =>
                       $"Password={Environment.GetEnvironmentVariable("DB_PASSWORD")};");
 });
 
+// Repositories and their associated services.
 builder.Services.AddScoped<IUserRepository,UserRepository>();
 builder.Services.AddScoped<UserService>();
+
+
 
 builder.Services.AddControllersWithViews(options =>
 {
@@ -60,6 +63,14 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+}
+
+// A bit more elegant of a solution than manually running `dotnet ef database update` every time...
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<GrupperingTypeContext>();
+    if (context.Database.GetPendingMigrations().Any())
+        context.Database.Migrate();
 }
 
 app.UseHttpsRedirection();
