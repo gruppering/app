@@ -1,0 +1,86 @@
+using app.DTO.Course;
+using app.Models;
+using app.Repositories;
+
+namespace app.Services;
+
+public class CourseService(ICourseRepository courseRepository,IUserRepository userRepository)
+{
+
+    /**
+     * Adds the specified user to the specified course. Throws an ArgumentException if a course with the given name wasn't found.
+     */
+    public async Task AddUserToCourse(string courseName,GrupperingUser userToAdd)
+    {
+        var course = await courseRepository.GetCourseByNameAsync(courseName);
+        if (course is null) throw new ArgumentException(); // TODO, find better way of handling this
+        course.Members.Add(userToAdd);
+        await courseRepository.SaveAsync(course);
+    }
+    /**
+    * Adds the user with the specified username to the specified course. Throws an ArgumentException if a course or a user with the given name wasn't found.
+    */
+    public async Task AddUserToCourse(string courseName,string usernameToAdd)
+    {
+        var course = await courseRepository.GetCourseByNameAsync(courseName);
+        if (course is null) throw new ArgumentException(); // TODO, find better way of handling this
+
+        var user = userRepository.GetUserByUsername(usernameToAdd);
+        if (user is null) throw new ArgumentException(); // TODO, find better way of handling this
+        course.Members.Add(user);
+        await courseRepository.SaveAsync(course);
+    }
+
+    /**
+     * Removes the specified user from the specified course. Throws an ArgumentException if a course with the given name wasn't found or the user isn't a member of the specified course.
+     */
+    public async Task RemoveUserFromCourse(string courseName,GrupperingUser userToRemove)
+    {
+        var course = await courseRepository.GetCourseByNameAsync(courseName);
+        if (course is null) throw new ArgumentException();
+        var user = course.Members.Find(u => u.Id == userToRemove.Id);
+        if (user is null) throw new ArgumentException();
+        course.Members.Remove(user);
+        await courseRepository.SaveAsync(course);
+    }
+    /**
+     * Removes the specified user from the specified course. Throws an ArgumentException if a course or user with the given name wasn't found.
+     */
+    public async Task RemoveUserFromCourse(string courseName,string usernameToRemove)
+    {
+        var course = await courseRepository.GetCourseByNameAsync(courseName);
+        if (course is null) throw new ArgumentException();
+        var user = course.Members.Find(u => u.Username == usernameToRemove);
+        if (user is null) throw new ArgumentException();
+        course.Members.Remove(user);
+        await courseRepository.SaveAsync(course);
+    }
+    
+    /**
+     * Creates a new course given the creationDto and a creator, envisioned to be the user making the request.
+     */
+    public async Task<Course> CreateNewCourse(CourseCreationDto creationDto,GrupperingUser creator)
+    {
+        var course = new Course
+        {
+            DisplayName = creationDto.CourseName,
+            Description = creationDto.Description,
+            OwnerId = creator.Id,
+            IsPublic = creationDto.IsPublic
+        };
+        return await courseRepository.SaveAsync(course);
+    }
+    
+    /**
+     * Deletes a course with the given name, given that the user is authorized to do so, throws an ArgumentException if the specified course wasn't found.
+     * If the user requesting the deletion isn't authorized to do that, an ArgumentException is thrown.
+     */
+    public async Task<Course> DeleteCourse(string courseName,GrupperingUser requestor)
+    {
+        if (requestor.Roles.Any(r => r.Role == "ROLE_ADMIN"))
+            throw new ArgumentException();
+        var course = await courseRepository.GetCourseByNameAsync(courseName);
+        if (course is null) throw new ArgumentException();
+        return await courseRepository.DeleteAsync(course);
+    }
+}
