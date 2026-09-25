@@ -5,6 +5,7 @@ using NUnit.Framework;
 
 namespace app.Tests.Courses;
 
+// Compiler is stupid, and doesn't understand that the OneTimeSetup is run before the others, actually creating the users, etc.
 public class CourseIntegrationTests
 {
     private readonly GrupperingTestApplicationFactory _factory = new();
@@ -33,7 +34,7 @@ public class CourseIntegrationTests
     {
         var courseDto = new CourseCreationDto("test", "...", true);
         _createdCourseNames.Add("test");
-        var createdCourse = await _courseService.CreateNewCourse(courseDto, _testUser);
+        var createdCourse = await _courseService.CreateNewCourse(courseDto, _testUser!);
         Assert.That(createdCourse.DisplayName,Is.EqualTo("test"));
     }
     
@@ -42,10 +43,10 @@ public class CourseIntegrationTests
     {
         var courseDto = new CourseCreationDto("testAddition", "...", true);
         _createdCourseNames.Add("testAddition");
-        await _courseService.CreateNewCourse(courseDto, _testUser);
-        await _courseService.AddUserToCourse("testAddition", _secondTestUser);
+        await _courseService.CreateNewCourse(courseDto, _testUser!);
+        await _courseService.AddUserToCourse("testAddition", _secondTestUser!);
         var updatedCourse = await _courseService.GetCourseByNameAsync("testAddition");
-        Assert.That(updatedCourse.Members.Contains(_secondTestUser),Is.EqualTo(true));
+        Assert.That(updatedCourse.Members.Contains(_secondTestUser!),Is.EqualTo(true));
     }
     
     [Test]
@@ -53,21 +54,19 @@ public class CourseIntegrationTests
     {
         var courseDto = new CourseCreationDto("testAddition2", "...", true);
         _createdCourseNames.Add("testAddition2");
-        await _courseService.CreateNewCourse(courseDto, _testUser);
-        await _courseService.AddUserToCourse("testAddition2", _secondTestUser);
-        await _courseService.RemoveUserFromCourse("testAddition2", _secondTestUser);
+        await _courseService.CreateNewCourse(courseDto, _testUser!);
+        await _courseService.AddUserToCourse("testAddition2", _secondTestUser!);
+        await _courseService.RemoveUserFromCourse("testAddition2", _secondTestUser!);
         var updatedCourse = await _courseService.GetCourseByNameAsync("testAddition2");
-        Assert.That(updatedCourse.Members.Contains(_secondTestUser),Is.EqualTo(false));
+        Assert.That(updatedCourse.Members.Contains(_secondTestUser!),Is.EqualTo(false));
     }
     
     [Test]
     public async Task EnsureRemovingCourseCompletesSuccessfully()
     {
         var courseDto = new CourseCreationDto("testAddition3", "...", true);
-        _createdCourseNames.Add("testAddition3");
-        await _courseService.CreateNewCourse(courseDto, _testUser);
-        await _courseService.DeleteCourse(courseDto.CourseName, _testUser);
-
+        await _courseService.CreateNewCourse(courseDto, _testUser!);
+        await _courseService.DeleteCourse(courseDto.CourseName, _testUser!);
         Assert.ThrowsAsync<ArgumentException>(async () => await _courseService.GetCourseByNameAsync("testAddition3"));
     }
 
@@ -78,7 +77,7 @@ public class CourseIntegrationTests
     {
         foreach (var courseName in _createdCourseNames)
         {
-            await _courseService.DeleteCourse(courseName, _testUser);
+            await _courseService.DeleteCourse(courseName, _testUser!);
         }
     }
 }
