@@ -12,8 +12,8 @@ using app.DAL;
 namespace app.Migrations
 {
     [DbContext(typeof(GrupperingTypeContext))]
-    [Migration("20260924202250_Courses")]
-    partial class Courses
+    [Migration("20260925115941_CoursesInitial")]
+    partial class CoursesInitial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
