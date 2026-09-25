@@ -8,9 +8,36 @@ public class CourseService(ICourseRepository courseRepository,IUserRepository us
 {
 
 
+    
     public async Task<Course> GetCourseByNameAsync(string courseName)
     {
         return await courseRepository.GetCourseByNameAsync(courseName);
+    }
+
+    /**
+     * Gets all public courses, and returns a list.
+     * TODO, should probably return a public DTO or something similar, to make user info, nor internal Ids are leaked.
+     */
+    public async Task<List<Course>> GetAllPublicCoursesAsync()
+    {
+        return await courseRepository.GetAllPublicCoursesAsync();
+    }
+
+    /**
+    * Gets all users from a course, and returns a list of them.
+    * TODO, same case as method above, should return a list of public DTO, withholding sensitive info.
+    */
+    public async Task<List<GrupperingUser>> GetAllUsersFromCourse(string courseName)
+    {
+        return await courseRepository.GetAllUsersFromCourse(courseName);
+    }
+
+    /**
+     * Gets all courses where the specified user is a member.
+     */
+    public async Task<List<Course>> GetAllCoursesWithMemberAsync(GrupperingUser user)
+    {
+        return await courseRepository.GetAllCoursesWithMemberAsync(user);
     }
 
     
