@@ -12,8 +12,8 @@ using app.DAL;
 namespace app.Migrations
 {
     [DbContext(typeof(GrupperingTypeContext))]
-    [Migration("20260922134252_PostgresMigration")]
-    partial class PostgresMigration
+    [Migration("20260925115941_CoursesInitial")]
+    partial class CoursesInitial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,50 @@ namespace app.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("CourseGrupperingUser", b =>
+                {
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("MembersId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("CourseId", "MembersId");
+
+                    b.HasIndex("MembersId");
+
+                    b.ToTable("CourseGrupperingUser");
+                });
+
+            modelBuilder.Entity("app.Models.Course", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OwnerId");
+
+                    b.ToTable("Courses");
+                });
 
             modelBuilder.Entity("app.Models.GrupperingUser", b =>
                 {
@@ -71,6 +115,32 @@ namespace app.Migrations
                     b.HasIndex("GrupperingUserId");
 
                     b.ToTable("UserRoles");
+                });
+
+            modelBuilder.Entity("CourseGrupperingUser", b =>
+                {
+                    b.HasOne("app.Models.Course", null)
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("app.Models.GrupperingUser", null)
+                        .WithMany()
+                        .HasForeignKey("MembersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("app.Models.Course", b =>
+                {
+                    b.HasOne("app.Models.GrupperingUser", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("app.Models.GrupperingUserRole", b =>

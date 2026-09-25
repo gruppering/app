@@ -22,7 +22,7 @@ else // Then assumes the .env file isn't present, but the Postgres container is 
 }
 
 // Adds DbContext and configures 
-builder.Services.AddDbContext<GrupperingTypeContext>(options =>
+builder.Services.AddDbContextPool<GrupperingTypeContext>(options =>
 {
     options.UseNpgsql($"Server={Environment.GetEnvironmentVariable("DB_HOST")};" +
                       $"Port={Environment.GetEnvironmentVariable("POSTGRES_PORT")};" +
@@ -35,7 +35,8 @@ builder.Services.AddDbContext<GrupperingTypeContext>(options =>
 builder.Services.AddScoped<IUserRepository,UserRepository>();
 builder.Services.AddScoped<UserService>();
 
-
+builder.Services.AddScoped<ICourseRepository,CourseRepository>();
+builder.Services.AddScoped<CourseService>();
 
 builder.Services.AddControllersWithViews(options =>
 {

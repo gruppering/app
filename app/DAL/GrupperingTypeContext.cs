@@ -10,4 +10,15 @@ public class GrupperingTypeContext: DbContext
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
     }
     public DbSet<GrupperingUser> Users { get; set; } = null!;
+    public DbSet<Course> Courses { get; set; } = null!;
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        
+        // We have to manually specify the many-to-many relationship so we don't have to add unnecessary info to the user entity.
+        modelBuilder.Entity<Course>()
+            .HasMany(c => c.Members)
+            .WithMany();
+    }
 }
