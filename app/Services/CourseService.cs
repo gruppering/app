@@ -29,6 +29,7 @@ public class CourseService(ICourseRepository courseRepository,IUserRepository us
     public async Task AddUserToCourse(string courseName,string usernameToAdd)
     {
         var course = await courseRepository.GetCourseByNameAsync(courseName);
+        if (course.Members.Any(u => u.Username == usernameToAdd)) throw new ArgumentException("A user with that name already is a member of this course.");
         var user = userRepository.GetUserByUsername(usernameToAdd);
         if (user is null) throw new ArgumentException("A user with that name was not found"); // TODO, find better way of handling this
         course.Members.Add(user);
