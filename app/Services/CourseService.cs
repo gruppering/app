@@ -7,6 +7,13 @@ namespace app.Services;
 public class CourseService(ICourseRepository courseRepository,IUserRepository userRepository)
 {
 
+
+    public async Task<Course> GetCourseByNameAsync(string courseName)
+    {
+        return await courseRepository.GetCourseByNameAsync(courseName);
+    }
+
+    
     /**
      * Adds the specified user to the specified course. Throws an ArgumentException if a course with the given name wasn't found.
      */
@@ -14,7 +21,7 @@ public class CourseService(ICourseRepository courseRepository,IUserRepository us
     {
         var course = await courseRepository.GetCourseByNameAsync(courseName);
         course.Members.Add(userToAdd);
-        await courseRepository.SaveAsync(course);
+        await courseRepository.UpdateAsync(course);
     }
     /**
     * Adds the user with the specified username to the specified course. Throws an ArgumentException if a course or a user with the given name wasn't found.
@@ -25,7 +32,7 @@ public class CourseService(ICourseRepository courseRepository,IUserRepository us
         var user = userRepository.GetUserByUsername(usernameToAdd);
         if (user is null) throw new ArgumentException("A user with that name was not found"); // TODO, find better way of handling this
         course.Members.Add(user);
-        await courseRepository.SaveAsync(course);
+        await courseRepository.UpdateAsync(course);
     }
 
     /**
@@ -37,7 +44,7 @@ public class CourseService(ICourseRepository courseRepository,IUserRepository us
         var user = course.Members.Find(u => u.Id == userToRemove.Id);
         if (user is null) throw new ArgumentException("User was not found as a member of this course.");
         course.Members.Remove(user);
-        await courseRepository.SaveAsync(course);
+        await courseRepository.UpdateAsync(course);
     }
     /**
      * Removes the specified user from the specified course. Throws an ArgumentException if a course or user with the given name wasn't found.
@@ -48,7 +55,7 @@ public class CourseService(ICourseRepository courseRepository,IUserRepository us
         var user = course.Members.Find(u => u.Username == usernameToRemove);
         if (user is null) throw new ArgumentException("User was not found as a member of this course.");
         course.Members.Remove(user);
-        await courseRepository.SaveAsync(course);
+        await courseRepository.UpdateAsync(course);
     }
     
     /**
