@@ -36,6 +36,13 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
         await typeContext.SaveChangesAsync();
         return courseEntity.Entity;
     }
+    
+    public async Task<Course> UpdateAsync(Course course)
+    {
+        var courseEntity = typeContext.Courses.Update(course);
+        await typeContext.SaveChangesAsync();
+        return courseEntity.Entity;
+    }
     public async Task<Course> DeleteAsync(Course course)
     {
         var courseEntity = typeContext.Courses.Remove(course);

@@ -12,6 +12,9 @@ public interface ICourseRepository
 
     public Task<Course> GetCourseByNameAsync(string courseName);
     public Task<Course> SaveAsync(Course course);
+
+    public Task<Course> UpdateAsync(Course course);
+
     public Task<Course> DeleteAsync(Course course);
 
 }
