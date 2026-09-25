@@ -7,9 +7,17 @@ namespace app.Repositories;
 public class CourseRepository(GrupperingTypeContext typeContext): ICourseRepository
 {
     
-    public async Task<Course?> GetCourseByNameAsync(string courseName)
+    public async Task<Course> GetCourseByNameAsync(string courseName)
     {
-        return await typeContext.Courses.Include(c => c.Members).FirstOrDefaultAsync(c => c.DisplayName == courseName);
+        var course = await typeContext.Courses.Include(c => c.Members).FirstOrDefaultAsync(c => c.DisplayName == courseName);
+        return course ?? throw new ArgumentException("A course with that name was not found.");
+    }
+
+    public async Task<List<GrupperingUser>> GetAllUsersFromCourse(string courseName)
+    {
+        var course = await typeContext.Courses.Include(c => c.Members).FirstOrDefaultAsync(c => c.DisplayName == courseName);
+        if (course is null) throw new ArgumentException("A course with that name was not found.");
+        return course.Members;
     }
 
     public async Task<List<Course>> GetAllPublicCoursesAsync()

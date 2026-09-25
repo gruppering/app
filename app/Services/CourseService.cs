@@ -13,7 +13,6 @@ public class CourseService(ICourseRepository courseRepository,IUserRepository us
     public async Task AddUserToCourse(string courseName,GrupperingUser userToAdd)
     {
         var course = await courseRepository.GetCourseByNameAsync(courseName);
-        if (course is null) throw new ArgumentException(); // TODO, find better way of handling this
         course.Members.Add(userToAdd);
         await courseRepository.SaveAsync(course);
     }
@@ -23,10 +22,8 @@ public class CourseService(ICourseRepository courseRepository,IUserRepository us
     public async Task AddUserToCourse(string courseName,string usernameToAdd)
     {
         var course = await courseRepository.GetCourseByNameAsync(courseName);
-        if (course is null) throw new ArgumentException(); // TODO, find better way of handling this
-
         var user = userRepository.GetUserByUsername(usernameToAdd);
-        if (user is null) throw new ArgumentException(); // TODO, find better way of handling this
+        if (user is null) throw new ArgumentException("A user with that name was not found"); // TODO, find better way of handling this
         course.Members.Add(user);
         await courseRepository.SaveAsync(course);
     }
@@ -37,9 +34,8 @@ public class CourseService(ICourseRepository courseRepository,IUserRepository us
     public async Task RemoveUserFromCourse(string courseName,GrupperingUser userToRemove)
     {
         var course = await courseRepository.GetCourseByNameAsync(courseName);
-        if (course is null) throw new ArgumentException();
         var user = course.Members.Find(u => u.Id == userToRemove.Id);
-        if (user is null) throw new ArgumentException();
+        if (user is null) throw new ArgumentException("User was not found as a member of this course.");
         course.Members.Remove(user);
         await courseRepository.SaveAsync(course);
     }
@@ -49,9 +45,8 @@ public class CourseService(ICourseRepository courseRepository,IUserRepository us
     public async Task RemoveUserFromCourse(string courseName,string usernameToRemove)
     {
         var course = await courseRepository.GetCourseByNameAsync(courseName);
-        if (course is null) throw new ArgumentException();
         var user = course.Members.Find(u => u.Username == usernameToRemove);
-        if (user is null) throw new ArgumentException();
+        if (user is null) throw new ArgumentException("User was not found as a member of this course.");
         course.Members.Remove(user);
         await courseRepository.SaveAsync(course);
     }
@@ -78,9 +73,8 @@ public class CourseService(ICourseRepository courseRepository,IUserRepository us
     public async Task<Course> DeleteCourse(string courseName,GrupperingUser requestor)
     {
         if (requestor.Roles.Any(r => r.Role == "ROLE_ADMIN"))
-            throw new ArgumentException();
+            throw new ArgumentException("User is not authorized to complete this action.");
         var course = await courseRepository.GetCourseByNameAsync(courseName);
-        if (course is null) throw new ArgumentException();
         return await courseRepository.DeleteAsync(course);
     }
 }
