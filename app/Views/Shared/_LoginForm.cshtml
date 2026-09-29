@@ -1,10 +1,18 @@
+@{
+    var returnUrl = "";
+    if (Context.Request.Query.ContainsKey("ReturnUrl"))
+    {
+        returnUrl = $"?ReturnUrl={Context.Request.Query["ReturnUrl"]}";
+    }
+}
 <div class="text-center">
     @if(ViewBag.Error != null)
     {
         <span>@ViewBag.Error</span>
     }
     <h1 class="display-4">Login</h1>
-    <form action="/login" method="post">
+    <a href="@("/signup" + returnUrl)">Signup instead</a>
+    <form action="@("/login" + returnUrl)" method="post">
         <div class="mb-3">
             <label for="username" class="form-label">Username</label>
             <input type="text" class="form-control" id="username" aria-describedby="username" name="username">
