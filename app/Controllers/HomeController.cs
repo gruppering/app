@@ -32,6 +32,10 @@ public class HomeController(UserService userService) : Controller
             claims.Add(new Claim(ClaimTypes.Name,user.Username));
             var claimsIdentity = new ClaimsIdentity(claims, "cookie");
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+            
+            if (HttpContext.Request.Query.TryGetValue("ReturnUrl",out var redirectUrl))
+                return Redirect(redirectUrl!);
+            
             return RedirectToAction("Index", "Home");
         }
         ViewBag.Error = "Invalid username or password";
@@ -46,7 +50,7 @@ public class HomeController(UserService userService) : Controller
     [AllowAnonymous]
     public async Task<IActionResult> Signup( [FromForm]string username,[FromForm] string email, [FromForm]string password)
     {
-        if (await userService.Signup(username, email, password) != null)
+        if (await userService.Signup(username, email, password) is not null)
         {
             var claims = new List<Claim>
             {
@@ -55,6 +59,10 @@ public class HomeController(UserService userService) : Controller
             };
             var claimsIdentity = new ClaimsIdentity(claims, "cookie");
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+            
+            if (HttpContext.Request.Query.TryGetValue("ReturnUrl",out var redirectUrl))
+                return Redirect(redirectUrl!);
+            
             return RedirectToAction("Index", "Home");
         }
         ViewBag.Error = "User with this username already exists!";
@@ -64,7 +72,7 @@ public class HomeController(UserService userService) : Controller
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
-        await HttpContext.SignOutAsync();
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return RedirectToAction("Login", "Home");
     }
 
