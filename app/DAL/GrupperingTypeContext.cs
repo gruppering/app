@@ -20,5 +20,8 @@ public class GrupperingTypeContext: DbContext
         modelBuilder.Entity<Course>()
             .HasMany(c => c.Members)
             .WithMany();
+        modelBuilder.Entity<Group>()
+            .HasMany(g => g.Members)
+            .WithMany();
     }
 }
