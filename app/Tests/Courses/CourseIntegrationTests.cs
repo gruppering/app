@@ -8,21 +8,23 @@ namespace app.Tests.Courses;
 // Compiler is stupid, and doesn't understand that the OneTimeSetup is run before the others, actually creating the users, etc.
 public class CourseIntegrationTests
 {
-    private readonly GrupperingTestApplicationFactory _factory = new();
-    private CourseService _courseService;
-    private UserService _userService;
+    private readonly CourseService _courseService;
+    private readonly UserService _userService;
 
-    private IServiceScope? _scope;
     private GrupperingUser? _testUser;
     private GrupperingUser? _secondTestUser;
-    private HashSet<string> _createdCourseNames = [];
+    private readonly HashSet<string> _createdCourseNames = [];
+
+    public CourseIntegrationTests()
+    {
+        GrupperingTestApplicationFactory factory = new();
+        var scope = factory.Services.CreateScope();
+        _courseService = scope.ServiceProvider.GetRequiredService<CourseService>();
+        _userService = scope.ServiceProvider.GetRequiredService<UserService>();    }
     
     [OneTimeSetUp] 
     public async Task Setup()
     {
-        _scope = _factory.Services.CreateScope();
-        _courseService = _scope.ServiceProvider.GetRequiredService<CourseService>();
-        _userService = _scope.ServiceProvider.GetRequiredService<UserService>();
         _testUser = await _userService.Signup("test","test@kvok.no","test");
         _secondTestUser = await _userService.Signup("test2","test2@kvok.no","test");
 
