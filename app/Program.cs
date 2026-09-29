@@ -1,6 +1,7 @@
 using app.DAL;
 using app.Repositories;
 using app.Services;
+using app.Utils;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -12,13 +13,26 @@ if (File.Exists("../.env"))
 {
     DotNetEnv.Env.Load("../.env");
 }
-else // Then assumes the .env file isn't present, but the Postgres container is running, therefore trying the same default credentials as in the compose files.
+
+// If .env does not exist, use placeholder values in example env file
+else if (File.Exists("../example.env"))
 {
-    Environment.SetEnvironmentVariable("DB_HOST","localhost");
-    Environment.SetEnvironmentVariable("POSTGRES_PORT","5455");
-    Environment.SetEnvironmentVariable("DB_NAME","gruppering");
-    Environment.SetEnvironmentVariable("DB_USER","grouper");
-    Environment.SetEnvironmentVariable("DB_PASSWORD","Insecure");
+    DotNetEnv.Env.Load("../.env");
+}
+
+// Checks to see if we are inside a docker container,
+// and if environment variables aren't set, defines them.
+else if(EnvironmentUtils.IsInDocker())
+{
+    EnvironmentUtils.SetVariableIfNotPresent("DB_HOST", "postgres");
+    
+    EnvironmentUtils.SetVariableIfNotPresent("POSTGRES_PORT", "5432");
+    
+    EnvironmentUtils.SetVariableIfNotPresent("DB_NAME", "gruppering");
+    
+    EnvironmentUtils.SetVariableIfNotPresent("DB_USER", "grouper");
+    
+    EnvironmentUtils.SetVariableIfNotPresent("DB_PASSWORD", "Insecure");
 }
 
 // Adds DbContext and configures 
