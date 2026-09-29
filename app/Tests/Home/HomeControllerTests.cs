@@ -8,12 +8,16 @@ public class HomeControllerTests
     private GrupperingTestApplicationFactory _factory;
     private HttpClient _client;
 
+
+    public HomeControllerTests()
+    {
+        _factory = new GrupperingTestApplicationFactory();   
+        _client = _factory.CreateClient();
+    }
     
     [OneTimeSetUp] 
     public async Task Setup()
     {
-        _factory = new GrupperingTestApplicationFactory();   
-        _client = _factory.CreateClient();
         _client.DefaultRequestHeaders
             .Accept
             .Add(new MediaTypeWithQualityHeaderValue("application/json"));
