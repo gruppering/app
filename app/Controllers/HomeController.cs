@@ -33,7 +33,7 @@ public class HomeController(UserService userService) : Controller
             var claimsIdentity = new ClaimsIdentity(claims, "cookie");
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
             
-            if (HttpContext.Request.Query.TryGetValue("ReturnUrl",out var redirectUrl))
+            if (HttpContext.Request.Query.TryGetValue("ReturnUrl",out var redirectUrl) && !redirectUrl.Equals(""))
                 return Redirect(redirectUrl!);
             
             return RedirectToAction("Index", "Home");
@@ -60,7 +60,7 @@ public class HomeController(UserService userService) : Controller
             var claimsIdentity = new ClaimsIdentity(claims, "cookie");
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
             
-            if (HttpContext.Request.Query.TryGetValue("ReturnUrl",out var redirectUrl))
+            if (HttpContext.Request.Query.TryGetValue("ReturnUrl",out var redirectUrl) && !redirectUrl.Equals(""))
                 return Redirect(redirectUrl!);
             
             return RedirectToAction("Index", "Home");
