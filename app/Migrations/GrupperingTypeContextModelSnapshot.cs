@@ -37,6 +37,24 @@ namespace app.Migrations
                     b.ToTable("CourseGrupperingUser");
                 });
 
+            modelBuilder.Entity("GroupGrupperingUser", b =>
+                {
+                    b.Property<Guid>("MembersId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("GroupCourseId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("MembersId", "GroupId", "GroupCourseId");
+
+                    b.HasIndex("GroupId", "GroupCourseId");
+
+                    b.ToTable("GroupGrupperingUser");
+                });
+
             modelBuilder.Entity("app.Models.Course", b =>
                 {
                     b.Property<Guid>("Id")
@@ -64,6 +82,26 @@ namespace app.Migrations
                     b.HasIndex("OwnerId");
 
                     b.ToTable("Courses");
+                });
+
+            modelBuilder.Entity("app.Models.Group", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("GroupName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id", "CourseId");
+
+                    b.HasIndex("CourseId");
+
+                    b.ToTable("Groups");
                 });
 
             modelBuilder.Entity("app.Models.GrupperingUser", b =>
@@ -129,6 +167,21 @@ namespace app.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("GroupGrupperingUser", b =>
+                {
+                    b.HasOne("app.Models.GrupperingUser", null)
+                        .WithMany()
+                        .HasForeignKey("MembersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("app.Models.Group", null)
+                        .WithMany()
+                        .HasForeignKey("GroupId", "GroupCourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("app.Models.Course", b =>
                 {
                     b.HasOne("app.Models.GrupperingUser", "Owner")
@@ -138,6 +191,17 @@ namespace app.Migrations
                         .IsRequired();
 
                     b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("app.Models.Group", b =>
+                {
+                    b.HasOne("app.Models.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
                 });
 
             modelBuilder.Entity("app.Models.GrupperingUserRole", b =>
