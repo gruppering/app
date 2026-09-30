@@ -4,10 +4,11 @@ using Microsoft.EntityFrameworkCore;
 namespace app.Models;
 
 
-[PrimaryKey("Id")]
+[PrimaryKey("Id","CourseId")]
+
 public class Group
 {
-    public Guid Id { get; set; }
+    public int Id { get; set; } 
     [MaxLength(100)]
     public string GroupName { get; set; } = string.Empty;
     public Guid CourseId { get; set; }
