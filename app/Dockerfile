@@ -21,4 +21,4 @@ FROM base AS final
 WORKDIR /app
 ENV INDOCKER=true
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "app.dll"]
+ENTRYPOINT ["dotnet", "app.dll", "--launch-profile","https"]
