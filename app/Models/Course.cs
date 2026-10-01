@@ -8,13 +8,11 @@ namespace app.Models;
 public class Course
 {
     public Guid Id { get; set; }
-    [MaxLength(50)]
-    public string DisplayName { get; set; }
-    [MaxLength(300)]
-    public string Description { get; set; } = string.Empty;
+    [MaxLength(50)] public string DisplayName { get; set; } = string.Empty;
+    [MaxLength(300)] public string Description { get; set; } = string.Empty;
     public bool IsPublic { get; set; }
     public Guid OwnerId { get; set; }
-    public GrupperingUser Owner { get; set; }
+    public required GrupperingUser Owner { get; set; }
     public List<GrupperingUser> Members { get; set; } = [];
 
 }
