@@ -12,7 +12,7 @@ public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepositor
      */
     public Group GetGroupByNameAndCourseId(string name, Guid courseId)
     {
-        return typeContext.Groups.First(g => g.GroupName == name && g.CourseId == courseId);
+        return typeContext.Groups.Include(g => g.Members).First(g => g.GroupName == name && g.CourseId == courseId);
     }
     
     /**
@@ -63,18 +63,59 @@ public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepositor
         return resultGroup.Entity;
     }
 
-    public Task<List<Group>> CreateNewGroupsAsync(string namePrefix,int amount, Course course)
+    /**
+     * Creates the specified number of groups with the given name prefix,
+     * for instance, with the prefix 'Group', the resulting group name would then be in the range of 'Group 1' - 'Group 50'.
+     * Returns the newly created groups.
+     */
+    public async Task<List<Group>> CreateNewGroupsAsync(string namePrefix,int amount, Course course)
     {
-        throw new NotImplementedException();
+        var nextId =  await typeContext.Groups
+            .Where(g => g.CourseId == course.Id)
+            .OrderBy(g => g.Id).Select(g => g.Id).FirstOrDefaultAsync();
+        List<Group> groups = new List<Group>(amount);
+        for (var i = 0; i < amount; i++)
+        {
+            nextId += 1;
+            var group = new Group
+            {
+                Id = nextId,
+                Course = course,
+                CourseId = course.Id,
+                GroupName = $"{namePrefix} {nextId}"
+            };
+            groups.Add(group);
+        }
+        await typeContext.Groups.AddRangeAsync(groups);
+        await typeContext.SaveChangesAsync();
+        return groups;
     }
 
-    public Task<Group> AddUserToGroup(GrupperingUser user, int groupId, Course course)
+    /**
+     * Adds the specified user to the specified group,
+     * throws an ArgumentException if user is already a part of the group.
+     */
+    public async Task<Group> AddUserToGroup(GrupperingUser user, int groupId, Course course)
     {
-        throw new NotImplementedException();
+        var group = await typeContext.Groups.Include(g => g.Members).FirstAsync(g => g.Id == groupId && g.CourseId == course.Id);
+        if (group.Members.Contains(user))
+            throw new ArgumentException("User is already a part of this group");
+        group.Members.Add(user);
+        await typeContext.SaveChangesAsync();
+        return group;
     }
 
-    public Task<Group> RemoveUserFromGroup(GrupperingUser user, int groupId, Course course)
+    /**
+     * Removes the specified user from the specified group,
+     * throws an ArgumentException if user isn't part of the group.
+     */
+    public async Task<Group> RemoveUserFromGroup(GrupperingUser user, int groupId, Course course)
     {
-        throw new NotImplementedException();
+        var group = await typeContext.Groups.Include(g => g.Members).FirstAsync(g => g.Id == groupId && g.CourseId == course.Id);
+        if (!group.Members.Contains(user))
+            throw new ArgumentException("User is not a part of this group!");
+        group.Members.Remove(user);
+        await typeContext.SaveChangesAsync();
+        return group;
     }
 }
