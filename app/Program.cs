@@ -52,6 +52,9 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ICourseRepository,CourseRepository>();
 builder.Services.AddScoped<CourseService>();
 
+builder.Services.AddScoped<IGroupRepository,GroupRepository>();
+builder.Services.AddScoped<GroupService>();
+
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add(new AuthorizeFilter());
