@@ -95,6 +95,7 @@ public class CourseService(ICourseRepository courseRepository,IUserRepository us
         {
             DisplayName = creationDto.CourseName,
             Description = creationDto.Description,
+            Owner = creator,
             OwnerId = creator.Id,
             IsPublic = creationDto.IsPublic
         };
