@@ -6,6 +6,13 @@ namespace app.Repositories;
 
 public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepository
 {
+    
+    public async Task<List<Group>> GetUserGroups(string userName)
+    {
+        return await typeContext.Groups.Include(g => g.Members)
+            .Where(g => g.Members.All(gu => gu.Username == userName ))
+            .ToListAsync();
+    }
 
     /**
      * Gets a group by the specified name and course.

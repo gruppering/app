@@ -4,6 +4,8 @@ namespace app.Repositories;
 
 public interface IGroupRepository
 {
+    public Task<List<Group>> GetUserGroups(string userName);
+    
     public Group GetGroupByNameAndCourseId(string name,Guid courseId);
     public Task<Group> GetGroupByCourseIdAndId(int groupId, Guid courseId);
     
