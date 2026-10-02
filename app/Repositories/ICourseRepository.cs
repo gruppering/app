@@ -17,4 +17,5 @@ public interface ICourseRepository
 
     public Task<Course> DeleteAsync(Course course);
 
+    public List<Tuple<string,Guid>> GetExistingJoinCodes();
 }

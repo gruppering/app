@@ -49,4 +49,9 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
         await typeContext.SaveChangesAsync();
         return courseEntity.Entity;
     }
+
+    public List<Tuple<string,Guid>> GetExistingJoinCodes()
+    {
+        return typeContext.Courses.Select(c => new Tuple<string,Guid>(c.JoinCode,c.Id)).ToList();
+    }
 }
