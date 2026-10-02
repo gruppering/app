@@ -4,20 +4,11 @@
 En gruppematching-plattform for både studenter og lærere, 
 hvor man kan finne, opprette grupper eller opprette courses etter ønsker.
 
-## Build
-
-Hvis dotnet-ef ikke er installert
-`dotnet tool install dotnet-ef --version "10.*"`
-
-`dotnet build`
-
 
 ## Run 
-`docker compose -f compose.dev.yaml up -d`
+1. Opprett .env fil fra sample.env
 
-`dotnet ef database update`
-
-`dotnet run`
+2. `docker compose -f compose.yaml up -d`
 
 ## Testing
 `dotnet test`
