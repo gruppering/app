@@ -1,12 +1,9 @@
-using System.Diagnostics;
-
 namespace app.Utils;
 
 public static class JoinCodeUtils
 {
-    public static string GenerateNonRandomJoinCode(HashSet<string> overview,int length)
+    public static string GenerateNonRandomJoinCode(Dictionary<string,Guid>.KeyCollection overview,int length)
     {
-        var stopwatch = Stopwatch.StartNew();
         string joinCode;
         do
         {
@@ -16,10 +13,7 @@ public static class JoinCodeUtils
                 joinCode += (char)Random.Shared.Next(65, 90);
             }
         } while (overview.Contains(joinCode));
-
-        overview.Add(joinCode);
-        stopwatch.Stop();
-        Console.WriteLine(stopwatch.Elapsed);
+        
         return joinCode;
     }
 }
