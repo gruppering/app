@@ -137,7 +137,7 @@ public class CourseService
         if (requestor.Roles.Any(r => r.Role == "ROLE_ADMIN"))
             throw new ArgumentException("User is not authorized to complete this action.");
         var course = await _courseRepository.GetCourseByNameAsync(courseName);
-        
+        _joinCodeOverview.Remove(course.JoinCode);
         return await _courseRepository.DeleteAsync(course);
     }
 }
