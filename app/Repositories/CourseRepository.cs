@@ -12,6 +12,13 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
         var course = await typeContext.Courses.Include(c => c.Members).FirstOrDefaultAsync(c => c.DisplayName == courseName);
         return course ?? throw new ArgumentException("A course with that name was not found.");
     }
+    
+    public async Task<Course> GetCourseByIdAsync(Guid id)
+    {
+        var course = await typeContext.Courses.Include(c => c.Members).FirstAsync(c => c.Id == id);
+        return course ?? throw new ArgumentException("A course with that name was not found.");
+    }
+
 
     public async Task<List<GrupperingUser>> GetAllUsersFromCourse(string courseName)
     {
