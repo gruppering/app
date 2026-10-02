@@ -29,6 +29,13 @@ public class CourseService
         }
     }
     
+    public async Task<Course> GetCourseByJoinCodeAsync(string joinCode)
+    {
+        if (_joinCodeOverview.TryGetValue(joinCode, out Guid id))
+            return await _courseRepository.GetCourseByIdAsync(id);
+        throw new ArgumentException("A course with this join code was not found.");
+    }
+
     public async Task<Course> GetCourseByNameAsync(string courseName)
     {
         return await _courseRepository.GetCourseByNameAsync(courseName);
