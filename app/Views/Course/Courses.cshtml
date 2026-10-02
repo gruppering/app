@@ -1,0 +1,19 @@
+@model IEnumerable<Course>
+@{
+    ViewData["Title"] = "Course";
+    
+}
+<!-- This is the card view with the routiong helper to go to the corrosponding course -->
+@foreach (var course in Model)
+{
+    <div class="card" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title">@course.DisplayName</h5>
+            <p class="card-text">@course.Description</p>
+            <a asp-controller="Course" 
+               asp-action="Details"
+               asp-route-courseName="@course.DisplayName" 
+               class="card-link">Go to course page</a>
+        </div>
+    </div>
+}

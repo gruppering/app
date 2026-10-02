@@ -1,0 +1,10 @@
+@model Course
+@{
+    ViewData["Title"] = "Course - " + Model.DisplayName;  
+}
+<h1>@Model.DisplayName</h1>
+<p>@Model.Description</p>
+<a asp-controller=""
+   asp-action="Grupper"
+   asp-route-gruppeId=""
+   >Grupper</a>
