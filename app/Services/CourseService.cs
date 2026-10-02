@@ -20,6 +20,7 @@ public class CourseService
         GetExistingJoinCodesAndPopulate();
     }
 
+    // Internal method to populate join code overview.
     private void GetExistingJoinCodesAndPopulate()
     {
         List<Tuple<string,Guid>> joinCodes = _courseRepository.GetExistingJoinCodes();
@@ -29,6 +30,9 @@ public class CourseService
         }
     }
     
+    /**
+     * Gets a course by the specified join code by using the lookup dictionary we populate on service creation.
+     */
     public async Task<Course> GetCourseByJoinCodeAsync(string joinCode)
     {
         if (_joinCodeOverview.TryGetValue(joinCode, out Guid id))
@@ -36,6 +40,7 @@ public class CourseService
         throw new ArgumentException("A course with this join code was not found.");
     }
 
+    // Self-explanatory.
     public async Task<Course> GetCourseByNameAsync(string courseName)
     {
         return await _courseRepository.GetCourseByNameAsync(courseName);
