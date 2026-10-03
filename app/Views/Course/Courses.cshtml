@@ -1,0 +1,88 @@
+@model app.ViewModel.CourseViewModel
+@{
+    ViewData["Title"] = "Course";
+    
+}
+<!-- Form to create a new course -->
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Create a course</h5>
+
+        <form asp-controller="Course"
+              asp-action="CreateCourse"
+              method="post">
+
+            <div class="mb-3">
+                <label asp-for="CreateCourse.CourseName" class="form-label">
+                    Course name
+                </label>
+
+                <input asp-for="CreateCourse.CourseName"
+                       class="form-control"
+                       placeholder="Enter course name" />
+
+                <span asp-validation-for="CreateCourse.CourseName"
+                      class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="CreateCourse.Description" class="form-label">
+                    Description
+                </label>
+
+                <textarea asp-for="CreateCourse.Description"
+                          class="form-control"
+                          rows="4"
+                          placeholder="Describe your course"></textarea>
+
+                <span asp-validation-for="CreateCourse.Description"
+                      class="text-danger"></span>
+            </div>
+
+            <div class="form-check mb-3">
+                <input asp-for="CreateCourse.IsPublic"
+                       class="form-check-input" />
+
+                <label asp-for="CreateCourse.IsPublic"
+                       class="form-check-label">
+                    Public course
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Create course
+            </button>
+        </form>
+    </div>
+</div>
+<!-- This is the card view with the routiong helper to go to the corrosponding course -->
+
+<!-- Card display for every course where the user is a member of NOTE: the structure html is not done -->
+@foreach (var memberOfCourse in Model.MemberOfCourses)
+{
+    <div class="card" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title">@memberOfCourse.DisplayName</h5>
+            <p class="card-text">@memberOfCourse.Description</p>
+            <a asp-controller="Course" 
+               asp-action="Details"
+               asp-route-courseName="@memberOfCourse.DisplayName" 
+               class="card-link">Go to course page</a>
+        </div>
+    </div>
+}
+
+<!-- Card display for all courses that are public NOTE: add paging -->
+@foreach (var publicCourse in Model.PublicCourses)
+{
+    <div class="card" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title">@publicCourse.DisplayName</h5>
+            <p class="card-text">@publicCourse.Description</p>
+            <a asp-controller="Course" 
+               asp-action="Details"
+               asp-route-courseName="@publicCourse.DisplayName" 
+               class="card-link">Go to course page</a>
+        </div>
+    </div>
+}

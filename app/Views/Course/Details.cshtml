@@ -1,0 +1,16 @@
+@model app.ViewModel.CourseDetailViewModel
+@{
+    ViewData["Title"] = "Course - " + Model.Course.DisplayName;  
+}
+<!-- ATM just consceptual structure of detailed view -->
+<h1>@Model.Course.DisplayName</h1>
+<p>@Model.Course.Description</p>
+<a asp-controller=""
+   asp-action="Grupper"
+   asp-route-gruppeId=""
+>Grupper</a>
+@foreach(var user in Model.UsersInCourse)
+{
+    <p>@user.Username</p>
+    
+}
