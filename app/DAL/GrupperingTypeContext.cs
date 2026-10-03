@@ -21,6 +21,7 @@ public class GrupperingTypeContext: DbContext
         modelBuilder.Entity<Course>()
             .HasMany(c => c.Members)
             .WithMany();
+        modelBuilder.Entity<Course>().HasIndex(c => c.JoinCode).IsUnique();
         modelBuilder.Entity<Group>()
             .HasMany(g => g.Members)
             .WithMany();

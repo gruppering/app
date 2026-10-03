@@ -12,6 +12,13 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
         var course = await typeContext.Courses.Include(c => c.Members).FirstOrDefaultAsync(c => c.DisplayName == courseName);
         return course ?? throw new ArgumentException("A course with that name was not found.");
     }
+    
+    public async Task<Course> GetCourseByIdAsync(Guid id)
+    {
+        var course = await typeContext.Courses.Include(c => c.Members).FirstAsync(c => c.Id == id);
+        return course ?? throw new ArgumentException("A course with that name was not found.");
+    }
+
 
     public async Task<List<GrupperingUser>> GetAllUsersFromCourse(string courseName)
     {
@@ -48,5 +55,10 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
         var courseEntity = typeContext.Courses.Remove(course);
         await typeContext.SaveChangesAsync();
         return courseEntity.Entity;
+    }
+
+    public List<Tuple<string,Guid>> GetExistingJoinCodes()
+    {
+        return typeContext.Courses.Select(c => new Tuple<string,Guid>(c.JoinCode,c.Id)).ToList();
     }
 }
