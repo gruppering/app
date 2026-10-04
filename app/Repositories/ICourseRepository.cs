@@ -7,7 +7,8 @@ public interface ICourseRepository
     public Task<List<Course>> GetAllPublicCoursesAsync();
 
     public Task<List<GrupperingUser>> GetAllUsersFromCourse(string courseName);
-
+    public Task<List<GrupperingUser>> GetAllUsersFromCourseById(Guid courseId);
+    
     public Task<List<Course>> GetAllCoursesWithMemberAsync(GrupperingUser user);
 
     public Task<Course> GetCourseByNameAsync(string courseName);

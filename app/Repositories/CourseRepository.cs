@@ -20,12 +20,26 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
     }
 
 
+    /**
+     * Gets all users from the specified course.
+     */
     public async Task<List<GrupperingUser>> GetAllUsersFromCourse(string courseName)
     {
         var course = await typeContext.Courses.Include(c => c.Members).FirstOrDefaultAsync(c => c.DisplayName == courseName);
         if (course is null) throw new ArgumentException("A course with that name was not found.");
         return course.Members;
     }
+    
+    /**
+     * Gets all the users from the specified course id.
+     */
+    public async Task<List<GrupperingUser>> GetAllUsersFromCourseById(Guid courseId)
+    {
+        var course = await typeContext.Courses.Include(c => c.Members).FirstOrDefaultAsync(c => c.Id == courseId);
+        if (course is null) throw new ArgumentException("A course with that name was not found.");
+        return course.Members;
+    }
+
 
     public async Task<List<Course>> GetAllPublicCoursesAsync()
     {
