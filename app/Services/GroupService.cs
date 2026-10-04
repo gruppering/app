@@ -46,23 +46,23 @@ public class GroupService(IGroupRepository groupRepository,ICourseRepository cou
         int usersPerGroup = users.Count / groups.Count;
         int stragglers = users.Count % groups.Count;
         
-        foreach (var group in groups) // Not sure if shuffling the list is needed, but adds some randomness to the equation IG.
+        foreach (var group in groups)
         {
             for (int i = 0; i < usersPerGroup; i++)
             {
-                int choice = Random.Shared.Next(0, users.Count);
+                int choice = Random.Shared.Next(0, users.Count); // Untested, need to come back to this.
                 group.Members.Add(users[choice]);
                 users.RemoveAt(choice);
             }
         }
 
-        if (stragglers != 0 && !redistributeUsers)
+        if (stragglers != 0 && !redistributeUsers) // Adds any leftover users to a leftover group.
         {
             var stragglerGroup = await groupRepository.CreateNewGroupAsync("Leftovers", course);
             stragglerGroup.Members.AddRange(users);
             groups.Add(stragglerGroup);
         }
-        else if (stragglers != 0 && redistributeUsers)
+        else if (stragglers != 0 && redistributeUsers) // Adds them to random existing groups.
         {
             foreach (var u in users)
             {
