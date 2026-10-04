@@ -3,7 +3,7 @@ using app.Repositories;
 
 namespace app.Services;
 
-public class GroupService(IGroupRepository groupRepository)
+public class GroupService(IGroupRepository groupRepository,ICourseRepository courseRepository)
 {
     
     public async Task<List<Group>> GetUserGroups(string userName)
@@ -32,6 +32,47 @@ public class GroupService(IGroupRepository groupRepository)
         return await groupRepository.GetAllGroupsByCourse(courseId);
     }
 
+    /*
+     * Delegates the users to groups, based on the existing numbers of groups,
+     * if redistribute users is true, it just randomly places them in groups,
+     * and if redistribute users is false, adds them to a new group called leftovers,
+     * probably rude, but the best solution I could find for now.
+     */
+    public async Task<List<Group>> DelegateUsersToGroups(Guid courseId,bool redistributeUsers)
+    {
+        var course = await courseRepository.GetCourseByIdAsync(courseId);
+        var groups = await groupRepository.GetAllGroupsByCourse(courseId);
+        var users = await courseRepository.GetAllUsersFromCourseById(courseId);
+        int usersPerGroup = users.Count / groups.Count;
+        int stragglers = users.Count % groups.Count;
+        
+        foreach (var group in groups) // Not sure if shuffling the list is needed, but adds some randomness to the equation IG.
+        {
+            for (int i = 0; i < usersPerGroup; i++)
+            {
+                int choice = Random.Shared.Next(0, users.Count);
+                group.Members.Add(users[choice]);
+                users.RemoveAt(choice);
+            }
+        }
+
+        if (stragglers != 0 && !redistributeUsers)
+        {
+            var stragglerGroup = await groupRepository.CreateNewGroupAsync("Leftovers", course);
+            stragglerGroup.Members.AddRange(users);
+            groups.Add(stragglerGroup);
+        }
+        else if (stragglers != 0 && redistributeUsers)
+        {
+            foreach (var u in users)
+            {
+                groups[Random.Shared.Next(0,groups.Count)].Members.Add(u);
+            }
+        }
+        await groupRepository.UpdateGroupsAsync(groups);
+        return groups;
+    }
+    
     public async Task<Group> CreateNewGroupAsync(string name, Course course)
     {
         return await groupRepository.CreateNewGroupAsync(name, course);
