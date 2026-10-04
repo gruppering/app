@@ -125,4 +125,23 @@ public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepositor
         await typeContext.SaveChangesAsync();
         return group;
     }
+
+    public async Task UpdateGroupAsync(Group group)
+    {
+        typeContext.Groups.Update(group);
+        await typeContext.SaveChangesAsync();
+    }
+
+    public async Task UpdateGroupsAsync(List<Group> groups)
+    {
+        typeContext.Groups.UpdateRange(groups);
+        await typeContext.SaveChangesAsync();
+    }
+
+    public async Task DeleteGroupAsync(int groupId, Course course)
+    {
+        var groupToDelete = typeContext.Groups.First(g => g.Id == groupId && g.CourseId == course.Id);
+        typeContext.Groups.Remove(groupToDelete);
+        await typeContext.SaveChangesAsync();
+    }
 }

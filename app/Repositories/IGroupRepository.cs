@@ -17,5 +17,9 @@ public interface IGroupRepository
 
     public Task<Group> AddUserToGroup(GrupperingUser user,int groupId,Course course);
     public Task<Group> RemoveUserFromGroup(GrupperingUser user,int groupId,Course course);
-    
+
+    public Task UpdateGroupAsync(Group group);
+    public Task UpdateGroupsAsync(List<Group> groups);
+    public Task DeleteGroupAsync(int groupId, Course course);
+
 }
