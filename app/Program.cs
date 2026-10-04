@@ -42,7 +42,7 @@ builder.Services.AddDbContextPool<GrupperingTypeContext>(options =>
                       $"Port={Environment.GetEnvironmentVariable("POSTGRES_PORT")};" +
                       $"Database={Environment.GetEnvironmentVariable("DB_NAME")};" +
                       $"User Id={Environment.GetEnvironmentVariable("DB_USER")};" +
-                      $"Password={Environment.GetEnvironmentVariable("DB_PASSWORD")};");
+                      $"Password={Environment.GetEnvironmentVariable("DB_PASSWORD")};No Reset On Close=true;");
 });
 
 // Repositories and their associated services.
