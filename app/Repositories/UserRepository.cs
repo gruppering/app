@@ -16,10 +16,16 @@ public class UserRepository(GrupperingTypeContext typeContext): IUserRepository
         return typeContext.Users.Any(u => u.Username == username);
     }
 
-    public async Task<GrupperingUser> Save(GrupperingUser user)
+    public async Task<GrupperingUser> SaveAsync(GrupperingUser user)
     {
         var createdUser = await typeContext.Users.AddAsync(user);
         await typeContext.SaveChangesAsync();
         return createdUser.Entity;
+    }
+
+    public async Task SaveRangeAsync(List<GrupperingUser> users)
+    {
+        await typeContext.Users.AddRangeAsync(users);
+        await typeContext.SaveChangesAsync();
     }
 }
