@@ -94,6 +94,15 @@ public class CourseService
         course.Members.Add(user);
         await _courseRepository.UpdateAsync(course);
     }
+    /**
+     * Adds the specified users to the specified course. Throws an ArgumentException if a course with the given name wasn't found.
+     */
+    public async Task AddUserToCourse(Guid courseId,List<GrupperingUser> usersToAdd)
+    {
+        var course = await _courseRepository.GetCourseByIdAsync(courseId);
+        course.Members.AddRange(usersToAdd);
+        await _courseRepository.UpdateAsync(course);
+    }
 
     /**
      * Removes the specified user from the specified course. Throws an ArgumentException if a course with the given name wasn't found or the user isn't a member of the specified course.
