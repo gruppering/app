@@ -7,6 +7,7 @@ public interface IUserRepository
     GrupperingUser? GetUserByUsername(string username);
     bool UserExistsWithUsername(string username);
 
-    Task<GrupperingUser> Save(GrupperingUser user);
+    Task<GrupperingUser> SaveAsync(GrupperingUser user);
+    Task SaveRangeAsync(List<GrupperingUser> user);
 
 }

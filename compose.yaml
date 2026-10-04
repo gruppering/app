@@ -5,6 +5,8 @@
     restart: unless-stopped
     env_file:
       - .env
+    environment:
+      - TEST_DB_SEEDING=${TEST_DB_SEEDING:-false}
     ports:
       - "7047:8080"
     build:

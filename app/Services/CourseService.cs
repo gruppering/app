@@ -59,7 +59,7 @@ public class CourseService
     * Gets all users from a course, and returns a list of them.
     * TODO, same case as method above, should return a list of public DTO, withholding sensitive info.
     */
-    public async Task<List<GrupperingUser>> GetAllUsersFromCourse(string courseName)
+    public async Task<List<GrupperingUser>> GetAllUsersFromCourseAsync(string courseName)
     {
         return await _courseRepository.GetAllUsersFromCourse(courseName);
     }
@@ -76,7 +76,7 @@ public class CourseService
     /**
      * Adds the specified user to the specified course. Throws an ArgumentException if a course with the given name wasn't found.
      */
-    public async Task AddUserToCourse(string courseName,GrupperingUser userToAdd)
+    public async Task AddUserToCourseAsync(string courseName,GrupperingUser userToAdd)
     {
         var course = await _courseRepository.GetCourseByNameAsync(courseName);
         course.Members.Add(userToAdd);
@@ -85,7 +85,7 @@ public class CourseService
     /**
     * Adds the user with the specified username to the specified course. Throws an ArgumentException if a course or a user with the given name wasn't found.
     */
-    public async Task AddUserToCourse(string courseName,string usernameToAdd)
+    public async Task AddUserToCourseAsync(string courseName,string usernameToAdd)
     {
         var course = await _courseRepository.GetCourseByNameAsync(courseName);
         if (course.Members.Any(u => u.Username == usernameToAdd)) throw new ArgumentException("A user with that name already is a member of this course.");
@@ -94,11 +94,20 @@ public class CourseService
         course.Members.Add(user);
         await _courseRepository.UpdateAsync(course);
     }
+    /**
+     * Adds the specified users to the specified course. Throws an ArgumentException if a course with the given name wasn't found.
+     */
+    public async Task AddUsersToCourseAsync(Guid courseId,List<GrupperingUser> usersToAdd)
+    {
+        var course = await _courseRepository.GetCourseByIdAsync(courseId);
+        course.Members.AddRange(usersToAdd);
+        await _courseRepository.UpdateAsync(course);
+    }
 
     /**
      * Removes the specified user from the specified course. Throws an ArgumentException if a course with the given name wasn't found or the user isn't a member of the specified course.
      */
-    public async Task RemoveUserFromCourse(string courseName,GrupperingUser userToRemove)
+    public async Task RemoveUserFromCourseAsync(string courseName,GrupperingUser userToRemove)
     {
         var course = await _courseRepository.GetCourseByNameAsync(courseName);
         var user = course.Members.Find(u => u.Id == userToRemove.Id);
@@ -109,7 +118,7 @@ public class CourseService
     /**
      * Removes the specified user from the specified course. Throws an ArgumentException if a course or user with the given name wasn't found.
      */
-    public async Task RemoveUserFromCourse(string courseName,string usernameToRemove)
+    public async Task RemoveUserFromCourseAsync(string courseName,string usernameToRemove)
     {
         var course = await _courseRepository.GetCourseByNameAsync(courseName);
         var user = course.Members.Find(u => u.Username == usernameToRemove);
@@ -121,7 +130,7 @@ public class CourseService
     /**
      * Creates a new course given the creationDto and a creator, envisioned to be the user making the request.
      */
-    public async Task<Course> CreateNewCourse(CourseCreationDto creationDto,GrupperingUser creator)
+    public async Task<Course> CreateNewCourseAsync(CourseCreationDto creationDto,GrupperingUser creator)
     {
         var guid = Guid.CreateVersion7();
         var joinCode = JoinCodeUtils.GenerateNonRandomJoinCode(_joinCodeOverview.Keys, 4);
@@ -144,7 +153,7 @@ public class CourseService
      * Deletes a course with the given name, given that the user is authorized to do so, throws an ArgumentException if the specified course wasn't found.
      * If the user requesting the deletion isn't authorized to do that, an ArgumentException is thrown.
      */
-    public async Task<Course> DeleteCourse(string courseName,GrupperingUser requestor)
+    public async Task<Course> DeleteCourseAsync(string courseName,GrupperingUser requestor)
     {
         if (requestor.Roles.Any(r => r.Role == "ROLE_ADMIN"))
             throw new ArgumentException("User is not authorized to complete this action.");

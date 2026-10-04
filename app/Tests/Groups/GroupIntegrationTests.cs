@@ -34,8 +34,8 @@ public class GroupIntegrationTests
     [Test]
     public async Task EnsureCreatingTwoGroupInDifferingCoursesHaveSameId()
     {
-        var eCourse = await _courseService.CreateNewCourse(new CourseCreationDto("testExclusiveCourse1", "...", true), _testUser!);
-        var eCourse2 = await _courseService.CreateNewCourse(new CourseCreationDto("testExclusiveCourse2", "...", true), _testUser!);
+        var eCourse = await _courseService.CreateNewCourseAsync(new CourseCreationDto("testExclusiveCourse1", "...", true), _testUser!);
+        var eCourse2 = await _courseService.CreateNewCourseAsync(new CourseCreationDto("testExclusiveCourse2", "...", true), _testUser!);
 
         var group1FirstCourse = await _groupService.CreateNewGroupAsync("testGroup",eCourse);
         var group2SecondCourse = await _groupService.CreateNewGroupAsync("testGroup",eCourse2);
@@ -45,7 +45,7 @@ public class GroupIntegrationTests
     [Test]
     public async Task EnsureCorrectUserMembershipIsReturned()
     {
-        var eCourse = await _courseService.CreateNewCourse(new CourseCreationDto("testMembershipCourse1", "...", true), _testUser!);
+        var eCourse = await _courseService.CreateNewCourseAsync(new CourseCreationDto("testMembershipCourse1", "...", true), _testUser!);
 
         var testMembershipGroup = await _groupService.CreateNewGroupAsync("testMembershipGroup",eCourse);
         await _groupService.AddUserToGroup(_secondTestUser!, testMembershipGroup.Id, eCourse);
