@@ -9,7 +9,7 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
     
     public async Task<Course> GetCourseByNameAsync(string courseName)
     {
-        var course = await typeContext.Courses.Include(c => c.Members).FirstOrDefaultAsync(c => c.DisplayName == courseName);
+        var course = await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).FirstOrDefaultAsync(c => c.DisplayName == courseName);
         return course ?? throw new ArgumentException("A course with that name was not found.");
     }
     

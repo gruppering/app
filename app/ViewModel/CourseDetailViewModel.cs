@@ -6,6 +6,6 @@ public class CourseDetailViewModel(Course course, bool isOwner, IEnumerable<Grup
 {
     public Course Course { get; set; } = course;
 
-    public bool IsOwner { get; set; }
+    public bool IsOwner { get; set; } = isOwner;
     public IEnumerable<GrupperingUser> UsersInCourse => usersInCourse;
 }

@@ -26,18 +26,22 @@ public class CourseController(CourseService courseService, UserService userServi
     [HttpGet("/courses/{courseName}")]
     public async Task<IActionResult> Details(string courseName)
     {
-        var course = await courseService.GetCourseByNameAsync(courseName);
-        if (course is null)
-                    return NotFound();
+        try
+        {
+            var course = await courseService.GetCourseByNameAsync(courseName);
+            // Checking if the current user based on name is the same as the creator of a course
+            // This can be used to make the course details content differ depending on ownership
+            var isOwner = course.Owner.Username == User.FindFirst(ClaimTypes.Name)!.Value;
+            var users = await courseService.GetAllUsersFromCourseAsync(courseName);
         
-        // Checking if the current user based on name is the same as the creator of a course
-        // This can be used to make the course details content differ depending on ownership
-        var isOwner = course.Owner.Username == User.FindFirst(ClaimTypes.Name)!.Value;
-        var users = await courseService.GetAllUsersFromCourseAsync(courseName);
+            var detailCourseViewModel = new CourseDetailViewModel(course, isOwner, users);
         
-        var detailCourseViewModel = new CourseDetailViewModel(course, isOwner, users);
-        
-        return View(detailCourseViewModel);
+            return View(detailCourseViewModel);
+        }
+        catch(ArgumentException ae)
+        {
+            return NotFound(ae);
+        }
     }
     
         // Create course NOTE; this is not implemented yet cause idk where it should be added 
