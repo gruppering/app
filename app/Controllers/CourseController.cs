@@ -44,6 +44,26 @@ public class CourseController(CourseService courseService, UserService userServi
         }
     }
     
+    [HttpGet("/courses/join/{joinCode}")]
+    public async Task<IActionResult> Join(string joinCode)
+    {
+        try
+        {
+            var course = await courseService.GetCourseByJoinCodeAsync(joinCode);
+            // Checking if the current user based on name is the same as the creator of a course
+            // This can be used to make the course details content differ depending on ownership
+            var isOwner = course.Owner.Username == User.FindFirst(ClaimTypes.Name)!.Value;
+            if (isOwner) return RedirectToAction("Index", "Home");
+            await courseService.AddUserToCourseAsync(course.DisplayName, User.FindFirst(ClaimTypes.Name)!.Value);
+            
+            return Redirect($"../{course.DisplayName}"); // This is extremely hacky, but I am tired, so I'll let it be for now.
+        }
+        catch(ArgumentException)
+        {
+            return NotFound();
+        }
+    }
+    
         // Create course NOTE; this is not implemented yet cause idk where it should be added 
     [HttpPost("/courses/create")]
     public async Task<IActionResult> CreateCourse(CourseCreationDto dto)

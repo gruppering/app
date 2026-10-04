@@ -15,8 +15,8 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
     
     public async Task<Course> GetCourseByIdAsync(Guid id)
     {
-        var course = await typeContext.Courses.Include(c => c.Members).FirstAsync(c => c.Id == id);
-        return course ?? throw new ArgumentException("A course with that name was not found.");
+        var course = await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).FirstAsync(c => c.Id == id);
+        return course ?? throw new ArgumentException("A course with that id was not found.");
     }
 
 
@@ -25,7 +25,7 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
      */
     public async Task<List<GrupperingUser>> GetAllUsersFromCourse(string courseName)
     {
-        var course = await typeContext.Courses.Include(c => c.Members).FirstOrDefaultAsync(c => c.DisplayName == courseName);
+        var course = await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).FirstOrDefaultAsync(c => c.DisplayName == courseName);
         if (course is null) throw new ArgumentException("A course with that name was not found.");
         return course.Members;
     }
@@ -35,7 +35,7 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
      */
     public async Task<List<GrupperingUser>> GetAllUsersFromCourseById(Guid courseId)
     {
-        var course = await typeContext.Courses.Include(c => c.Members).FirstOrDefaultAsync(c => c.Id == courseId);
+        var course = await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).FirstOrDefaultAsync(c => c.Id == courseId);
         if (course is null) throw new ArgumentException("A course with that name was not found.");
         return course.Members;
     }
@@ -43,12 +43,12 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
 
     public async Task<List<Course>> GetAllPublicCoursesAsync()
     {
-        return await typeContext.Courses.Include(c => c.Members).Where(c => c.IsPublic).ToListAsync();
+        return await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).Where(c => c.IsPublic).ToListAsync();
     }
     
     public async Task<List<Course>> GetAllCoursesWithMemberAsync(GrupperingUser member)
     {
-        return await typeContext.Courses.Include(c => c.Members).Where(c => c.Members.Contains(member)).ToListAsync();
+        return await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).Where(c => c.Members.Contains(member)).ToListAsync();
     }
     
     public async Task<Course> SaveAsync(Course course)
