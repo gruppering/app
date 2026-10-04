@@ -1,4 +1,5 @@
 using app.DAL;
+using app.DTO.Course;
 using app.Repositories;
 using app.Services;
 using app.Utils;
@@ -89,6 +90,21 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<GrupperingTypeContext>();
     if (context.Database.GetPendingMigrations().Any())
         context.Database.Migrate();
+
+    if (Environment.GetEnvironmentVariable("TEST_DB_SEEDING") == "true")
+    {
+        var courseService = scope.ServiceProvider.GetRequiredService<CourseService>();
+        var userService = scope.ServiceProvider.GetRequiredService<UserService>();
+        var groupService = scope.ServiceProvider.GetRequiredService<GroupService>();
+        
+        var testAdminUser = await userService.Signup("adminTest", "admin.test@gruppering.no", "adminTest");
+        var createdCourse = await courseService.CreateNewCourseAsync(new CourseCreationDto("Evaluation Course","This is for evaluation purposes",true),testAdminUser);
+
+        var createdStudents = await userService.CreateRangeOfUsers("testUser", "gruppering.no", "test", 150);
+
+        await courseService.AddUsersToCourseAsync(createdCourse.Id, createdStudents);
+
+    }
 }
 
 app.UseHttpsRedirection();
