@@ -14,8 +14,8 @@ public class CourseController(CourseService courseService, UserService userServi
     {
         var publicCourses = await courseService.GetAllPublicCoursesAsync();
         
-        var uName = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var user = userService.GetUserByUsername(uName)!;
+        var uName = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        var user = userService.GetUserByUsername(uName);
         var memberOfCourse = await courseService.GetAllCoursesWithMemberAsync(user);
         
         var courseViewModel = new CourseViewModel(publicCourses, memberOfCourse);
@@ -32,7 +32,7 @@ public class CourseController(CourseService courseService, UserService userServi
         
         // Checking if the current user based on name is the same as the creator of a course
         // This can be used to make the course details content differ depending on ownership
-        var isOwner = course.Owner.Username == User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var isOwner = course.Owner.Username == User.FindFirst(ClaimTypes.Name)!.Value;
         var users = await courseService.GetAllUsersFromCourseAsync(courseName);
         
         var detailCourseViewModel = new CourseDetailViewModel(course, isOwner, users);
@@ -44,8 +44,8 @@ public class CourseController(CourseService courseService, UserService userServi
     [HttpPost("/courses/create")]
     public async Task<IActionResult> CreateCourse(CourseCreationDto dto)
     {
-        var uName = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var creator = userService.GetUserByUsername(uName)!;
+        var uName = User.FindFirst(ClaimTypes.Name)!.Value;
+        var creator = userService.GetUserByUsername(uName);
         
         await courseService.CreateNewCourseAsync(dto,creator);
         
