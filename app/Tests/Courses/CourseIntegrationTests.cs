@@ -36,7 +36,7 @@ public class CourseIntegrationTests
     {
         var courseDto = new CourseCreationDto("test", "...", true);
         _createdCourseNames.Add("test");
-        var createdCourse = await _courseService.CreateNewCourse(courseDto, _testUser!);
+        var createdCourse = await _courseService.CreateNewCourseAsync(courseDto, _testUser!);
         Assert.That(createdCourse.DisplayName,Is.EqualTo("test"));
     }
     
@@ -45,8 +45,8 @@ public class CourseIntegrationTests
     {
         var courseDto = new CourseCreationDto("testAddition", "...", true);
         _createdCourseNames.Add("testAddition");
-        await _courseService.CreateNewCourse(courseDto, _testUser!);
-        await _courseService.AddUserToCourse("testAddition", _secondTestUser!);
+        await _courseService.CreateNewCourseAsync(courseDto, _testUser!);
+        await _courseService.AddUserToCourseAsync("testAddition", _secondTestUser!);
         var updatedCourse = await _courseService.GetCourseByNameAsync("testAddition");
         Assert.That(updatedCourse.Members.Contains(_secondTestUser!),Is.EqualTo(true));
     }
@@ -56,9 +56,9 @@ public class CourseIntegrationTests
     {
         var courseDto = new CourseCreationDto("testAddition2", "...", true);
         _createdCourseNames.Add("testAddition2");
-        await _courseService.CreateNewCourse(courseDto, _testUser!);
-        await _courseService.AddUserToCourse("testAddition2", _secondTestUser!);
-        await _courseService.RemoveUserFromCourse("testAddition2", _secondTestUser!);
+        await _courseService.CreateNewCourseAsync(courseDto, _testUser!);
+        await _courseService.AddUserToCourseAsync("testAddition2", _secondTestUser!);
+        await _courseService.RemoveUserFromCourseAsync("testAddition2", _secondTestUser!);
         var updatedCourse = await _courseService.GetCourseByNameAsync("testAddition2");
         Assert.That(updatedCourse.Members.Contains(_secondTestUser!),Is.EqualTo(false));
     }
@@ -67,8 +67,8 @@ public class CourseIntegrationTests
     public async Task EnsureRemovingCourseCompletesSuccessfully()
     {
         var courseDto = new CourseCreationDto("testAddition3", "...", true);
-        await _courseService.CreateNewCourse(courseDto, _testUser!);
-        await _courseService.DeleteCourse(courseDto.CourseName, _testUser!);
+        await _courseService.CreateNewCourseAsync(courseDto, _testUser!);
+        await _courseService.DeleteCourseAsync(courseDto.CourseName, _testUser!);
         Assert.ThrowsAsync<ArgumentException>(async () => await _courseService.GetCourseByNameAsync("testAddition3"));
     }
 
@@ -79,7 +79,7 @@ public class CourseIntegrationTests
     {
         foreach (var courseName in _createdCourseNames)
         {
-            await _courseService.DeleteCourse(courseName, _testUser!);
+            await _courseService.DeleteCourseAsync(courseName, _testUser!);
         }
     }
 }
