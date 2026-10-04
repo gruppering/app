@@ -91,20 +91,30 @@ using (var scope = app.Services.CreateScope())
     if (context.Database.GetPendingMigrations().Any())
         context.Database.Migrate();
 
-    if (Environment.GetEnvironmentVariable("TEST_DB_SEEDING") == "true")
+    try
     {
-        var courseService = scope.ServiceProvider.GetRequiredService<CourseService>();
-        var userService = scope.ServiceProvider.GetRequiredService<UserService>();
-        var groupService = scope.ServiceProvider.GetRequiredService<GroupService>();
-        
-        var testAdminUser = await userService.Signup("adminTest", "admin.test@gruppering.no", "adminTest");
-        var createdCourse = await courseService.CreateNewCourseAsync(new CourseCreationDto("Evaluation Course","This is for evaluation purposes",true),testAdminUser);
+        if (Environment.GetEnvironmentVariable("TEST_DB_SEEDING") == "true")
+        {
+            Console.WriteLine("Commencing Database Seeding");
+            var courseService = scope.ServiceProvider.GetRequiredService<CourseService>();
+            var userService = scope.ServiceProvider.GetRequiredService<UserService>();
+            var groupService = scope.ServiceProvider.GetRequiredService<GroupService>();
 
-        var createdStudents = await userService.CreateRangeOfUsers("testUser", "gruppering.no", "test", 150);
+            var testAdminUser = await userService.Signup("adminTest", "admin.test@gruppering.no", "adminTest");
+            var createdCourse = await courseService.CreateNewCourseAsync(
+                new CourseCreationDto("eval", "This is for evaluation purposes", true), testAdminUser);
 
-        await courseService.AddUsersToCourseAsync(createdCourse.Id, createdStudents);
+            var createdStudents = await userService.CreateRangeOfUsers("testUser", "gruppering.no", "test", 150);
 
+            await courseService.AddUsersToCourseAsync(createdCourse.Id, createdStudents);
+
+        }
     }
+    catch(ArgumentException)
+    {
+        Console.WriteLine("Assuming seeding has already been done, skipping.");
+    }
+    
 }
 
 app.UseHttpsRedirection();
