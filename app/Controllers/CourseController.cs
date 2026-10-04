@@ -14,7 +14,7 @@ public class CourseController(CourseService courseService, UserService userServi
     {
         var publicCourses = await courseService.GetAllPublicCoursesAsync();
         
-        var uName = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        var uName = User.FindFirst(ClaimTypes.Name)!.Value;
         var user = userService.GetUserByUsername(uName);
         var memberOfCourse = await courseService.GetAllCoursesWithMemberAsync(user);
         
