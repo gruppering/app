@@ -6,9 +6,9 @@ namespace app.Services;
 public class UserService(IUserRepository userRepository)
 {
 
-    public GrupperingUser? GetUserByUsername(string username)
+    public GrupperingUser GetUserByUsername(string username)
     {
-        return userRepository.GetUserByUsername(username);
+        return userRepository.GetUserByUsername(username) ?? throw new ArgumentException("User with this username was not found");
     }
     
     /**
@@ -34,7 +34,27 @@ public class UserService(IUserRepository userRepository)
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
             Roles = [new GrupperingUserRole("ROLE_USER")]
         };
-        
-        return await userRepository.Save(user);
+        return await userRepository.SaveAsync(user);
+    }
+
+    /*
+     * Creates the specified amount of users with the given name (+ the id), email and password, intended for use in evaluation.
+     */
+    public async Task<List<GrupperingUser>> CreateRangeOfUsers(string namePrefix,string emailSuffix,string password,int amount)
+    {
+        var users = new List<GrupperingUser>();
+        for (int i = 0; i < amount; i++)
+        {
+            var user = new GrupperingUser
+            {
+                Username = namePrefix + i,
+                Email = $"{i}@{emailSuffix}",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
+                Roles = [new GrupperingUserRole("ROLE_USER")]
+            };
+            users.Add(user);
+        }
+        await userRepository.SaveRangeAsync(users);
+        return users;
     }
 }
