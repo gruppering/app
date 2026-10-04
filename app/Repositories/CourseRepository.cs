@@ -16,7 +16,7 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
     public async Task<Course> GetCourseByIdAsync(Guid id)
     {
         var course = await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).FirstAsync(c => c.Id == id);
-        return course ?? throw new ArgumentException("A course with that name was not found.");
+        return course ?? throw new ArgumentException("A course with that id was not found.");
     }
 
 
