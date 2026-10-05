@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using app.DTO.Course;
+using app.Models;
 using app.Services;
 using app.ViewModel;
 
@@ -16,7 +17,7 @@ public class CourseController(CourseService courseService,GroupService groupServ
         var uName = User.FindFirst(ClaimTypes.Name)!.Value;
         var user = userService.GetUserByUsername(uName);
         var memberOfCourse = await courseService.GetAllCoursesWithMemberAsync(user);
-        
+        Console.WriteLine(memberOfCourse.Count);
         var courseViewModel = new CourseViewModel(publicCourses, memberOfCourse);
         return View(courseViewModel);
     }
@@ -37,9 +38,9 @@ public class CourseController(CourseService courseService,GroupService groupServ
         
             return View(detailCourseViewModel);
         }
-        catch(ArgumentException ae)
+        catch(ArgumentException)
         {
-            return NotFound(ae);
+            return RedirectToAction("Error","Home",new {code = 404,description="A Course with that name was not found"});
         }
     }
     
@@ -59,7 +60,7 @@ public class CourseController(CourseService courseService,GroupService groupServ
         }
         catch(ArgumentException)
         {
-            return NotFound();
+            return RedirectToAction("Error","Home");
         }
     }
     
