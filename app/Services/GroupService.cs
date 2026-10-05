@@ -76,7 +76,7 @@ public class GroupService(IGroupRepository groupRepository,ICourseRepository cou
                 groups[Random.Shared.Next(0,groups.Count)].Members.Add(u);
             }
         }
-        await groupRepository.UpdateGroupsAsync(groups);
+        await groupRepository.UpdateGroupsAsync();
         return groups;
     }
     
@@ -88,6 +88,7 @@ public class GroupService(IGroupRepository groupRepository,ICourseRepository cou
         var course = await courseRepository.GetCourseByIdAsync(courseId);
         var groups = await groupRepository.CreateNewGroupsAsync(groupPrefix,amount, course);
         var users = await courseRepository.GetAllUsersFromCourseById(courseId);
+        var usersToAdd = users;
         int usersPerGroup = users.Count / amount;
         int stragglers = users.Count % amount;
         
@@ -97,8 +98,8 @@ public class GroupService(IGroupRepository groupRepository,ICourseRepository cou
             for (int i = 0; i < usersPerGroup; i++)
             {
                 int choice = Random.Shared.Next(0, users.Count); // Untested, need to come back to this.
-                group.Members.Add(users[choice]);
-                users.RemoveAt(choice);
+                group.Members.Add(usersToAdd[choice]);
+                usersToAdd.RemoveAt(choice);
             }
         }
 
@@ -115,7 +116,7 @@ public class GroupService(IGroupRepository groupRepository,ICourseRepository cou
                 groups[Random.Shared.Next(0,groups.Count)].Members.Add(u);
             }
         }
-        await groupRepository.UpdateGroupsAsync(groups);
+        await groupRepository.UpdateGroupsAsync();
         return groups;
     }
     
