@@ -31,8 +31,8 @@ public class CourseController(CourseService courseService,GroupService groupServ
     }
 
     // Gets the course that is called and sends the user to a descriptive page of the course
-    [HttpGet("/courses/{courseName}")]
-    public async Task<IActionResult> Details(string courseName)
+    [HttpGet("/course")]
+    public async Task<IActionResult> Details([FromQuery] string courseName)
     {
         try
         {
@@ -65,7 +65,7 @@ public class CourseController(CourseService courseService,GroupService groupServ
             if (isOwner) return RedirectToAction("Error", "Home",new {code=500,description="You are the owner of this course"});
             await courseService.AddUserToCourseAsync(course.DisplayName, User.FindFirst(ClaimTypes.Name)!.Value);
             
-            return Redirect($"../{course.DisplayName}"); // This is extremely hacky, but I am tired, so I'll let it be for now.
+            return RedirectToAction("Details","Course",new {courseName=course.DisplayName}); // This is extremely hacky, but I am tired, so I'll let it be for now.
         }
         catch(ArgumentException)
         {

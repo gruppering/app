@@ -6,7 +6,7 @@
     <h1 class="display-4">Welcome</h1>
     <p>Join a course here!</p>
     
-    <form id="joinForm" asp-controller="Course" asp-action="Join">
+    <form id="joinForm" asp-controller="Course" asp-action="Join" method="get">
         <legend>Enter code:</legend>
         <fieldset>
             <input id="joinCode" name="joinCode" type="text" minlength="4" maxlength="4" placeholder="ABCD" required/>
@@ -20,5 +20,7 @@
 </div>
 
 <script defer>
-    
+    document.getElementById("joinButton").addEventListener("click",() => {
+        document.getElementById("joinForm").setAttribute("asp-route-joinCode",document.getElementById("joinCode").value);
+    });
 </script>
