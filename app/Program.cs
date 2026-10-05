@@ -18,7 +18,7 @@ if (File.Exists("../.env"))
 // If .env does not exist, use placeholder values in example env file
 else if (File.Exists("../example.env"))
 {
-    DotNetEnv.Env.Load("../.env");
+    DotNetEnv.Env.Load("../example.env");
 }
 
 // Checks to see if we are inside a docker container,
