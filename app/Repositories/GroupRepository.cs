@@ -79,11 +79,12 @@ public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepositor
     {
         var nextId =  await typeContext.Groups
             .Where(g => g.CourseId == course.Id)
-            .OrderBy(g => g.Id).Select(g => g.Id).FirstOrDefaultAsync();
+            .Select(g => (int?)g.Id)
+            .MaxAsync() ?? 0;
         List<Group> groups = new List<Group>(amount);
         for (var i = 0; i < amount; i++)
         {
-            nextId += 1;
+            nextId++;
             var group = new Group
             {
                 Id = nextId,

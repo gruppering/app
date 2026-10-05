@@ -73,6 +73,45 @@ public class GroupService(IGroupRepository groupRepository,ICourseRepository cou
         return groups;
     }
     
+    /*
+     * Delegates the users to groups, based on a specified amount of users.
+     */
+    public async Task<List<Group>> DelegateUsersToGroups(Guid courseId,bool redistributeUsers,int amount,string groupPrefix)
+    {
+        var course = await courseRepository.GetCourseByIdAsync(courseId);
+        var groups = await groupRepository.CreateNewGroupsAsync(groupPrefix,amount, course);
+        var users = await courseRepository.GetAllUsersFromCourseById(courseId);
+        int usersPerGroup = users.Count / amount;
+        int stragglers = users.Count % amount;
+        
+        
+        foreach (var group in groups)
+        {
+            for (int i = 0; i < usersPerGroup; i++)
+            {
+                int choice = Random.Shared.Next(0, users.Count); // Untested, need to come back to this.
+                group.Members.Add(users[choice]);
+                users.RemoveAt(choice);
+            }
+        }
+
+        if (stragglers != 0 && !redistributeUsers) // Adds any leftover users to a leftover group.
+        {
+            var stragglerGroup = await groupRepository.CreateNewGroupAsync("Leftovers", course);
+            stragglerGroup.Members.AddRange(users);
+            groups.Add(stragglerGroup);
+        }
+        else if (stragglers != 0 && redistributeUsers) // Adds them to random existing groups.
+        {
+            foreach (var u in users)
+            {
+                groups[Random.Shared.Next(0,groups.Count)].Members.Add(u);
+            }
+        }
+        await groupRepository.UpdateGroupsAsync(groups);
+        return groups;
+    }
+    
     public async Task<Group> CreateNewGroupAsync(string name, Course course)
     {
         return await groupRepository.CreateNewGroupAsync(name, course);
