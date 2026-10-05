@@ -69,7 +69,7 @@ public class HomeController(UserService userService) : Controller
         return View();
     }
     
-    [HttpPost("logout")]
+    [HttpGet("logout")]
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -78,10 +78,10 @@ public class HomeController(UserService userService) : Controller
 
     
 
-    [HttpGet("error")]
+    [HttpGet("error/{code}")]
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
+    public IActionResult Error(int code,[FromQuery] string description)
     {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        return View(new ErrorViewModel {ErrorDescription = description,ErrorCode = code, RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }
