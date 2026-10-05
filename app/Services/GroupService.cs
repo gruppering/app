@@ -29,7 +29,14 @@ public class GroupService(IGroupRepository groupRepository,ICourseRepository cou
 
     public async Task<List<Group>> GetAllGroupsByCourse(Guid courseId)
     {
-        return await groupRepository.GetAllGroupsByCourse(courseId);
+        try
+        {
+            return await groupRepository.GetAllGroupsByCourse(courseId);
+        }
+        catch (ArgumentNullException)
+        {
+            return [];
+        }
     }
 
     /*

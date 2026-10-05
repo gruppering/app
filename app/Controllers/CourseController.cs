@@ -3,10 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using app.DTO.Course;
 using app.Services;
 using app.ViewModel;
-using app.Models;
 
 namespace app.Controllers;
-public class CourseController(CourseService courseService, UserService userService) : Controller
+public class CourseController(CourseService courseService,GroupService groupService, UserService userService) : Controller
 {
         // Sends all PUBLIC courses to the endpoint NOTE; add Paging if time 
     [HttpGet("/courses")]
@@ -33,8 +32,8 @@ public class CourseController(CourseService courseService, UserService userServi
             // This can be used to make the course details content differ depending on ownership
             var isOwner = course.Owner.Username == User.FindFirst(ClaimTypes.Name)!.Value;
             var users = await courseService.GetAllUsersFromCourseAsync(courseName);
-        
-            var detailCourseViewModel = new CourseDetailViewModel(course, isOwner, users);
+            var groups = await groupService.GetAllGroupsByCourse(course.Id);
+            var detailCourseViewModel = new CourseDetailViewModel(course, isOwner, users,groups);
         
             return View(detailCourseViewModel);
         }
