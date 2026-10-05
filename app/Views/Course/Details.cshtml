@@ -6,6 +6,8 @@
 <h1>@Model.Course.DisplayName</h1>
 <h2>Join Code: @Model.Course.JoinCode</h2>
 <p>@Model.Course.Description</p>
+<a asp-controller="Course" asp-action="JoinCourse"
+   asp-route-courseName="@Model.Course.DisplayName">Join course</a>
 <a asp-controller=""
    asp-action="Grupper"
    asp-route-gruppeId=""
