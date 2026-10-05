@@ -48,7 +48,10 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
     
     public async Task<List<Course>> GetAllCoursesWithMemberAsync(GrupperingUser member)
     {
-        return await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).Where(c => c.Members.Contains(member)).ToListAsync();
+        return await typeContext.Courses
+            .Include(c => c.Owner)
+            .Include(c => c.Members)
+            .Where(c => c.Members.Any(g => g.Id == member.Id)).ToListAsync();
     }
     
     public async Task<Course> SaveAsync(Course course)
