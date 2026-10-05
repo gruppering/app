@@ -13,7 +13,10 @@ hvor man kan finne, opprette grupper eller opprette courses etter ønsker.
 ### Credentials
 Assuming that the environment variable `TEST_DB_SEEDING` in the docker compose file is present and set to true,
 the credentials for logging in as a course owner is username: `adminTest`, password: `adminTest`
-and to login as the users are; username `testUser*` (where * is a number between 0 and 150), and password: `test` 
+and to login as the users are; username `testUser*` (where * is a number between 0 and 150), and password: `test`.
+
+If the environment variable is not set, you need to manually create an account with the signup endpoint, which you will be redirected to automatically.
+
 
 ## Testing
 `dotnet test`
