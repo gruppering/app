@@ -43,7 +43,7 @@ public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepositor
      */
     public async Task<List<Group>> GetAllGroupsByCourse(Guid courseId)
     {
-        return await typeContext.Groups.Where(g => g.CourseId == courseId).ToListAsync();
+        return await typeContext.Groups.Include(g => g.Members).Where(g => g.CourseId == courseId).ToListAsync();
     }
 
     /**
