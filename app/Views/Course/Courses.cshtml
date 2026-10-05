@@ -13,11 +13,11 @@
               method="post">
 
             <div class="mb-3">
-                <label asp-for="CreateCourse.CourseName" class="form-label">
+                <label for="CourseName" class="form-label">
                     Course name
                 </label>
 
-                <input asp-for="CreateCourse.CourseName"
+                <input id="CourseName" name="CourseName"
                        class="form-control"
                        placeholder="Enter course name" />
 
@@ -26,11 +26,11 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="CreateCourse.Description" class="form-label">
+                <label for="Description" class="form-label">
                     Description
                 </label>
 
-                <textarea asp-for="CreateCourse.Description"
+                <textarea id="Description" name="Description"
                           class="form-control"
                           rows="4"
                           placeholder="Describe your course"></textarea>
@@ -40,10 +40,13 @@
             </div>
 
             <div class="form-check mb-3">
-                <input asp-for="CreateCourse.IsPublic"
-                       class="form-check-input" />
-
-                <label asp-for="CreateCourse.IsPublic"
+                <input name="IsPublic"
+                       id="IsPublic"
+                       type="checkbox"
+                       class="form-check-input" value="true" />
+                <input name="IsPublic" type="hidden" value="false"/>
+                
+                <label for="IsPublic" 
                        class="form-check-label">
                     Public course
                 </label>
@@ -72,6 +75,8 @@
     </div>
 }
 
+
+<h2>Public Courses</h2>
 <!-- Card display for all courses that are public NOTE: add paging -->
 @foreach (var publicCourse in Model.PublicCourses)
 {
