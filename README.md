@@ -7,8 +7,9 @@ hvor man kan finne, opprette grupper eller opprette courses etter ønsker.
 
 ## Run 
 1. Create .env file from example.env
+2. Change DB Host to `postgres` to take advantage of docker hostname mapping.
 
-2. `docker compose -f compose.yaml up -d`
+3. `docker compose -f compose.yaml up -d`
 
 ### Credentials
 Assuming that the environment variable `TEST_DB_SEEDING` in the docker compose file is present and set to true,
