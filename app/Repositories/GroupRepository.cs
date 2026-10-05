@@ -43,7 +43,7 @@ public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepositor
      */
     public async Task<List<Group>> GetAllGroupsByCourse(Guid courseId)
     {
-        return await typeContext.Groups.Where(g => g.CourseId == courseId).ToListAsync();
+        return await typeContext.Groups.Include(g => g.Members).Where(g => g.CourseId == courseId).ToListAsync();
     }
 
     /**
@@ -79,11 +79,12 @@ public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepositor
     {
         var nextId =  await typeContext.Groups
             .Where(g => g.CourseId == course.Id)
-            .OrderBy(g => g.Id).Select(g => g.Id).FirstOrDefaultAsync();
+            .Select(g => (int?)g.Id)
+            .MaxAsync() ?? 0;
         List<Group> groups = new List<Group>(amount);
         for (var i = 0; i < amount; i++)
         {
-            nextId += 1;
+            nextId++;
             var group = new Group
             {
                 Id = nextId,
@@ -126,15 +127,13 @@ public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepositor
         return group;
     }
 
-    public async Task UpdateGroupAsync(Group group)
+    public async Task UpdateGroupAsync()
     {
-        typeContext.Groups.Update(group);
         await typeContext.SaveChangesAsync();
     }
 
-    public async Task UpdateGroupsAsync(List<Group> groups)
+    public async Task UpdateGroupsAsync()
     {
-        typeContext.Groups.UpdateRange(groups);
         await typeContext.SaveChangesAsync();
     }
 

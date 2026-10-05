@@ -8,7 +8,7 @@ namespace app.Models;
 
 public class Group
 {
-    public int Id { get; set; } 
+    public int Id { get; init; } 
     [MaxLength(100)]
     public string GroupName { get; set; } = string.Empty;
     public Guid CourseId { get; set; }

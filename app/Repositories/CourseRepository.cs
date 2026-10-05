@@ -6,17 +6,24 @@ namespace app.Repositories;
 
 public class CourseRepository(GrupperingTypeContext typeContext): ICourseRepository
 {
+    private static ILoggerFactory _factory = LoggerFactory.Create(builder => builder.AddConsole());
+    private readonly ILogger _logger = _factory.CreateLogger("Courses");
     
     public async Task<Course> GetCourseByNameAsync(string courseName)
     {
         var course = await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).FirstOrDefaultAsync(c => c.DisplayName == courseName);
-        return course ?? throw new ArgumentException("A course with that name was not found.");
+        if (course is not null) return course;
+        _logger.LogWarning("A Course with name: {CourseName} was not found", courseName);   
+        throw new ArgumentException("A course with that name was not found.");
     }
     
     public async Task<Course> GetCourseByIdAsync(Guid id)
     {
-        var course = await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).FirstAsync(c => c.Id == id);
-        return course ?? throw new ArgumentException("A course with that id was not found.");
+        var course = await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).FirstOrDefaultAsync(c => c.Id == id);
+        if (course is not null) return course;
+        
+        _logger.LogWarning((string)"A Course with id: {id} was not found",id);
+        throw new ArgumentException("A course with that id was not found.");
     }
 
 
@@ -26,8 +33,11 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
     public async Task<List<GrupperingUser>> GetAllUsersFromCourse(string courseName)
     {
         var course = await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).FirstOrDefaultAsync(c => c.DisplayName == courseName);
-        if (course is null) throw new ArgumentException("A course with that name was not found.");
-        return course.Members;
+        if (course is not null) return course.Members;
+        
+        _logger.LogWarning((string)"A Course with name: {courseName} was not found",courseName);
+        throw new ArgumentException("A course with that name was not found.");
+        
     }
     
     /**
@@ -36,8 +46,9 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
     public async Task<List<GrupperingUser>> GetAllUsersFromCourseById(Guid courseId)
     {
         var course = await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).FirstOrDefaultAsync(c => c.Id == courseId);
-        if (course is null) throw new ArgumentException("A course with that name was not found.");
-        return course.Members;
+        if (course is not null) return course.Members;
+        _logger.LogWarning((string)"A Course with id: {courseId} was not found",courseId);
+        throw new ArgumentException("A course with that name was not found.");
     }
 
 
@@ -48,7 +59,10 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
     
     public async Task<List<Course>> GetAllCoursesWithMemberAsync(GrupperingUser member)
     {
-        return await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).Where(c => c.Members.Contains(member)).ToListAsync();
+        return await typeContext.Courses
+            .Include(c => c.Owner)
+            .Include(c => c.Members)
+            .Where(c => c.Members.Any(g => g.Id == member.Id)).ToListAsync();
     }
     
     public async Task<Course> SaveAsync(Course course)

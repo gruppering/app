@@ -33,6 +33,18 @@
                     </li>
                 </ul>
             </div>
+            
+            @if (User.Identity is not null && User.Identity.IsAuthenticated)
+            {
+            <div>
+                <ul class="navbar-nav ms-auto">
+                    <li nav-item>
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Logout">Logout</a>
+                    </li>
+                </ul>
+            </div>  
+            }
+            
         </div>
     </nav>
 </header>

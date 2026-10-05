@@ -6,12 +6,113 @@
 <h1>@Model.Course.DisplayName</h1>
 <h2>Join Code: @Model.Course.JoinCode</h2>
 <p>@Model.Course.Description</p>
+<a asp-controller="Course" asp-action="JoinCourse"
+   asp-route-courseName="@Model.Course.DisplayName">Join course</a>
 <a asp-controller=""
    asp-action="Grupper"
    asp-route-gruppeId=""
 >Grupper</a>
+
+<div id="groups">
+    @foreach (var group in Model.GroupsInCourse)
+    {
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">@group.GroupName</h5>
+                <ul>
+                    @foreach (var member in group.Members)
+                    {
+                        <li>
+                            <span>
+                                @member.Username
+                            </span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+</div>
+
+@if (Model.IsOwner && !Model.GroupsInCourse.Any())
+{
+    <div>
+        <form>
+            <label for="groupAmount">Amount of Groups</label>
+            <input type="number" id="groupAmount"/>
+            <label for="groupPrefix">Group Prefix</label>
+
+            <input type="text" id="groupPrefix" value="Group"/>
+            
+            <button type="submit">Generate Random Groups</button>
+        </form>
+    </div>
+     
+}
+
+
 @foreach(var user in Model.UsersInCourse)
 {
     <p>@user.Username</p>
     
+}
+
+@if (Model.IsOwner && !Model.GroupsInCourse.Any())
+{
+    <script>
+        const groupDiv = document.getElementById("groups");
+
+        const groupAmount = document.getElementById("groupAmount");
+        const groupPrefix = document.getElementById("groupPrefix");
+        let groupingData;
+        document.addEventListener("submit",async (e) => {
+            e.preventDefault();
+            
+            fetch("/course/@Model.Course.DisplayName/groups/new",{
+                method: "POST",
+                body: JSON.stringify({
+                    "groupAmount":groupAmount.value,
+                    "groupPrefix":groupPrefix.value
+                },
+                ),
+                headers: {
+                    "Content-Type":"application/json"
+                }
+            }).then(async (result) => {
+                if (result.ok) {
+                    const bod = await result.json()
+                    populateGroup(bod)
+                }
+            })
+    })
+    
+    function populateGroup(groups){
+        groups.forEach((group)=> {
+            console.log(group)
+            processElement(group)
+        })
+    }
+    function processElement(element){
+            let wrapper = document.createElement("div");
+            let groupTitle = document.createElement("h3");
+            groupTitle.textContent = element.groupName;
+            let groupMembers = document.createElement("ul");
+            // groupMembers.setAttribute("hidden","true");
+            
+            element.members.forEach((member) => {
+                let groupMember = document.createElement("li");
+                let groupMemberTitle = document.createElement("span");
+                
+                groupMemberTitle.textContent = member.username;
+                
+                groupMember.append(groupMemberTitle);
+                
+                groupMembers.append(groupMember);
+            })
+            wrapper.append(groupTitle);
+            wrapper.append(groupMembers);
+        
+            groupDiv.append(wrapper)
+    }
+</script> 
 }

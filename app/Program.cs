@@ -18,7 +18,7 @@ if (File.Exists("../.env"))
 // If .env does not exist, use placeholder values in example env file
 else if (File.Exists("../example.env"))
 {
-    DotNetEnv.Env.Load("../.env");
+    DotNetEnv.Env.Load("../example.env");
 }
 
 // Checks to see if we are inside a docker container,
@@ -91,11 +91,13 @@ using (var scope = app.Services.CreateScope())
     if (context.Database.GetPendingMigrations().Any())
         context.Database.Migrate();
 
+    ILoggerFactory factory = LoggerFactory.Create(logBuilder => logBuilder.AddConsole());
+    var logger = factory.CreateLogger("Seeding");
     try
     {
         if (Environment.GetEnvironmentVariable("TEST_DB_SEEDING") == "true")
         {
-            Console.WriteLine("Commencing Database Seeding");
+            logger.LogInformation("Commencing Database Seeding");
             var courseService = scope.ServiceProvider.GetRequiredService<CourseService>();
             var userService = scope.ServiceProvider.GetRequiredService<UserService>();
             var groupService = scope.ServiceProvider.GetRequiredService<GroupService>();
@@ -112,7 +114,7 @@ using (var scope = app.Services.CreateScope())
     }
     catch(ArgumentException)
     {
-        Console.WriteLine("Assuming seeding has already been done, skipping.");
+        logger.LogWarning("Assuming seeding has already been done, skipping.");
     }
     
 }

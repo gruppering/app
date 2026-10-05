@@ -29,7 +29,14 @@ public class GroupService(IGroupRepository groupRepository,ICourseRepository cou
 
     public async Task<List<Group>> GetAllGroupsByCourse(Guid courseId)
     {
-        return await groupRepository.GetAllGroupsByCourse(courseId);
+        try
+        {
+            return await groupRepository.GetAllGroupsByCourse(courseId);
+        }
+        catch (ArgumentNullException)
+        {
+            return [];
+        }
     }
 
     /*
@@ -69,7 +76,47 @@ public class GroupService(IGroupRepository groupRepository,ICourseRepository cou
                 groups[Random.Shared.Next(0,groups.Count)].Members.Add(u);
             }
         }
-        await groupRepository.UpdateGroupsAsync(groups);
+        await groupRepository.UpdateGroupsAsync();
+        return groups;
+    }
+    
+    /*
+     * Delegates the users to groups, based on a specified amount of users.
+     */
+    public async Task<List<Group>> DelegateUsersToGroups(Guid courseId,bool redistributeUsers,int amount,string groupPrefix)
+    {
+        var course = await courseRepository.GetCourseByIdAsync(courseId);
+        var groups = await groupRepository.CreateNewGroupsAsync(groupPrefix,amount, course);
+        var users = await courseRepository.GetAllUsersFromCourseById(courseId);
+        var usersToAdd = users;
+        int usersPerGroup = users.Count / amount;
+        int stragglers = users.Count % amount;
+        
+        
+        foreach (var group in groups)
+        {
+            for (int i = 0; i < usersPerGroup; i++)
+            {
+                int choice = Random.Shared.Next(0, users.Count); // Untested, need to come back to this.
+                group.Members.Add(usersToAdd[choice]);
+                usersToAdd.RemoveAt(choice);
+            }
+        }
+
+        if (stragglers != 0 && !redistributeUsers) // Adds any leftover users to a leftover group.
+        {
+            var stragglerGroup = await groupRepository.CreateNewGroupAsync("Leftovers", course);
+            stragglerGroup.Members.AddRange(users);
+            groups.Add(stragglerGroup);
+        }
+        else if (stragglers != 0 && redistributeUsers) // Adds them to random existing groups.
+        {
+            foreach (var u in users)
+            {
+                groups[Random.Shared.Next(0,groups.Count)].Members.Add(u);
+            }
+        }
+        await groupRepository.UpdateGroupsAsync();
         return groups;
     }
     
