@@ -14,18 +14,20 @@
 <div id="groups">
     @foreach (var group in Model.GroupsInCourse)
     {
-        <div>
-            <h3>@group.GroupName</h3>
-            <ul>
-                @foreach (var member in group.Members)
-                {
-                    <li>
-                        <span>
-                            @member.Username
-                        </span>
-                    </li>
-                }
-            </ul>
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">@group.GroupName</h5>
+                <ul>
+                    @foreach (var member in group.Members)
+                    {
+                        <li>
+                            <span>
+                                @member.Username
+                            </span>
+                        </li>
+                    }
+                </ul>
+            </div>
         </div>
     }
 </div>
