@@ -7,7 +7,10 @@ using app.ViewModel;
 namespace app.Controllers;
 public class CourseController(CourseService courseService,GroupService groupService, UserService userService) : Controller
 {
-        // Sends all PUBLIC courses to the endpoint NOTE; add Paging if time 
+    private static readonly ILoggerFactory Factory = LoggerFactory.Create(builder => builder.AddConsole());
+    private readonly ILogger _logger = Factory.CreateLogger("Groups");
+    
+    // Sends all PUBLIC courses to the endpoint NOTE; add Paging if time 
     [HttpGet("/courses")]
     public async Task<IActionResult> Courses()
     {
@@ -18,7 +21,6 @@ public class CourseController(CourseService courseService,GroupService groupServ
             var uName = User.FindFirst(ClaimTypes.Name)!.Value;
             var user = userService.GetUserByUsername(uName);
             var memberOfCourse = await courseService.GetAllCoursesWithMemberAsync(user);
-            Console.WriteLine(memberOfCourse.Count);
             var courseViewModel = new CourseViewModel(publicCourses, memberOfCourse);
             return View(courseViewModel);
         }
@@ -28,7 +30,7 @@ public class CourseController(CourseService courseService,GroupService groupServ
         }
     }
 
-        // Gets the course that is called and sends the user to a descriptive page of the course
+    // Gets the course that is called and sends the user to a descriptive page of the course
     [HttpGet("/courses/{courseName}")]
     public async Task<IActionResult> Details(string courseName)
     {
@@ -46,12 +48,13 @@ public class CourseController(CourseService courseService,GroupService groupServ
         }
         catch(ArgumentException)
         {
+            _logger.LogError("No course with name: {courseName} was found",courseName);
             return RedirectToAction("Error","Home",new {code = 404,description="A Course with that name was not found"});
         }
     }
     
-    [HttpGet("/courses/join/{joinCode}")]
-    public async Task<IActionResult> Join(string joinCode)
+    [HttpGet("/courses/join")]
+    public async Task<IActionResult> Join([FromQuery] string joinCode)
     {
         try
         {
@@ -66,7 +69,8 @@ public class CourseController(CourseService courseService,GroupService groupServ
         }
         catch(ArgumentException)
         {
-            return RedirectToAction("Error","Home",new {code = 404,description="Could not create join code"});
+            _logger.LogError("No course with join code: {joinCode} was found",joinCode);
+            return RedirectToAction("Error","Home",new {code = 404,description="Could not find course with join code"});
         }
     }
     
@@ -86,11 +90,11 @@ public class CourseController(CourseService courseService,GroupService groupServ
         }
         catch(ArgumentException)
         {
+            _logger.LogError("Could not join the course");
             return RedirectToAction("Error","Home",new {code = 404,description="Could not join the course"});
         }
     }
     
-        // Create course NOTE; this is not implemented yet cause idk where it should be added 
     [HttpPost("/courses/create")]
     public async Task<IActionResult> CreateCourse(CourseCreationDto dto)
     {
@@ -105,6 +109,8 @@ public class CourseController(CourseService courseService,GroupService groupServ
         }
         catch (ArgumentException)
         {
+            _logger.LogError("Could not create course with params; Name: {DtoCourseName}, Description: {DtoDescription},Is Public: {DtoIsPublic}", dto.CourseName, dto.Description, dto.IsPublic);
+
             return RedirectToAction("Error","Home",new {code = 404,description="Could not create the course"});
         }
     }
