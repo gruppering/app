@@ -127,15 +127,13 @@ public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepositor
         return group;
     }
 
-    public async Task UpdateGroupAsync(Group group)
+    public async Task UpdateGroupAsync()
     {
-        typeContext.Groups.Update(group);
         await typeContext.SaveChangesAsync();
     }
 
-    public async Task UpdateGroupsAsync(List<Group> groups)
+    public async Task UpdateGroupsAsync()
     {
-        typeContext.Groups.UpdateRange(groups);
         await typeContext.SaveChangesAsync();
     }
 
