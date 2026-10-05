@@ -1,15 +1,13 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using app.DTO.Course;
+using app.Models;
 using app.Services;
 using app.ViewModel;
 
 namespace app.Controllers;
 public class CourseController(CourseService courseService,GroupService groupService, UserService userService) : Controller
 {
-    private static readonly ILoggerFactory Factory = LoggerFactory.Create(builder => builder.AddConsole());
-    private readonly ILogger _logger = Factory.CreateLogger("Course Controller");
-    
         // Sends all PUBLIC courses to the endpoint NOTE; add Paging if time 
     [HttpGet("/courses")]
     public async Task<IActionResult> Courses()
@@ -19,6 +17,7 @@ public class CourseController(CourseService courseService,GroupService groupServ
         var uName = User.FindFirst(ClaimTypes.Name)!.Value;
         var user = userService.GetUserByUsername(uName);
         var memberOfCourse = await courseService.GetAllCoursesWithMemberAsync(user);
+        Console.WriteLine(memberOfCourse.Count);
         var courseViewModel = new CourseViewModel(publicCourses, memberOfCourse);
         return View(courseViewModel);
     }
@@ -41,7 +40,6 @@ public class CourseController(CourseService courseService,GroupService groupServ
         }
         catch(ArgumentException)
         {
-            _logger.LogWarning((string)"A course with name {courseName} was not found",courseName);
             return RedirectToAction("Error","Home",new {code = 404,description="A Course with that name was not found"});
         }
     }
