@@ -4,5 +4,21 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
+    <p>Join a course here!</p>
+    
+    <form id="joinForm" action="/courses/join/">
+        <legend>Enter code:</legend>
+        <fieldset>
+            <input id="joinCode" name="joinCode" type="text" minlength="4" maxlength="4" placeholder="ABCD" required/>
+            <button id="joinButton" type="submit">Join</button>
+        </fieldset>
+    </form>
+</div>
+
+<div class="text-center">
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+
+<script defer>
+    
+</script>
