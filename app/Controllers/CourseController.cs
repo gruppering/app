@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using app.DTO.Course;
-using app.Models;
 using app.Services;
 using app.ViewModel;
 
@@ -12,14 +11,21 @@ public class CourseController(CourseService courseService,GroupService groupServ
     [HttpGet("/courses")]
     public async Task<IActionResult> Courses()
     {
-        var publicCourses = await courseService.GetAllPublicCoursesAsync();
-        
-        var uName = User.FindFirst(ClaimTypes.Name)!.Value;
-        var user = userService.GetUserByUsername(uName);
-        var memberOfCourse = await courseService.GetAllCoursesWithMemberAsync(user);
-        Console.WriteLine(memberOfCourse.Count);
-        var courseViewModel = new CourseViewModel(publicCourses, memberOfCourse);
-        return View(courseViewModel);
+        try
+        {
+            var publicCourses = await courseService.GetAllPublicCoursesAsync();
+
+            var uName = User.FindFirst(ClaimTypes.Name)!.Value;
+            var user = userService.GetUserByUsername(uName);
+            var memberOfCourse = await courseService.GetAllCoursesWithMemberAsync(user);
+            Console.WriteLine(memberOfCourse.Count);
+            var courseViewModel = new CourseViewModel(publicCourses, memberOfCourse);
+            return View(courseViewModel);
+        }
+        catch (ArgumentException)
+        {
+            return RedirectToAction("Error","Home",new {code = 404,description="Could not find courses"});
+        }
     }
 
         // Gets the course that is called and sends the user to a descriptive page of the course
@@ -60,7 +66,7 @@ public class CourseController(CourseService courseService,GroupService groupServ
         }
         catch(ArgumentException)
         {
-            return RedirectToAction("Error","Home");
+            return RedirectToAction("Error","Home",new {code = 404,description="Could not create join code"});
         }
     }
     
@@ -80,7 +86,7 @@ public class CourseController(CourseService courseService,GroupService groupServ
         }
         catch(ArgumentException)
         {
-            return RedirectToAction("Error","Home");
+            return RedirectToAction("Error","Home",new {code = 404,description="Could not join the course"});
         }
     }
     
@@ -88,11 +94,18 @@ public class CourseController(CourseService courseService,GroupService groupServ
     [HttpPost("/courses/create")]
     public async Task<IActionResult> CreateCourse(CourseCreationDto dto)
     {
-        var uName = User.FindFirst(ClaimTypes.Name)!.Value;
-        var creator = userService.GetUserByUsername(uName);
-        
-        await courseService.CreateNewCourseAsync(dto,creator);
-        
-        return RedirectToAction("Courses");
+        try
+        {
+            var uName = User.FindFirst(ClaimTypes.Name)!.Value;
+            var creator = userService.GetUserByUsername(uName);
+
+            await courseService.CreateNewCourseAsync(dto, creator);
+
+            return RedirectToAction("Courses");
+        }
+        catch (ArgumentException)
+        {
+            return RedirectToAction("Error","Home",new {code = 404,description="Could not create the course"});
+        }
     }
 }
