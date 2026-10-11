@@ -1,4 +1,5 @@
 using app.DTO.Course;
+using app.DTO.User;
 using app.Models;
 using app.Repositories;
 using app.Utils;
@@ -59,9 +60,12 @@ public class CourseService
     * Gets all users from a course, and returns a list of them.
     * TODO, same case as method above, should return a list of public DTO, withholding sensitive info.
     */
-    public async Task<List<GrupperingUser>> GetAllUsersFromCourseAsync(string courseName)
+    public async Task<List<UserDetailsDto>> GetAllUsersFromCourseAsync(string courseName)
     {
-        return await _courseRepository.GetAllUsersFromCourse(courseName);
+        var users = await _courseRepository.GetAllUsersFromCourse(courseName);
+        var dto = users.Select(item => new UserDetailsDto(item.Username));
+        
+        return dto.ToList();
     }
 
     /**
