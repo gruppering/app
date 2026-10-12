@@ -25,5 +25,7 @@ public class GrupperingTypeContext: DbContext
         modelBuilder.Entity<Group>()
             .HasMany(g => g.Members)
             .WithMany();
+        modelBuilder.Entity<GrupperingUser>().HasOne(gu => gu.ExternalAuth).WithOne()
+            .HasForeignKey<ExternalAuth>(ea => ea.UserId);
     }
 }

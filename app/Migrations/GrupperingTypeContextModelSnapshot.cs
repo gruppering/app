@@ -92,6 +92,25 @@ namespace app.Migrations
                     b.ToTable("Courses");
                 });
 
+            modelBuilder.Entity("app.Models.ExternalAuth", b =>
+                {
+                    b.Property<string>("Issuer")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Subject")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Issuer", "Subject");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("ExternalAuth");
+                });
+
             modelBuilder.Entity("app.Models.Group", b =>
                 {
                     b.Property<int>("Id")
@@ -201,6 +220,15 @@ namespace app.Migrations
                     b.Navigation("Owner");
                 });
 
+            modelBuilder.Entity("app.Models.ExternalAuth", b =>
+                {
+                    b.HasOne("app.Models.GrupperingUser", null)
+                        .WithOne("ExternalAuth")
+                        .HasForeignKey("app.Models.ExternalAuth", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("app.Models.Group", b =>
                 {
                     b.HasOne("app.Models.Course", "Course")
@@ -221,6 +249,8 @@ namespace app.Migrations
 
             modelBuilder.Entity("app.Models.GrupperingUser", b =>
                 {
+                    b.Navigation("ExternalAuth");
+
                     b.Navigation("Roles");
                 });
 #pragma warning restore 612, 618

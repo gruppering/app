@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using app.Models;
 using app.Repositories;
 
@@ -10,6 +11,11 @@ public class UserService(IUserRepository userRepository)
     {
         return userRepository.GetUserByUsername(username) ?? throw new ArgumentException("User with this username was not found");
     }
+    public GrupperingUser GetUserById(string id)
+    {
+        return userRepository.GetUserById(id) ?? throw new ArgumentException("User with this id was not found");
+    }
+
     
     /**
      * Verifies if the password matches the password with the supplied user.
@@ -26,6 +32,11 @@ public class UserService(IUserRepository userRepository)
     {
         if (userRepository.UserExistsWithUsername(username))
             throw new ArgumentException("User with this username already exists.");
+
+        if (password.Length == 0 || password.IsWhiteSpace())
+        {
+            throw new ArgumentException("Paasword is empty");
+        }
         
         var user = new GrupperingUser
         {
@@ -36,7 +47,36 @@ public class UserService(IUserRepository userRepository)
         };
         return await userRepository.SaveAsync(user);
     }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public async Task<GrupperingUser> GoogleLoginOrElseSignup(JwtSecurityToken token)
+    {
+        var existingUser = userRepository.GetUserByIssuerAndSubject(token.Issuer, token.Subject);
+        if (existingUser is not null)
+            return existingUser;
+        
+        
+        var user = new GrupperingUser
+        {
+            Username = $"{token.Claims.First(c => c.Type == "given_name").Value}{Random.Shared.Next(1000,9999)}",
+            Email = token.Claims.First(c => c.Type == "email").Value,
+            ExternalAuth = new ExternalAuth()
+            {
+                Issuer = token.Issuer,
+                Subject = token.Subject
+            },
+            Roles = [new GrupperingUserRole("ROLE_USER")]
+        };
+        return await userRepository.SaveAsync(user);
+    }
 
+
+    
+    
     /*
      * Creates the specified amount of users with the given name (+ the id), email and password, intended for use in evaluation.
      */

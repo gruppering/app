@@ -18,8 +18,8 @@ public class CourseController(CourseService courseService,GroupService groupServ
         {
             var publicCourses = await courseService.GetAllPublicCoursesAsync();
 
-            var uName = User.FindFirst(ClaimTypes.Name)!.Value;
-            var user = userService.GetUserByUsername(uName);
+            var uId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            var user = userService.GetUserById(uId);
             var memberOfCourse = await courseService.GetAllCoursesWithMemberAsync(user);
             var courseViewModel = new CourseViewModel(publicCourses, memberOfCourse);
             return View(courseViewModel);
@@ -39,7 +39,7 @@ public class CourseController(CourseService courseService,GroupService groupServ
             var course = await courseService.GetCourseByNameAsync(courseName);
             // Checking if the current user based on name is the same as the creator of a course
             // This can be used to make the course details content differ depending on ownership
-            var isOwner = course.Owner.Username == User.FindFirst(ClaimTypes.Name)!.Value;
+            var isOwner = course.Owner.Id.ToString() == User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             var users = await courseService.GetAllUsersFromCourseAsync(courseName);
             var groups = await groupService.GetAllGroupsByCourse(course.Id);
             var detailCourseViewModel = new CourseDetailViewModel(course, isOwner, users,groups);
@@ -61,7 +61,7 @@ public class CourseController(CourseService courseService,GroupService groupServ
             var course = await courseService.GetCourseByJoinCodeAsync(joinCode);
             // Checking if the current user based on name is the same as the creator of a course
             // This can be used to make the course details content differ depending on ownership
-            var isOwner = course.Owner.Username == User.FindFirst(ClaimTypes.Name)!.Value;
+            var isOwner = course.Owner.Id.ToString() == User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             if (isOwner) return RedirectToAction("Error", "Home",new {code=500,description="You are the owner of this course"});
             await courseService.AddUserToCourseAsync(course.DisplayName, User.FindFirst(ClaimTypes.Name)!.Value);
             
@@ -82,7 +82,7 @@ public class CourseController(CourseService courseService,GroupService groupServ
             var course = await courseService.GetCourseByNameAsync(courseName);
             // Checking if the current user based on name is the same as the creator of a course
             // This can be used to make the course details content differ depending on ownership
-            var isOwner = course.Owner.Username == User.FindFirst(ClaimTypes.Name)!.Value;
+            var isOwner = course.Owner.Id.ToString() == User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             if (isOwner) return RedirectToAction("Error", "Home",new {code=500,description="You are the owner of this course"});
             await courseService.AddUserToCourseAsync(course.DisplayName, User.FindFirst(ClaimTypes.Name)!.Value);
             
@@ -100,8 +100,8 @@ public class CourseController(CourseService courseService,GroupService groupServ
     {
         try
         {
-            var uName = User.FindFirst(ClaimTypes.Name)!.Value;
-            var creator = userService.GetUserByUsername(uName);
+            var uId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            var creator = userService.GetUserById(uId);
 
             await courseService.CreateNewCourseAsync(dto, creator);
 

@@ -10,11 +10,30 @@ public class UserRepository(GrupperingTypeContext typeContext): IUserRepository
     {
         return typeContext.Users.Include(u => u.Roles).FirstOrDefault(u => u.Username == username);
     }
+    
+    public GrupperingUser? GetUserById(string id)
+    {
+        return typeContext.Users.Include(u => u.Roles).FirstOrDefault(u => u.Id.ToString() == id);
+    }
+
 
     public bool UserExistsWithUsername(string username)
     {
         return typeContext.Users.Any(u => u.Username == username);
     }
+
+    /// <summary>
+    /// Checks if user has signed in previously with this external account.
+    /// </summary>
+    /// <param name="issuer"></param>
+    /// <param name="subject"></param>
+    /// <returns></returns>
+    public GrupperingUser? GetUserByIssuerAndSubject(string issuer, string subject)
+    {
+        return typeContext.Users.Include(gu => gu.Roles).Include(gu => gu.ExternalAuth)
+            .FirstOrDefault(gu => gu.ExternalAuth!.Issuer == issuer && gu.ExternalAuth.Subject == subject);
+    }
+
 
     public async Task<GrupperingUser> SaveAsync(GrupperingUser user)
     {

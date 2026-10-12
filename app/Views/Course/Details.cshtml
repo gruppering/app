@@ -70,6 +70,7 @@
             
             fetch("/course/@Model.Course.DisplayName/groups/new",{
                 method: "POST",
+                credentials:"same-origin",
                 body: JSON.stringify({
                     "groupAmount":groupAmount.value,
                     "groupPrefix":groupPrefix.value
