@@ -5,8 +5,11 @@ namespace app.Repositories;
 public interface IUserRepository
 { 
     GrupperingUser? GetUserByUsername(string username);
-    bool UserExistsWithUsername(string username);
+    GrupperingUser? GetUserById(string id);
 
+    bool UserExistsWithUsername(string username);
+    GrupperingUser? GetUserByIssuerAndSubject(string issuer,string subject);
+    
     Task<GrupperingUser> SaveAsync(GrupperingUser user);
     Task SaveRangeAsync(List<GrupperingUser> user);
 
