@@ -62,7 +62,7 @@ public class UserService(IUserRepository userRepository)
         
         var user = new GrupperingUser
         {
-            Username = $"{token.Claims.First(c => c.Type == "given_name").Value}{Random.Shared.Next(9999)}",
+            Username = $"{token.Claims.First(c => c.Type == "given_name").Value}{Random.Shared.Next(1000,9999)}",
             Email = token.Claims.First(c => c.Type == "email").Value,
             ExternalAuth = new ExternalAuth()
             {
