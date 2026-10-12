@@ -26,6 +26,11 @@ public class UserService(IUserRepository userRepository)
     {
         if (userRepository.UserExistsWithUsername(username))
             throw new ArgumentException("User with this username already exists.");
+
+        if (password.Length == 0 || password.IsWhiteSpace())
+        {
+            throw new ArgumentException("Paasword is empty");
+        }
         
         var user = new GrupperingUser
         {
