@@ -8,7 +8,7 @@ namespace app.Models;
 public class GrupperingUser
 {
     [Column(TypeName = "uuid")]
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
 
     [MaxLength(50)]
     public string Username { get; set; } = string.Empty;
@@ -19,6 +19,8 @@ public class GrupperingUser
     public string PasswordHash { get; set; } = string.Empty;
 
     public List<GrupperingUserRole> Roles { get; set; } = [];
+    
+    public ExternalAuth? ExternalAuth { get; set; }
 
 }
 
