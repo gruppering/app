@@ -11,6 +11,7 @@
         <span>@ViewBag.Error</span>
     }
     <h1 class="display-4">Login</h1>
+    <a href="" id="testGoogleUrl">Login with google</a>
     <a href="@("/signup" + returnUrl)">Signup instead</a>
     <form action="@("/login" + returnUrl)" method="post">
         <div class="mb-3">
@@ -24,3 +25,21 @@
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
+<script>
+    const handleGoogleAuthentication = () => {
+        const params = new URLSearchParams({
+            client_id: "@Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID")",
+            redirect_uri: "https://localhost:7047/auth/google",
+            response_type: "code",
+            scope: "openid email profile",
+        });
+
+        const url = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
+        console.log(url);
+
+        document.getElementById("testGoogleUrl").setAttribute("href",url)
+    }
+    
+    handleGoogleAuthentication();
+
+</script>
