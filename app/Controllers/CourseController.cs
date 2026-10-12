@@ -18,8 +18,8 @@ public class CourseController(CourseService courseService,GroupService groupServ
         {
             var publicCourses = await courseService.GetAllPublicCoursesAsync();
 
-            var uName = User.FindFirst(ClaimTypes.Name)!.Value;
-            var user = userService.GetUserByUsername(uName);
+            var uId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            var user = userService.GetUserById(uId);
             var memberOfCourse = await courseService.GetAllCoursesWithMemberAsync(user);
             var courseViewModel = new CourseViewModel(publicCourses, memberOfCourse);
             return View(courseViewModel);
@@ -100,8 +100,8 @@ public class CourseController(CourseService courseService,GroupService groupServ
     {
         try
         {
-            var uName = User.FindFirst(ClaimTypes.Name)!.Value;
-            var creator = userService.GetUserByUsername(uName);
+            var uId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            var creator = userService.GetUserById(uId);
 
             await courseService.CreateNewCourseAsync(dto, creator);
 
