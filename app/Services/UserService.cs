@@ -97,4 +97,11 @@ public class UserService(IUserRepository userRepository)
         await userRepository.SaveRangeAsync(users);
         return users;
     }
+
+    public async Task<bool> DeleteUser(GrupperingUser user)
+    {
+        if (user == null) return false;
+        await DeleteUser(user);
+        return true;
+    }
 }
