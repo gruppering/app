@@ -22,7 +22,13 @@ public static class AuthenticationUtils
         
     }
 
-    public static async Task<JwtSecurityToken> GetGoogleToken(string code, string redirectUri)
+    /// <summary>
+    /// Gets a Google JWT with the given access code and redirect uri.
+    /// </summary>
+    /// <param name="code">The access code acquired when user logs in via Google</param>
+    /// <param name="redirectUri">The redirect uri to use, dynamically generated.</param>
+    /// <returns>A JwtSecurityToken, containing all the important claims necessary to either log in or sign up the user.</returns>
+    public static async Task<JwtSecurityToken> GetGoogleJwt(string code, string redirectUri)
     {
         HttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 

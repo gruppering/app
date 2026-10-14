@@ -93,7 +93,7 @@ public class HomeController(UserService userService): Controller
     [HttpGet("auth/google")]
     public async Task<IActionResult> GoogleAuthCallback([FromQuery] string code)
     {
-        var token = await AuthenticationUtils.GetGoogleToken(code,
+        var token = await AuthenticationUtils.GetGoogleJwt(code,
             $"{Request.Scheme}://{Request.Host}{Request.PathBase}/auth/google");
 
         var user = await userService.GoogleLoginOrElseSignup(token);
