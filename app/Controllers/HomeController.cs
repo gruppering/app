@@ -12,13 +12,14 @@ using app.Utils;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.FeatureManagement.Mvc;
 
 namespace app.Controllers;
 
 public class HomeController: Controller
 {
-    private HttpClient _client;
-    private UserService _userService;
+    private readonly HttpClient _client;
+    private readonly UserService _userService;
 
     public HomeController(UserService userService)
     {
@@ -102,13 +103,14 @@ public class HomeController: Controller
         return RedirectToAction("Login", "Home");
     }
 
+    [FeatureGate("GoogleSignin")]
     [AllowAnonymous]
     [HttpGet("auth/google")]
     public async Task<IActionResult> GoogleAuthCallback([FromQuery] string code)
     {
         Console.WriteLine(code);
         var body = JsonSerializer.Serialize(
-            new GoogleAuthCodeRequestDto(code));
+            new GoogleAuthCodeRequestDto(code,$"{Request.Scheme}://{Request.Host}{Request.PathBase}/auth/google"));
         Console.WriteLine(body);
         var content = new StringContent(body,Encoding.UTF8,"application/json");
         var response = await _client.PostAsync(" https://oauth2.googleapis.com/token", content);
