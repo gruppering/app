@@ -11,7 +11,12 @@
         <span>@ViewBag.Error</span>
     }
     <h1 class="display-4">Login</h1>
-    <a href="" id="testGoogleUrl">Login with google</a>
+    <div>
+        @if (Environment.GetEnvironmentVariable("GOOGLE_SIGNIN_ENABLED")!.Equals("true"))
+        {
+            <a href="" id="loginGoogleUrl">Login with Google</a>
+        }
+    </div>
     <a href="@("/signup" + returnUrl)">Signup instead</a>
     <form action="@("/login" + returnUrl)" method="post">
         <div class="mb-3">
@@ -34,10 +39,9 @@
             scope: "openid email profile",
         });
 
-        const url = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
-        console.log(url);
+        const googleUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
 
-        document.getElementById("testGoogleUrl").setAttribute("href",url)
+        document.getElementById("testGoogleUrl").setAttribute("href",googleUrl)
     }
     
     handleGoogleAuthentication();
