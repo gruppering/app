@@ -1,10 +1,5 @@
 using System.Diagnostics;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http.Headers;
 using System.Security.Claims;
-using System.Text;
-using System.Text.Json;
-using app.DTO.Auth.Google;
 using Microsoft.AspNetCore.Mvc;
 using app.Models;
 using app.Services;
@@ -16,19 +11,9 @@ using Microsoft.FeatureManagement.Mvc;
 
 namespace app.Controllers;
 
-public class HomeController: Controller
+public class HomeController(UserService userService): Controller
 {
-    private readonly HttpClient _client;
-    private readonly UserService _userService;
-
-    public HomeController(UserService userService)
-    {
-        _userService = userService;
-        _client = new();
-        _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        
-    }
-
+    
     [HttpGet("/")]
     public IActionResult Index()
     { 
@@ -43,8 +28,8 @@ public class HomeController: Controller
     [AllowAnonymous]
     public async Task<IActionResult> Login( [FromForm]string username, [FromForm]string password)
     {
-        var user = _userService.GetUserByUsername(username);
-        if (user is not null && _userService.VerifyPasswordMatches(user, password))
+        var user = userService.GetUserByUsername(username);
+        if (user is not null && userService.VerifyPasswordMatches(user, password))
         {
             List<Claim> claims = user.Roles.ConvertAll(role => new Claim(ClaimTypes.Role, role.Role));
             claims.Add(new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()));
@@ -71,7 +56,7 @@ public class HomeController: Controller
     {
         try
         {
-            var user = await _userService.Signup(username, email, password);
+            var user = await userService.Signup(username, email, password);
             var claims = new List<Claim>
             {
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -108,21 +93,10 @@ public class HomeController: Controller
     [HttpGet("auth/google")]
     public async Task<IActionResult> GoogleAuthCallback([FromQuery] string code)
     {
-        Console.WriteLine(code);
-        var body = JsonSerializer.Serialize(
-            new GoogleAuthCodeRequestDto(code,$"{Request.Scheme}://{Request.Host}{Request.PathBase}/auth/google"));
-        Console.WriteLine(body);
-        var content = new StringContent(body,Encoding.UTF8,"application/json");
-        var response = await _client.PostAsync(" https://oauth2.googleapis.com/token", content);
+        var token = await AuthenticationUtils.GetGoogleToken(code,
+            $"{Request.Scheme}://{Request.Host}{Request.PathBase}/auth/google");
 
-        Console.WriteLine(await response.Content.ReadAsStringAsync());
-        var authResponse = await response.Content.ReadFromJsonAsync<AuthResponseDto>();
-        
-        Console.WriteLine(authResponse);
-        
-        var token = new JwtSecurityTokenHandler().ReadJwtToken(authResponse!.id_token);
-
-        var user = await _userService.GoogleLoginOrElseSignup(token);
+        var user = await userService.GoogleLoginOrElseSignup(token);
         
         var claims = new List<Claim>
         {
