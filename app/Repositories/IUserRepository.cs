@@ -12,5 +12,6 @@ public interface IUserRepository
     
     Task<GrupperingUser> SaveAsync(GrupperingUser user);
     Task SaveRangeAsync(List<GrupperingUser> user);
+    Task DeleteUser(GrupperingUser user);
 
 }

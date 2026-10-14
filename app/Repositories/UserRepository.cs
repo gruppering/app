@@ -47,4 +47,10 @@ public class UserRepository(GrupperingTypeContext typeContext): IUserRepository
         await typeContext.Users.AddRangeAsync(users);
         await typeContext.SaveChangesAsync();
     }
+
+    public async Task DeleteUser(GrupperingUser user)
+    {
+        typeContext.Users.Remove(user);
+        await typeContext.SaveChangesAsync();
+    }
 }
