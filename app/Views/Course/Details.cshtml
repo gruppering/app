@@ -8,6 +8,9 @@
 <p>@Model.Course.Description</p>
 <a asp-controller="Course" asp-action="JoinCourse"
    asp-route-courseName="@Model.Course.DisplayName">Join course</a>
+<div style="max-width: 20%">
+    @Model.QrCode
+</div>
 <a asp-controller=""
    asp-action="Grupper"
    asp-route-gruppeId=""

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using app.DTO.Course;
 using app.Services;
 using app.ViewModel;
+using QRCoder;
 
 namespace app.Controllers;
 public class CourseController(CourseService courseService,GroupService groupService, UserService userService) : Controller
@@ -42,7 +43,13 @@ public class CourseController(CourseService courseService,GroupService groupServ
             var isOwner = course.Owner.Id.ToString() == User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             var users = await courseService.GetAllUsersFromCourseAsync(courseName);
             var groups = await groupService.GetAllGroupsByCourse(course.Id);
-            var detailCourseViewModel = new CourseDetailViewModel(course, isOwner, users,groups);
+            
+            var qrCodeUrl = new PayloadGenerator.Url($"{Request.Scheme}://{Request.Host}{Request.PathBase}/courses/join?joinCode={course.JoinCode}");
+            using var qrCodeData = QRCodeGenerator.GenerateQrCode(qrCodeUrl);
+            var svgRenderer = new SvgQRCode(qrCodeData);
+            string svg = svgRenderer.GetGraphic();
+            
+            var detailCourseViewModel = new CourseDetailViewModel(course, isOwner, users,groups,svg);
         
             return View(detailCourseViewModel);
         }
