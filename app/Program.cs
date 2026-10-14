@@ -6,6 +6,7 @@ using app.Utils;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +56,11 @@ builder.Services.AddScoped<CourseService>();
 
 builder.Services.AddScoped<IGroupRepository,GroupRepository>();
 builder.Services.AddScoped<GroupService>();
+
+
+// Feature Flags
+builder.Configuration["FeatureManagement:GoogleSignin"] = Environment.GetEnvironmentVariable("GOOGLE_SIGNIN_ENABLED"); // As we use a .env file, we set this manually, instead of having to update it in appsettings as well.
+builder.Services.AddFeatureManagement();
 
 builder.Services.AddControllersWithViews(options =>
 {
