@@ -6,8 +6,8 @@ namespace app.Repositories;
 
 public class CourseRepository(GrupperingTypeContext typeContext): ICourseRepository
 {
-    private static ILoggerFactory _factory = LoggerFactory.Create(builder => builder.AddConsole());
-    private readonly ILogger _logger = _factory.CreateLogger("Courses");
+    private static readonly ILoggerFactory Factory = LoggerFactory.Create(builder => builder.AddConsole());
+    private readonly ILogger _logger = Factory.CreateLogger("Courses");
     
     public async Task<Course> GetCourseByNameAsync(string courseName)
     {

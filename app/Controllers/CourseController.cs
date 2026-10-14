@@ -49,7 +49,7 @@ public class CourseController(CourseService courseService,GroupService groupServ
             var svgRenderer = new SvgQRCode(qrCodeData);
             string svg = svgRenderer.GetGraphic();
             
-            var detailCourseViewModel = new CourseDetailViewModel(course, isOwner, users,groups,svg);
+            var detailCourseViewModel = new CourseDetailViewModel(course, isOwner, users,groups, svg);
         
             return View(detailCourseViewModel);
         }
