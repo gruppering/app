@@ -35,7 +35,7 @@ public class UserService(IUserRepository userRepository)
 
         if (password.Length == 0 || password.IsWhiteSpace())
         {
-            throw new ArgumentException("Paasword is empty");
+            throw new ArgumentException("Password is empty");
         }
         
         var user = new GrupperingUser
@@ -96,5 +96,15 @@ public class UserService(IUserRepository userRepository)
         }
         await userRepository.SaveRangeAsync(users);
         return users;
+    }
+
+    public async Task<bool> DeleteUser(GrupperingUser? user)
+    {
+        if (user != null &&  userRepository.UserExistsWithUsername(user.Username))
+        {
+            await DeleteUser(user); 
+            return true;
+        }
+        return false;
     }
 }
