@@ -60,6 +60,8 @@ builder.Services.AddScoped<GroupService>();
 
 // Feature Flags
 builder.Configuration["FeatureManagement:GoogleSignin"] = Environment.GetEnvironmentVariable("GOOGLE_SIGNIN_ENABLED"); // As we use a .env file, we set this manually, instead of having to update it in appsettings as well.
+builder.Configuration["FeatureManagement:GitHubSignin"] = Environment.GetEnvironmentVariable("GOOGLE_SIGNIN_ENABLED"); // As we use a .env file, we set this manually, instead of having to update it in appsettings as well.
+
 builder.Services.AddFeatureManagement();
 
 builder.Services.AddControllersWithViews(options =>
