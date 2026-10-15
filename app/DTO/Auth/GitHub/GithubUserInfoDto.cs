@@ -1,3 +1,8 @@
 namespace app.DTO.Auth.GitHub;
 
-public record GithubUserInfoDto(string name,string avatar_url);
+public class GithubUserInfoDto
+{
+    public required string name { get; set; }
+    public required string avatar_url { get; set; }
+    public required string email { get; set; }
+}

@@ -77,7 +77,8 @@ public static class AuthenticationUtils
         var userInfo = await userInfoResponse.Content.ReadFromJsonAsync<GithubUserInfoDto>();
         var userEmails = await emailInfoResponse.Content.ReadFromJsonAsync<List<GithubUserEmailDto>>();
 
-        userInfo!.email = userEmails!.First().email;
+        // As for some reason, the email field in the user endpoint is always null, so we have to fetch and set the email separately.
+        userInfo!.email = userEmails!.First().email; 
 
         return userInfo;
     }
