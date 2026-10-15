@@ -11,7 +11,16 @@
         <span>@ViewBag.Error</span>
     }
     <h1 class="display-4">Login</h1>
-    <a href="" id="testGoogleUrl">Login with google</a>
+    <div>
+        @if (Environment.GetEnvironmentVariable("GOOGLE_SIGNIN_ENABLED")!.Equals("true"))
+        {
+            <a href="" id="loginGoogleUrl">Login with Google</a>
+        }
+        @if (Environment.GetEnvironmentVariable("GITHUB_SIGNIN_ENABLED")!.Equals("true"))
+        {
+            <a href="" id="loginGithubUrl">Login with Github</a>
+        }
+    </div>
     <a href="@("/signup" + returnUrl)">Signup instead</a>
     <form action="@("/login" + returnUrl)" method="post">
         <div class="mb-3">
@@ -25,21 +34,43 @@
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
-<script>
+@if (Environment.GetEnvironmentVariable("GOOGLE_SIGNIN_ENABLED")!.Equals("true"))
+{
+    <script>
     const handleGoogleAuthentication = () => {
         const params = new URLSearchParams({
             client_id: "@Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID")",
-            redirect_uri: "https://localhost:7047/auth/google",
+            redirect_uri: "@Context.Request.Scheme://@Context.Request.Host@Context.Request.PathBase/auth/google",
             response_type: "code",
             scope: "openid email profile",
         });
 
-        const url = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
-        console.log(url);
+        const googleUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
 
-        document.getElementById("testGoogleUrl").setAttribute("href",url)
+        document.getElementById("loginGoogleUrl").setAttribute("href",googleUrl)
     }
     
     handleGoogleAuthentication();
 
 </script>
+}
+
+@if (Environment.GetEnvironmentVariable("GITHUB_SIGNIN_ENABLED")!.Equals("true"))
+{
+    <script>
+    const handleGithubAuthenticationUrl = () => {
+        const params = new URLSearchParams({
+            client_id: "@Environment.GetEnvironmentVariable("GITHUB_CLIENT_ID")",
+            redirect_uri: "@Context.Request.Scheme://@Context.Request.Host@Context.Request.PathBase/auth/github",
+            scope: "read:user user:email",
+        });
+
+        const githubUrl = `https://github.com/login/oauth/authorize?${params}`;
+
+        document.getElementById("loginGithubUrl").setAttribute("href",githubUrl)
+    }
+    
+    handleGithubAuthenticationUrl();
+
+</script>
+}

@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using app.DTO.Auth.GitHub;
 using app.Models;
 using app.Repositories;
 
@@ -49,9 +50,10 @@ public class UserService(IUserRepository userRepository)
     }
     
     /// <summary>
-    /// 
+    /// With the given JWT, assuming it contains issuer and subject fields, either creates or logs in a user.
+    /// All the required info we need is already present in the jwt, so there is no need to call the endpoints to fetch user info.
     /// </summary>
-    /// <param name="token"></param>
+    /// <param name="token">The JWTSecurityToken acquired from Google.</param>
     /// <returns></returns>
     public async Task<GrupperingUser> GoogleLoginOrElseSignup(JwtSecurityToken token)
     {
@@ -74,6 +76,33 @@ public class UserService(IUserRepository userRepository)
         return await userRepository.SaveAsync(user);
     }
 
+    /// <summary>
+    /// With the supplied user info DTO, either creates or logs in a user.
+    /// As GitHub doesn't supply a JWT we can extract the info from,
+    /// a dedicated dto created from GetGitHubUserInformation in AuthUtils is needed.
+    /// </summary>
+    /// <param name="userInfoDto">A user info dto, containing the necessary fields to create or identify an already existing account</param>
+    /// <returns>A GrupperingUser object, either from an existing user, or the newly created one.</returns>
+    public async Task<GrupperingUser> GithubLoginOrElseSignup(GithubUserInfoDto userInfoDto)
+    {
+        var existingUser = userRepository.GetUserByIssuerAndSubject("https://github.com", $"{userInfoDto.id}");
+        if (existingUser is not null)
+            return existingUser;
+        
+        
+        var user = new GrupperingUser
+        {
+            Username = $"{userInfoDto.name.Split(" ")[0]}{Random.Shared.Next(1000,9999)}",
+            Email = userInfoDto.email,
+            ExternalAuth = new ExternalAuth()
+            {
+                Issuer = "https://github.com",
+                Subject = $"{userInfoDto.id}"
+            },
+            Roles = [new GrupperingUserRole("ROLE_USER")]
+        };
+        return await userRepository.SaveAsync(user);
+    }
 
     
     

@@ -89,11 +89,11 @@ public class CourseService
     /**
     * Adds the user with the specified username to the specified course. Throws an ArgumentException if a course or a user with the given name wasn't found.
     */
-    public async Task AddUserToCourseAsync(string courseName,string usernameToAdd)
+    public async Task AddUserToCourseAsync(string courseName,string userId)
     {
         var course = await _courseRepository.GetCourseByNameAsync(courseName);
-        if (course.Members.Any(u => u.Username == usernameToAdd)) throw new ArgumentException("A user with that name already is a member of this course.");
-        var user = _userRepository.GetUserByUsername(usernameToAdd);
+        if (course.Members.Any(u => u.Id.ToString() == userId)) throw new ArgumentException("A user with that name already is a member of this course.");
+        var user = _userRepository.GetUserById(userId);
         if (user is null) throw new ArgumentException("A user with that name was not found"); // TODO, find better way of handling this
         course.Members.Add(user);
         await _courseRepository.UpdateAsync(course);
