@@ -3,13 +3,13 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
+using app.DTO.Auth.GitHub;
 using app.DTO.Auth.Google;
 
 namespace app.Utils;
 
 public static class AuthenticationUtils
 {
-    private static readonly HttpClient HttpClient = new ();
 
     /// <summary>
     /// 
@@ -30,7 +30,8 @@ public static class AuthenticationUtils
     /// <returns>A JwtSecurityToken, containing all the important claims necessary to either log in or sign up the user.</returns>
     public static async Task<JwtSecurityToken> GetGoogleJwt(string code, string redirectUri)
     {
-        HttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        HttpClient httpClient = new();
+        httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
         // Generates a new request body.
         var body = JsonSerializer.Serialize(
@@ -38,10 +39,46 @@ public static class AuthenticationUtils
         var content = new StringContent(body,Encoding.UTF8,"application/json");
         
         // Sends the post request to google's servers, and gets the token in return.
-        var response = await HttpClient.PostAsync(" https://oauth2.googleapis.com/token", content);
+        var response = await httpClient.PostAsync(" https://oauth2.googleapis.com/token", content);
 
         var authResponse = await response.Content.ReadFromJsonAsync<AuthResponseDto>();
         
         return new JwtSecurityTokenHandler().ReadJwtToken(authResponse!.id_token);
+    }
+    
+    /// <summary>
+    /// Gets a GitHub JWT with the given access code and redirect uri.
+    /// </summary>
+    /// <param name="code">The access code acquired when user logs in via GitHub</param>
+    /// <param name="redirectUri">The redirect uri to use, dynamically generated.</param>
+    /// <returns>A JwtSecurityToken, containing all the important claims necessary to either log in or sign up the user.</returns>
+    public static async Task<GithubUserInfoDto> GetGitHubUserInformation(string code, string redirectUri)
+    {
+        HttpClient httpClient = new();
+        httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("Gruppering Web Server/Kestrel");
+
+        // Generates a new request body.
+        var body = JsonSerializer.Serialize(
+            new GitHubAuthCodeRequestDto(code,redirectUri));
+        var content = new StringContent(body,Encoding.UTF8,"application/json");
+        
+        // Sends the post request to google's servers, and gets the token in return.
+        var response = await httpClient.PostAsync(" https://github.com/login/oauth/access_token", content);
+        
+        var authResponse = await response.Content.ReadFromJsonAsync<GitHubAuthCodeResponseDto>();
+        
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authResponse!.access_token);
+
+        // In contrast to the Google implementation, we actually have to get the user info from the api, as no jwt is returned above.
+        var userInfoResponse = await httpClient.GetAsync("https://api.github.com/user");
+        var emailInfoResponse = await httpClient.GetAsync("https://api.github.com/user/emails");
+        
+        var userInfo = await userInfoResponse.Content.ReadFromJsonAsync<GithubUserInfoDto>();
+        var userEmails = await emailInfoResponse.Content.ReadFromJsonAsync<List<GithubUserEmailDto>>();
+
+        userInfo!.email = userEmails!.First().email;
+
+        return userInfo;
     }
 }
