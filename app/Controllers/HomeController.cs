@@ -112,6 +112,31 @@ public class HomeController(UserService userService): Controller
 
         return RedirectToAction("Index", "Home");
     }
+    
+    [FeatureGate("GitHubSignin")]
+    [AllowAnonymous]
+    [HttpGet("auth/github")]
+    public async Task<IActionResult> GitHubAuthCallback([FromQuery] string code)
+    {
+        var userInformation = await AuthenticationUtils.GetGitHubUserInformation(code,
+            $"{Request.Scheme}://{Request.Host}{Request.PathBase}/auth/github");
+
+        var user = await userService.GithubLoginOrElseSignup(userInformation);
+        
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Role, "ROLE_USER")
+        };
+
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+            AuthenticationUtils.GenerateClaimsPrincipal(claims));
+
+        if (HttpContext.Request.Query.TryGetValue("state", out var redirectUrl) && !redirectUrl.Equals(""))
+            return Redirect(redirectUrl!);
+
+        return RedirectToAction("Index", "Home");
+    }
 
     
     
