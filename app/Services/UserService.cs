@@ -49,9 +49,10 @@ public class UserService(IUserRepository userRepository)
     }
     
     /// <summary>
-    /// 
+    /// With the given JWT, assuming it contains issuer and subject fields, either creates or logs in a user.
+    /// All the required info we need is already present in the jwt, so there is no need to call the endpoints to fetch user info.
     /// </summary>
-    /// <param name="token"></param>
+    /// <param name="token">The JWTSecurityToken acquired from Google.</param>
     /// <returns></returns>
     public async Task<GrupperingUser> GoogleLoginOrElseSignup(JwtSecurityToken token)
     {
