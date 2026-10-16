@@ -27,9 +27,15 @@ public class ChatMessageRepository(GrupperingTypeContext typeContext): IChatMess
         typeContext.ChatMessages.Update(message);
         await typeContext.SaveChangesAsync();
     }
-
-    public async Task DeleteMessage(ChatMessage message)
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="messageId"></param>
+    public async Task DeleteMessage(Guid messageId)
     {
+        var message = await typeContext.ChatMessages.FindAsync(messageId);
+        if (message is null) throw new ArgumentException("This message does not exist.");
         typeContext.ChatMessages.Remove(message);
         await typeContext.SaveChangesAsync();
     }
