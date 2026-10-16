@@ -10,6 +10,7 @@ public class ChatHub(ChatMessageService messageService): Hub
     public async Task ConnectToChannel(string channel)
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, channel);
+        await Clients.Group(channel).SendAsync("ReceiveMessage", $"{Context.User!.Claims.First( c => c.Type == ClaimTypes.NameIdentifier).Value} connected");
     }
     
     public async Task SendMessage(string channel,string message)
