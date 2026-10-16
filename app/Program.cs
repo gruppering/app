@@ -58,6 +58,9 @@ builder.Services.AddScoped<CourseService>();
 builder.Services.AddScoped<IGroupRepository,GroupRepository>();
 builder.Services.AddScoped<GroupService>();
 
+builder.Services.AddScoped<IChatMessageRepository, ChatMessageRepository>();
+builder.Services.AddScoped<ChatMessageService>();
+
 // SignalR Hubs
 builder.Services.AddSignalR();
 
