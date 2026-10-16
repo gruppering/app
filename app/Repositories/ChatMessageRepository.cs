@@ -11,23 +11,26 @@ public class ChatMessageRepository(GrupperingTypeContext typeContext): IChatMess
         return await typeContext.ChatMessages.Where(cm => cm.Channel == channel).ToListAsync();
     }
 
-    public Task<List<ChatMessage>> GetAllChatMessagesByUserId(Guid userId)
+    public async Task<List<ChatMessage>> GetAllChatMessagesByUserId(Guid userId)
     {
-        throw new NotImplementedException();
+        return await typeContext.ChatMessages.Where(cm => cm.UserId == userId).ToListAsync();
     }
 
-    public Task SaveMessage(ChatMessage message)
+    public async Task SaveMessage(ChatMessage message)
     {
-        throw new NotImplementedException();
+        await typeContext.ChatMessages.AddAsync(message);
+        await typeContext.SaveChangesAsync();
     }
 
-    public Task<ChatMessage> UpdateChatMessage(ChatMessage message)
+    public async Task UpdateChatMessage(ChatMessage message)
     {
-        throw new NotImplementedException();
+        typeContext.ChatMessages.Update(message);
+        await typeContext.SaveChangesAsync();
     }
 
-    public Task DeleteMessage(ChatMessage message)
+    public async Task DeleteMessage(ChatMessage message)
     {
-        throw new NotImplementedException();
+        typeContext.ChatMessages.Remove(message);
+        await typeContext.SaveChangesAsync();
     }
 }
