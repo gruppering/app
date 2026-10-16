@@ -6,6 +6,13 @@ namespace app.Repositories;
 
 public class ChatMessageRepository(GrupperingTypeContext typeContext): IChatMessageRepository
 {
+    
+    public ChatMessage GetChatMessageById(Guid messageId)
+    {
+        var message =  typeContext.ChatMessages.Find(messageId);
+        return message ?? throw new ArgumentException("Message with this id does not exist");
+    }
+
     public async Task<List<ChatMessage>> GetAllChatMessagesByChannel(string channel)
     {
         return await typeContext.ChatMessages.Where(cm => cm.Channel == channel).ToListAsync();
@@ -36,6 +43,16 @@ public class ChatMessageRepository(GrupperingTypeContext typeContext): IChatMess
     {
         var message = await typeContext.ChatMessages.FindAsync(messageId);
         if (message is null) throw new ArgumentException("This message does not exist.");
+        typeContext.ChatMessages.Remove(message);
+        await typeContext.SaveChangesAsync();
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="message"></param>
+    public async Task DeleteMessage(ChatMessage message)
+    {
         typeContext.ChatMessages.Remove(message);
         await typeContext.SaveChangesAsync();
     }
