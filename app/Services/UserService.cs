@@ -22,7 +22,7 @@ public class UserService(IUserRepository userRepository)
     public UserPageDto GetUserByIdDto(string id)
     {
         var user = userRepository.GetUserById(id) ?? throw new ArgumentException("User with this id was not found");
-        var userPageDto = new UserPageDto(user.Username, user.Email, null);
+        var userPageDto = new UserPageDto(user.Username, user.Email);
         return userPageDto;
     }
     
@@ -134,14 +134,27 @@ public class UserService(IUserRepository userRepository)
         await userRepository.SaveRangeAsync(users);
         return users;
     }
-
+    // Deleting user and returning true or false depending on success or not
+    // TODO Create Unit tests 
     public async Task<bool> DeleteUser(GrupperingUser? user)
     {
         if (user != null &&  userRepository.UserExistsWithUsername(user.Username))
         {
-            await DeleteUser(user); 
+            await userRepository.DeleteUser(user); 
             return true;
         }
         return false;
+    }   
+    
+        // Updates the info and the user does have to exist in the DB
+    public async Task UpdateUserInfoAsync(string userId,UserPageDto dto)
+    {
+        var user = userRepository.GetUserById(userId);
+        if (user != null &&  userRepository.UserExistsWithUsername(user.Username))
+        {
+            user.Username = dto.Username;
+            user.Email = dto.Email;
+            await userRepository.UpdateUser(user);
+        }
     }
 }

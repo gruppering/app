@@ -7,5 +7,5 @@ namespace app.ViewModel;
 
 public class UserProfileModel(UserPageDto userPageDto)
 {
-    public UserPageDto  User { get; init; }
+    public UserPageDto User { get; } = userPageDto;
 }
