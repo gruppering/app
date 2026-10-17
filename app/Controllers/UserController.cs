@@ -8,7 +8,7 @@ using app.Services;
 
 namespace app.Controllers;
 
-public class ProfileController(UserService userService, CourseService courseService, GroupService groupService) : Controller // Could remove group service
+public class UserController(UserService userService, CourseService courseService, GroupService groupService) : Controller // Could remove group service
 {
     [HttpGet("/profile")]
     public async Task<IActionResult> Profile()
