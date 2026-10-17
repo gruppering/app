@@ -62,8 +62,6 @@
 
 @if (Model.IsOwner && !Model.GroupsInCourse.Any())
 {
-    @section Scripts
-    {
         <script>
         const groupDiv = document.getElementById("groups");
 
@@ -120,8 +118,7 @@
         
             groupDiv.append(wrapper)
     }
-</script> 
-    }
+</script>
 
 }
 
