@@ -14,7 +14,7 @@ public class ProfileController(UserService userService, CourseService courseServ
     public async Task<IActionResult> Profile()
     {
         var uId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-        var user = userService.GetUserByIdDTO(uId);
+        var user = userService.GetUserByIdDto(uId);
         
         var viewModel = new UserProfileModel(user);
         return View(viewModel);

@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using app.DTO.Auth.GitHub;
+using app.DTO.User;
 using app.Models;
 using app.Repositories;
 
@@ -17,6 +18,13 @@ public class UserService(IUserRepository userRepository)
         return userRepository.GetUserById(id) ?? throw new ArgumentException("User with this id was not found");
     }
 
+    // This method returns a DTO check app/DTO/user for the DTO constructor
+    public UserPageDto GetUserByIdDto(string id)
+    {
+        var user = userRepository.GetUserById(id) ?? throw new ArgumentException("User with this id was not found");
+        var userPageDto = new UserPageDto(user.Username, user.Email, null);
+        return userPageDto;
+    }
     
     /**
      * Verifies if the password matches the password with the supplied user.
