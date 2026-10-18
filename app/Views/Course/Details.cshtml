@@ -86,19 +86,15 @@
         return new Date(timestampInMilliseconds);
     }
 
-    function getLang() {
-        if (navigator.languages !== undefined)
-            return navigator.languages[0];
-        return navigator.language;
-    }
 
-
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const chatMessageNodes = document.getElementById("chatMessages");
     // This script exists to easily get the timezone and preferred locale of the user, instead of having to send it over to the server and process it there.
     for (let i = 0; i < chatMessageNodes.children.length; i++){
         let nodeId = chatMessageNodes.children[i].id;
         let uuid = nodeId.replace("message:","");
-        chatMessageNodes.children[i].children[0].textContent = extractTimestampFromUUIDv7(uuid).toLocaleString(getLang(),{timezone:Intl.DateTimeFormat().resolvedOptions().timeZone});
+        // The last part of this method chain (toLocaleString) gives us the local time, instead of utc time.
+        chatMessageNodes.children[i].children[0].textContent = extractTimestampFromUUIDv7(uuid).toLocaleString(navigator.languages[0],{timezone:timezone});
     }
 </script>
 
