@@ -1,3 +1,4 @@
+using app.DTO.Chat;
 using app.Models;
 using app.Repositories;
 
@@ -6,7 +7,7 @@ namespace app.Services;
 public class ChatMessageService(IChatMessageRepository chatMessageRepository)
 {
     
-    public async Task<List<ChatMessage>> GetAllChatMessagesInChannel(string channel)
+    public async Task<List<ChatMessageDto>> GetAllChatMessagesInChannel(string channel)
     {
         return await chatMessageRepository.GetAllChatMessagesByChannel(channel);
     }

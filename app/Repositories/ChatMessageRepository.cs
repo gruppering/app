@@ -1,4 +1,5 @@
 using app.DAL;
+using app.DTO.Chat;
 using app.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,9 +14,9 @@ public class ChatMessageRepository(GrupperingTypeContext typeContext): IChatMess
         return message ?? throw new ArgumentException("Message with this id does not exist");
     }
 
-    public async Task<List<ChatMessage>> GetAllChatMessagesByChannel(string channel)
+    public async Task<List<ChatMessageDto>> GetAllChatMessagesByChannel(string channel)
     {
-        return await typeContext.ChatMessages.Where(cm => cm.Channel == channel).ToListAsync();
+        return await typeContext.ChatMessages.Where(cm => cm.Channel == channel).Select(c => new ChatMessageDto(c.UserId,c.Username,c.Message)).ToListAsync();
     }
 
     public async Task<List<ChatMessage>> GetAllChatMessagesByUserId(Guid userId)
