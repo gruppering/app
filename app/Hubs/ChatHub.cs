@@ -10,12 +10,14 @@ public class ChatHub(ChatMessageService messageService): Hub
     public async Task ConnectToChannel(string channel)
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, channel);
-        await Clients.Group(channel).SendAsync("ReceiveMessage", $"{Context.User!.Claims.First( c => c.Type == ClaimTypes.NameIdentifier).Value} connected");
+        await Clients.Group(channel).SendAsync("UserConnected", $"{Context.User!.Claims.First( c => c.Type == ClaimTypes.NameIdentifier).Value} connected");
     }
     
     public async Task SendMessage(string channel,string message)
     {
         var userId = Context.User!.Claims.First(c => c.Type == ClaimTypes.NameIdentifier);
+        var userName = Context.User!.Claims.First(c => c.Type == ClaimTypes.Name);
+
         
         // Sends the message early, so the client doesn't have to wait for the db call.
         await Clients.Groups(channel).SendAsync("ReceiveMessage",message);
@@ -24,7 +26,8 @@ public class ChatHub(ChatMessageService messageService): Hub
         {
             Channel = channel,
             Message = message,
-            UserId = Guid.Parse(userId.Value)
+            UserId = Guid.Parse(userId.Value),
+            Username = userName.Value
         };
         await messageService.SaveMessage(chatMessage);
     }
