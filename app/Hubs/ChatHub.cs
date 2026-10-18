@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using app.DTO.Chat;
 using app.Models;
 using app.Services;
 using Microsoft.AspNetCore.SignalR;
@@ -18,12 +19,13 @@ public class ChatHub(ChatMessageService messageService): Hub
         var userId = Context.User!.Claims.First(c => c.Type == ClaimTypes.NameIdentifier);
         var userName = Context.User!.Claims.First(c => c.Type == ClaimTypes.Name);
 
-        
+        var messageId = Guid.CreateVersion7();
         // Sends the message early, so the client doesn't have to wait for the db call.
-        await Clients.Groups(channel).SendAsync("ReceiveMessage",message);
+        await Clients.Groups(channel).SendAsync("ReceiveMessage",new ChatMessageDto(messageId,Guid.Parse(userId.Value),userName.Value,message));
         
         var chatMessage = new ChatMessage
         {
+            Id = messageId,
             Channel = channel,
             Message = message,
             UserId = Guid.Parse(userId.Value),

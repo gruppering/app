@@ -16,7 +16,7 @@ public class ChatMessageRepository(GrupperingTypeContext typeContext): IChatMess
 
     public async Task<List<ChatMessageDto>> GetAllChatMessagesByChannel(string channel)
     {
-        return await typeContext.ChatMessages.Where(cm => cm.Channel == channel).Select(c => new ChatMessageDto(c.UserId,c.Username,c.Message)).ToListAsync();
+        return await typeContext.ChatMessages.Where(cm => cm.Channel == channel).Select(c => new ChatMessageDto(c.Id,c.UserId,c.Username,c.Message)).ToListAsync();
     }
 
     public async Task<List<ChatMessage>> GetAllChatMessagesByUserId(Guid userId)
