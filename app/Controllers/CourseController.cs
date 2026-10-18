@@ -6,7 +6,7 @@ using app.ViewModel;
 using QRCoder;
 
 namespace app.Controllers;
-public class CourseController(CourseService courseService,GroupService groupService, UserService userService) : Controller
+public class CourseController(CourseService courseService,GroupService groupService, UserService userService,ChatMessageService chatMessageService) : Controller
 {
     private static readonly ILoggerFactory Factory = LoggerFactory.Create(builder => builder.AddConsole());
     private readonly ILogger _logger = Factory.CreateLogger("Groups");
@@ -48,8 +48,10 @@ public class CourseController(CourseService courseService,GroupService groupServ
             using var qrCodeData = QRCodeGenerator.GenerateQrCode(qrCodeUrl);
             var svgRenderer = new SvgQRCode(qrCodeData);
             string svg = svgRenderer.GetGraphic();
+
+            var chatMessages = await chatMessageService.GetAllChatMessagesInChannel($"course:{course.JoinCode}");
             
-            var detailCourseViewModel = new CourseDetailViewModel(course, isOwner, users,groups, svg);
+            var detailCourseViewModel = new CourseDetailViewModel(course, isOwner, users,groups, svg, chatMessages);
         
             return View(detailCourseViewModel);
         }

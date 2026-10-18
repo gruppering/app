@@ -60,6 +60,13 @@
     
 }
 
+@foreach (var chatMessage in Model.ChatMessages)
+{
+    <div>
+        <span>@chatMessage</span>
+    </div>
+}
+
 @if (Model.IsOwner && !Model.GroupsInCourse.Any())
 {
         <script>
@@ -144,6 +151,9 @@
             console.log(message);
         });
 
+        connection.on("UserConnected", (message) => {
+            console.log(message);
+        });
 
         connection.onclose(async () => {
             await start();
