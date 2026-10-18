@@ -1,3 +1,4 @@
+@using System.Security.Claims
 @model app.ViewModel.CourseDetailViewModel
 @{
     ViewData["Title"] = "Course - " + Model.Course.DisplayName;  
@@ -66,6 +67,20 @@
         <div id="message:@chatMessage.Id" data-message-id="@chatMessage.Id" data-message-user="@chatMessage.UserId">
             <span></span>
             <span>@chatMessage.Username: @chatMessage.Message</span>
+            
+            @if (chatMessage.UserId.ToString() == Context.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value)
+            {
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Message Actions
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Edit Message</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" onclick="deleteMessage('@chatMessage.Id')">Delete</a></li>
+                    </ul>
+                </div>
+            }
         </div>
     }
 </section>
@@ -173,6 +188,9 @@
             .configureLogging(signalR.LogLevel.Information)
             .build();
 
+        const channel = "course:@Model.Course.JoinCode";
+
+
         async function start() {
             try {
                 await connection.start();
@@ -186,19 +204,41 @@
         connection.on("ReceiveMessage", (messageDto) => {
             let rootElement = document.getElementById("chatMessages");
             let newChatElement = document.createElement("div");
+            
+            newChatElement.id = "message:" + messageDto.id;
             newChatElement.setAttribute("data-chat-user",messageDto.userId);
             
             let newChatDateElement = document.createElement("span");
-            newChatDateElement.textContent = extractTimestampFromUUIDv7(messageDto.userId).toLocaleString(getLang(),{timezone:Intl.DateTimeFormat().resolvedOptions().timeZone});
+            newChatDateElement.textContent = extractTimestampFromUUIDv7(messageDto.userId).toLocaleString(navigator.languages[0],{timezone:Intl.DateTimeFormat().resolvedOptions().timeZone});
             newChatElement.append(newChatDateElement);
             
             let newChatTextElement = document.createElement("span");
             newChatTextElement.textContent = `${messageDto.username}: ${messageDto.message}`;
             newChatElement.append(newChatTextElement);
             
+            
+            let dropdown = document.getElementById("dropdown-template").cloneNode(true);
+            
+            //dropdown.children[1].children[2].setAttribute("onclick",`deleteMessage(${messageDto.id})`)
+            
+            newChatElement.append(dropdown);
+            
+            newChatElement.children[newChatElement.children.length -1].classList.remove("visually-hidden");
+            newChatElement.children[newChatElement.children.length -1]
+                .children[1]
+                .children[2]
+                .setAttribute("onclick",`deleteMessage("${messageDto.id}")`);
+            
             rootElement.append(newChatElement);
             
         });
+        
+        connection.on("MessageDeleted", (messageId) => {
+            console.log("Deleting message: " + messageId);
+            
+            let elem = document.getElementById("message:" + messageId);
+            elem.parentNode.removeChild(elem);
+        })
 
         connection.on("UserConnected", (message) => {
             console.log(message);
@@ -215,9 +255,16 @@
         
         async function sendMessage(){
             try {
-                let channel = "course:@Model.Course.JoinCode";
                 let message = document.getElementById("textMessage").value;
                 await connection.invoke("SendMessage", channel, message);
+            } catch (err) {
+                console.error(err);
+            }
+
+        }
+        async function deleteMessage(messageId){
+            try {
+                await connection.invoke("DeleteMessage",channel, messageId);
             } catch (err) {
                 console.error(err);
             }
@@ -226,3 +273,14 @@
         
     </script>
 }
+
+<div class="dropdown visually-hidden" id="dropdown-template">
+    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Message Actions
+    </button>
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="#">Edit Message</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item">Delete</a></li>
+    </ul>
+</div>

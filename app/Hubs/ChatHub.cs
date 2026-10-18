@@ -37,11 +37,10 @@ public class ChatHub(ChatMessageService messageService): Hub
     public async Task DeleteMessage(string channel, string messageId)
     {
         var userId = Context.User!.Claims.First(c => c.Type == ClaimTypes.NameIdentifier);
-
-        // Not sure how this ideally should be done in the frontend,
-        // imagining the div id becomes "message-{id}" or something, and then we remove that using JavaScript.
-        await Clients.Groups(channel).SendAsync("DeletedMessage",messageId);
         
         await messageService.DeleteMessage(Guid.Parse(messageId),Guid.Parse(userId.Value));
+        
+        await Clients.Groups(channel).SendAsync("MessageDeleted",messageId);
+
     }
 }
