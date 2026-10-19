@@ -211,7 +211,7 @@
             newChatElement.setAttribute("data-chat-user",messageDto.userId);
             
             let newChatDateElement = document.createElement("span");
-            newChatDateElement.textContent = extractTimestampFromUUIDv7(messageDto.userId).toLocaleString(navigator.languages[0],{timezone:Intl.DateTimeFormat().resolvedOptions().timeZone});
+            newChatDateElement.textContent = extractTimestampFromUUIDv7(messageDto.id).toLocaleString(navigator.languages[0],{timezone:Intl.DateTimeFormat().resolvedOptions().timeZone});
             newChatDateElement.id = `message:${messageDto.id}:time`;
             newChatElement.append(newChatDateElement);
 
