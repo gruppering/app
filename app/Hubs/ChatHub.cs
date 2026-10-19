@@ -33,6 +33,17 @@ public class ChatHub(ChatMessageService messageService): Hub
         };
         await messageService.SaveMessage(chatMessage);
     }
+    
+    public async Task UpdateMessage(string channel, string messageId,string message)
+    {
+        var userId = Context.User!.Claims.First(c => c.Type == ClaimTypes.NameIdentifier);
+        
+        await messageService.UpdateMessage(Guid.Parse(messageId),message);
+        
+        await Clients.Groups(channel).SendAsync("MessageUpdated",messageId,message);
+
+    }
+    
 
     public async Task DeleteMessage(string channel, string messageId)
     {

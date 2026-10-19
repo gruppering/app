@@ -23,8 +23,10 @@ public class ChatMessageService(IChatMessageRepository chatMessageRepository)
         await chatMessageRepository.SaveMessage(message);
     }
 
-    public async Task UpdateMessage(ChatMessage message)
+    public async Task UpdateMessage(Guid messageId, string updatedMessage)
     {
+        var message = chatMessageRepository.GetChatMessageById(messageId);
+        message.Message = updatedMessage;
         await chatMessageRepository.UpdateChatMessage(message);
     }
 
