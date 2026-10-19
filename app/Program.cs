@@ -1,5 +1,6 @@
 using app.DAL;
 using app.DTO.Course;
+using app.Hubs;
 using app.Repositories;
 using app.Services;
 using app.Utils;
@@ -57,6 +58,11 @@ builder.Services.AddScoped<CourseService>();
 builder.Services.AddScoped<IGroupRepository,GroupRepository>();
 builder.Services.AddScoped<GroupService>();
 
+builder.Services.AddScoped<IChatMessageRepository, ChatMessageRepository>();
+builder.Services.AddScoped<ChatMessageService>();
+
+// SignalR Hubs
+builder.Services.AddSignalR();
 
 // Feature Flags
 builder.Configuration["FeatureManagement:GoogleSignin"] = Environment.GetEnvironmentVariable("GOOGLE_SIGNIN_ENABLED"); // As we use a .env file, we set this manually, instead of having to update it in appsettings as well.
@@ -131,9 +137,12 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseCookiePolicy();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseStaticFiles();
+
+app.MapHub<ChatHub>("chat");
 
 app.MapControllers().WithStaticAssets();
 

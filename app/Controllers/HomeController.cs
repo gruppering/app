@@ -33,7 +33,7 @@ public class HomeController(UserService userService): Controller
         {
             List<Claim> claims = user.Roles.ConvertAll(role => new Claim(ClaimTypes.Role, role.Role));
             claims.Add(new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()));
-            
+            claims.Add(new Claim(ClaimTypes.Name,user.Username));
             var claimsIdentity = new ClaimsIdentity(claims, "cookie");
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
             
@@ -60,6 +60,7 @@ public class HomeController(UserService userService): Controller
             var claims = new List<Claim>
             {
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new(ClaimTypes.Name,user.Username),
                 new(ClaimTypes.Role, "ROLE_USER")
             };
 
@@ -101,6 +102,7 @@ public class HomeController(UserService userService): Controller
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Name,user.Username),
             new(ClaimTypes.Role, "ROLE_USER")
         };
 
@@ -126,6 +128,7 @@ public class HomeController(UserService userService): Controller
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name,user.Username),
             new(ClaimTypes.Role, "ROLE_USER")
         };
 

@@ -1,3 +1,4 @@
+@using System.Security.Claims
 @model app.ViewModel.CourseDetailViewModel
 @{
     ViewData["Title"] = "Course - " + Model.Course.DisplayName;  
@@ -59,10 +60,69 @@
     <p>@user.username</p>
     
 }
+<h3>Chat Messages</h3>
+<section id="chatMessages">
+    @foreach (var chatMessage in Model.ChatMessages)
+    {
+        <div id="message:@chatMessage.Id" data-message-user="@chatMessage.UserId">
+            <span id="message:@chatMessage.Id:time"></span>
+            <span id="message:@chatMessage.Id:sender">@chatMessage.Username:</span>
+            <span id="message:@chatMessage.Id:content">@chatMessage.Message</span>
+            
+            @if (chatMessage.UserId.ToString() == Context.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value)
+            {
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Message Actions
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editMessageModal" data-bs-message-id="@chatMessage.Id">Edit Message</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" onclick="deleteMessage('@chatMessage.Id')">Delete</a></li>
+                    </ul>
+                </div>
+            }
+        </div>
+    }
+</section>
+<script>
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    
+    // Taken from here: https://park.is/blog_posts/20240803_extracting_timestamp_from_uuid_v7/
+    function extractTimestampFromUUIDv7(uuid) {
+        // split the UUID into its components
+        const parts = uuid.split("-");
+
+        // the second part of the UUID contains the high bits of the timestamp (48 bits in total)
+        const highBitsHex = parts[0] + parts[1].slice(0, 4);
+
+        // convert the high bits from hex to decimal
+        const timestampInMilliseconds = parseInt(highBitsHex, 16);
+
+        // convert the timestamp to a Date object
+        return new Date(timestampInMilliseconds).toLocaleString(navigator.languages[0],{timezone:timezone});
+    }
+
+
+    const chatMessageNodes = document.getElementById("chatMessages");
+    // This script exists to easily get the timezone and preferred locale of the user, instead of having to send it over to the server and process it there.
+    for (let i = 0; i < chatMessageNodes.children.length; i++){
+        let nodeId = chatMessageNodes.children[i].id;
+        let uuid = nodeId.replace("message:","");
+        // The last part of this method chain (toLocaleString) gives us the local time, instead of utc time.
+        chatMessageNodes.children[i].children[0].textContent = extractTimestampFromUUIDv7(uuid);
+    }
+</script>
+
+<div class="input-group mb-3">
+    <input type="text" class="form-control" id="textMessage" name="textMessage" placeholder="New Message" aria-label="New Message" aria-describedby="message-button">
+    <button class="btn btn-outline-secondary" type="button" id="message-button" onclick="sendMessage()">Send</button>
+</div>
 
 @if (Model.IsOwner && !Model.GroupsInCourse.Any())
 {
-    <script>
+        <script>
         const groupDiv = document.getElementById("groups");
 
         const groupAmount = document.getElementById("groupAmount");
@@ -118,5 +178,171 @@
         
             groupDiv.append(wrapper)
     }
-</script> 
+</script>
+
 }
+
+@section Scripts
+{
+    <script async>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/chat")
+            .configureLogging(signalR.LogLevel.Information)
+            .build();
+
+        const channel = "course:@Model.Course.JoinCode";
+
+
+        async function start() {
+            try {
+                await connection.start();
+                console.log("SignalR Connected.");
+            } catch (err) {
+                console.log(err);
+                setTimeout(start, 5000);
+            }
+        }
+
+        connection.on("ReceiveMessage", (messageDto) => {
+            let rootElement = document.getElementById("chatMessages");
+            let newChatElement = document.createElement("div");
+            
+            newChatElement.id = `message:${messageDto.id}`;
+            newChatElement.setAttribute("data-chat-user",messageDto.userId);
+            
+            let newChatDateElement = document.createElement("span");
+            newChatDateElement.textContent = extractTimestampFromUUIDv7(messageDto.userId).toLocaleString(navigator.languages[0],{timezone:Intl.DateTimeFormat().resolvedOptions().timeZone});
+            newChatDateElement.id = `message:${messageDto.id}:time`;
+            newChatElement.append(newChatDateElement);
+
+            let newChatSenderElement = document.createElement("span");
+            newChatSenderElement.textContent = `${messageDto.username}: `;
+            newChatSenderElement.id = `message:${messageDto.id}:sender`
+            newChatElement.append(newChatSenderElement);
+            
+            let newChatContentElement = document.createElement("span");
+            newChatContentElement.textContent = messageDto.message;
+            newChatContentElement.id = `message:${messageDto.id}:content`
+            newChatElement.append(newChatContentElement);
+            
+            
+            let dropdown = document.getElementById("dropdown-template").cloneNode(true);
+            
+            //dropdown.children[1].children[2].setAttribute("onclick",`deleteMessage(${messageDto.id})`)
+            
+            newChatElement.append(dropdown);
+            
+            newChatElement.children[newChatElement.children.length -1].classList.remove("visually-hidden");
+            newChatElement.children[newChatElement.children.length -1]
+                .children[1]
+                .children[2]
+                .setAttribute("onclick",`deleteMessage("${messageDto.id}")`);
+            
+            rootElement.append(newChatElement);
+            
+        });
+        
+        connection.on("MessageUpdated", (messageId, message) => {
+            document.getElementById(`message:${messageId}:content`).textContent = message;
+        })
+        
+        connection.on("MessageDeleted", (messageId) => {
+            console.log("Deleting message: " + messageId);
+            
+            let elem = document.getElementById("message:" + messageId);
+            elem.parentNode.removeChild(elem);
+        })
+
+        connection.on("UserConnected", (message) => {
+            console.log(message);
+        });
+
+        connection.onclose(async () => {
+            await start();
+        });
+
+        // Start the connection.
+        start().then(() => {
+            connection.invoke("ConnectToChannel", "course:@Model.Course.JoinCode");
+        });
+        
+        async function sendMessage(){
+            try {
+                let message = document.getElementById("textMessage").value;
+                await connection.invoke("SendMessage", channel, message);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+        async function deleteMessage(messageId){
+            try {
+                await connection.invoke("DeleteMessage",channel, messageId);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+        
+        async function updateMessage(messageId){
+            const message = document.getElementById("newTextMessage").value;
+            
+            try {
+                await connection.invoke("UpdateMessage",channel, messageId, message);
+            } catch (err) {
+                console.error(err);
+            }
+            
+        }
+
+
+        const editMessageModal = document.getElementById('editMessageModal');
+        if (editMessageModal) {
+            editMessageModal.addEventListener('show.bs.modal', event => {
+                // Button that triggered the modal
+                const button = event.relatedTarget
+                
+                const messageId = button.getAttribute("data-bs-message-id");
+                const currentMessage = document.getElementById(`message:${messageId}:content`).textContent;
+                
+                // Update the modal's content.
+                const modalBodyInput = document.getElementById("newTextMessage");
+                modalBodyInput.value = currentMessage
+                
+                document.getElementById("newMessage-button").onclick = function (){
+                    updateMessage(messageId)
+                }
+            })
+        }
+
+
+    </script>
+}
+
+
+<div class="modal fade" id="editMessageModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editMessageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="editMessageModalLabel">Edit Message</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="newTextMessage" name="textMessage" placeholder="New Message" aria-label="New Message" aria-describedby="message-button">
+                    <button class="btn btn-outline-secondary" type="button" id="newMessage-button" data-bs-dismiss="modal" onclick="updateMessage()">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="dropdown visually-hidden" id="dropdown-template">
+    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Message Actions
+    </button>
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editMessageModal">Edit Message</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item">Delete</a></li>
+    </ul>
+</div>
