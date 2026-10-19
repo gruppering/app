@@ -40,12 +40,19 @@ public class ChatMessageService(IChatMessageRepository chatMessageRepository)
     /// Updates a message
     /// </summary>
     /// <param name="messageId">The id of the message to update</param>
+    /// <param name="userId">The id of the user sending the request</param>
     /// <param name="updatedMessage">the new message contents</param>
-    public async Task UpdateMessage(Guid messageId, string updatedMessage)
+    public async Task UpdateMessage(Guid messageId,Guid userId, string updatedMessage)
     {
         var message = chatMessageRepository.GetChatMessageById(messageId);
-        message.Message = updatedMessage;
-        await chatMessageRepository.UpdateChatMessage(message);
+        if (message.UserId.Equals(userId))
+        {
+            message.Message = updatedMessage;
+            await chatMessageRepository.UpdateChatMessage(message);
+        }
+        else throw new ArgumentException("User is not the sender of the message");
+
+        
     }
 
     /// <summary>

@@ -37,21 +37,37 @@ public class ChatHub(ChatMessageService messageService): Hub
     public async Task UpdateMessage(string channel, string messageId,string message)
     {
         var userId = Context.User!.Claims.First(c => c.Type == ClaimTypes.NameIdentifier);
-        
-        await messageService.UpdateMessage(Guid.Parse(messageId),message);
-        
-        await Clients.Groups(channel).SendAsync("MessageUpdated",messageId,message);
 
+        try
+        {
+            await messageService.UpdateMessage(Guid.Parse(messageId), Guid.Parse(userId.Value), message);
+
+            await Clients.Groups(channel).SendAsync("MessageUpdated", messageId, message);
+        }
+        catch (ArgumentException)
+        {
+            // TODO, should add logging in the case of a user trying to change someone else's message.
+            await Clients.Client(Context.ConnectionId).SendAsync("NefariousIntent","What are you trying to do?");
+        }
+        
     }
     
 
     public async Task DeleteMessage(string channel, string messageId)
     {
         var userId = Context.User!.Claims.First(c => c.Type == ClaimTypes.NameIdentifier);
-        
-        await messageService.DeleteMessage(Guid.Parse(messageId),Guid.Parse(userId.Value));
-        
-        await Clients.Groups(channel).SendAsync("MessageDeleted",messageId);
 
+        try
+        {
+            await messageService.DeleteMessage(Guid.Parse(messageId), Guid.Parse(userId.Value));
+
+            await Clients.Groups(channel).SendAsync("MessageDeleted", messageId);
+
+        }
+        catch (ArgumentException)
+        {
+            // TODO, should add logging in this case as well.
+            await Clients.Client(Context.ConnectionId).SendAsync("NefariousIntent","What are you trying to do?");
+        }
     }
 }
