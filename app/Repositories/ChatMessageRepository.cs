@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using app.DAL;
 using app.DTO.Chat;
 using app.Models;
@@ -21,13 +22,14 @@ public class ChatMessageRepository(GrupperingTypeContext typeContext): IChatMess
     }
 
     /// <summary>
-    /// Gets all messages from a specific channel.
+    /// Gets all messages from a specific channel, ordered by the id, as the timestamp is the first 12 characters of the id.
+    /// Uses AsNoTracking as we won't update these elements using this method, so we can enjoy a somewhat faster query.
     /// </summary>
     /// <param name="channel">The channel name, either in the form of "course:FOOH", or "FOOH:1" for a group</param>
     /// <returns>A list of all chat messages for this channel.</returns>
     public async Task<List<ChatMessageDto>> GetAllChatMessagesByChannel(string channel)
     {
-        return await typeContext.ChatMessages.Where(cm => cm.Channel == channel).Select(c => new ChatMessageDto(c.Id,c.UserId,c.Username,c.Message)).ToListAsync();
+        return await typeContext.ChatMessages.Where(cm => cm.Channel == channel).OrderBy(cm => cm.Id).AsNoTracking().Select(c => new ChatMessageDto(c.Id,c.UserId,c.Username,c.Message)).ToListAsync();
     }
 
     /// <summary>
