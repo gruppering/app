@@ -216,7 +216,7 @@
             newChatElement.append(newChatDateElement);
 
             let newChatSenderElement = document.createElement("span");
-            newChatSenderElement.textContent = `${messageDto.username}: `;
+            newChatSenderElement.textContent = ` ${messageDto.username}: `;
             newChatSenderElement.id = `message:${messageDto.id}:sender`
             newChatElement.append(newChatSenderElement);
             
@@ -226,17 +226,9 @@
             newChatElement.append(newChatContentElement);
             
             
-            let dropdown = document.getElementById("dropdown-template").cloneNode(true);
-            
-            //dropdown.children[1].children[2].setAttribute("onclick",`deleteMessage(${messageDto.id})`)
+            let dropdown = createDropdown(messageDto.id);
             
             newChatElement.append(dropdown);
-            
-            newChatElement.children[newChatElement.children.length -1].classList.remove("visually-hidden");
-            newChatElement.children[newChatElement.children.length -1]
-                .children[1]
-                .children[2]
-                .setAttribute("onclick",`deleteMessage("${messageDto.id}")`);
             
             rootElement.append(newChatElement);
             
@@ -293,6 +285,56 @@
             
         }
 
+        function createDropdown(messageId){
+            let rootEl = document.createElement("div");
+            rootEl.classList.add("dropdown");
+            
+            let toggleEl = document.createElement("button");
+            toggleEl.classList.add("btn", "btn-secondary", "dropdown-toggle");
+            toggleEl.setAttribute("type","button");
+            toggleEl.setAttribute("data-bs-toggle","dropdown");
+            toggleEl.setAttribute("aria-expanded","false");
+            toggleEl.textContent = "Message Actions";
+            
+            rootEl.append(toggleEl);
+            
+            let listEl = document.createElement("ul");
+            listEl.classList.add("dropdown-menu");
+            
+            let firstListEl = document.createElement("li");
+            let firstLink = document.createElement("a");
+            firstLink.classList.add("dropdown-item");
+            firstLink.setAttribute("data-bs-toggle","modal");
+            firstLink.setAttribute("data-bs-target","#editMessageModal");
+            firstLink.setAttribute("data-bs-message-id",messageId);
+            firstLink.textContent = "Edit Message";
+            
+            firstListEl.append(firstLink);
+            
+            let secondListEl = document.createElement("li");
+            let listDivider = document.createElement("hr");
+            listDivider.classList.add("dropdown-divider");
+            
+            secondListEl.append(listDivider);
+
+            let lastListEl = document.createElement("li");
+            let lastLink = document.createElement("a");
+            lastLink.classList.add("dropdown-item");
+            lastLink.setAttribute("data-bs-toggle","modal");
+            lastLink.textContent = "Delete";
+            lastLink.onclick = function (){
+                deleteMessage(messageId)
+            }
+            
+            lastListEl.append(lastLink);
+            
+            listEl.append(firstListEl,secondListEl,lastListEl);
+            
+            rootEl.append(listEl);
+            
+            return rootEl;
+            
+        }
 
         const editMessageModal = document.getElementById('editMessageModal');
         if (editMessageModal) {
@@ -312,7 +354,7 @@
                 }
             })
         }
-
+        
 
     </script>
 }
@@ -333,16 +375,4 @@
             </div>
         </div>
     </div>
-</div>
-
-
-<div class="dropdown visually-hidden" id="dropdown-template">
-    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        Message Actions
-    </button>
-    <ul class="dropdown-menu">
-        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editMessageModal">Edit Message</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item">Delete</a></li>
-    </ul>
 </div>
