@@ -33,15 +33,15 @@ public class CourseController(CourseService courseService,GroupService groupServ
 
     // Gets the course that is called and sends the user to a descriptive page of the course
     [HttpGet("/course")]
-    public async Task<IActionResult> Details([FromQuery] string courseName)
+    public async Task<IActionResult> Details([FromQuery] string code)
     {
         try
         {
-            var course = await courseService.GetCourseByNameAsync(courseName);
+            var course = await courseService.GetCourseByJoinCodeAsync(code);
             // Checking if the current user based on name is the same as the creator of a course
             // This can be used to make the course details content differ depending on ownership
             var isOwner = course.Owner.Id.ToString() == User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-            var users = await courseService.GetAllUsersFromCourseAsync(courseName);
+            var users = await courseService.GetAllUsersFromCourseByIdAsync(course.Id);
             var groups = await groupService.GetAllGroupsByCourse(course.Id);
             
             var qrCodeUrl = new PayloadGenerator.Url($"{Request.Scheme}://{Request.Host}{Request.PathBase}/courses/join?joinCode={course.JoinCode}");
@@ -57,8 +57,8 @@ public class CourseController(CourseService courseService,GroupService groupServ
         }
         catch(ArgumentException)
         {
-            _logger.LogError("No course with name: {courseName} was found",courseName);
-            return RedirectToAction("Error","Home",new {code = 404,description="A Course with that name was not found"});
+            _logger.LogError("No course with course code: {code} was found",code);
+            return RedirectToAction("Error","Home",new {code = 404,description="A Course with that code was not found"});
         }
     }
     

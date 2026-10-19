@@ -56,13 +56,27 @@ public class CourseService
         return await _courseRepository.GetAllPublicCoursesAsync();
     }
 
-    /**
-    * Gets all users from a course, and returns a list of them.
-    * TODO, same case as method above, should return a list of public DTO, withholding sensitive info.
-    */
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="courseName"></param>
+    /// <returns></returns>
     public async Task<List<UserDetailsDto>> GetAllUsersFromCourseAsync(string courseName)
     {
         var users = await _courseRepository.GetAllUsersFromCourse(courseName);
+        var dto = users.Select(item => new UserDetailsDto(item.Username));
+        
+        return dto.ToList();
+    }
+    
+    /// <summary>
+    /// Same as the method above, but uses the id so we can take advantage of the db index.
+    /// </summary>
+    /// <param name="courseId">The id of the course</param>
+    /// <returns>a list of the users in a course.</returns>
+    public async Task<List<UserDetailsDto>> GetAllUsersFromCourseByIdAsync(Guid courseId)
+    {
+        var users = await _courseRepository.GetAllUsersFromCourseById(courseId);
         var dto = users.Select(item => new UserDetailsDto(item.Username));
         
         return dto.ToList();
