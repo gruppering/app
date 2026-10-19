@@ -59,7 +59,6 @@ public class ChatMessageService(IChatMessageRepository chatMessageRepository)
         {
             await chatMessageRepository.DeleteMessage(messageId);
         }
-        throw new ArgumentException("User is not the sender of the message");
-
+        else throw new ArgumentException("User is not the sender of the message");
     }
 }
