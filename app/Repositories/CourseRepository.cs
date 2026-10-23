@@ -32,8 +32,8 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
      */
     public async Task<List<GrupperingUser>> GetAllUsersFromCourse(string courseName)
     {
-        var course = await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).FirstOrDefaultAsync(c => c.DisplayName == courseName);
-        if (course is not null) return course.Members;
+        var members = await typeContext.Courses.Include(c => c.Members).Where(c => c.DisplayName == courseName).Select(c => c.Members).FirstOrDefaultAsync();
+        if (members is not null) return members;
         
         _logger.LogWarning((string)"A Course with name: {courseName} was not found",courseName);
         throw new ArgumentException("A course with that name was not found.");
