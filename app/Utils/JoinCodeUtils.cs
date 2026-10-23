@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Html;
 using QRCoder;
 
 namespace app.Utils;
