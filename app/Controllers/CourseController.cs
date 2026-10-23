@@ -89,7 +89,7 @@ public class CourseController(CourseService courseService,GroupService groupServ
         try
         {
             var uId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-            var creator = userService.GetUserById(uId);
+            var creator = await userService.GetUserByIdAsync(uId);
 
             await courseService.CreateNewCourseAsync(dto, creator);
 
