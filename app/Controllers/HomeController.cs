@@ -28,22 +28,31 @@ public class HomeController(UserService userService): Controller
     [AllowAnonymous]
     public async Task<IActionResult> Login( [FromForm]string username, [FromForm]string password)
     {
-        var user = userService.GetUserByUsername(username);
-        if (user is not null && userService.VerifyPasswordMatches(user, password))
+        try
         {
-            List<Claim> claims = user.Roles.ConvertAll(role => new Claim(ClaimTypes.Role, role.Role));
-            claims.Add(new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()));
-            claims.Add(new Claim(ClaimTypes.Name,user.Username));
-            var claimsIdentity = new ClaimsIdentity(claims, "cookie");
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-            
-            if (HttpContext.Request.Query.TryGetValue("ReturnUrl",out var redirectUrl) && !redirectUrl.Equals(""))
-                return Redirect(redirectUrl!);
-            
-            return RedirectToAction("Index", "Home");
+            var user = userService.GetUserByUsername(username);
+            if (userService.VerifyPasswordMatches(user, password))
+            {
+                List<Claim> claims = user.Roles.ConvertAll(role => new Claim(ClaimTypes.Role, role.Role));
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+                claims.Add(new Claim(ClaimTypes.Name, user.Username));
+                var claimsIdentity = new ClaimsIdentity(claims, "cookie");
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity));
+
+                if (HttpContext.Request.Query.TryGetValue("ReturnUrl", out var redirectUrl) && !redirectUrl.Equals(""))
+                    return Redirect(redirectUrl!);
+
+                return RedirectToAction("Index", "Home");
+            }
         }
-        ViewBag.Error = "Invalid username or password";
-        return View();
+        catch (ArgumentException)
+        {
+            ViewBag.Error = "Invalid username or password";
+            return View();
+        }
+        
+        return RedirectToAction("Error","Home",new {code = 500,description="Something went wrong."});
     }
     
     [HttpGet("signup")]
@@ -74,11 +83,9 @@ public class HomeController(UserService userService): Controller
         }
         catch (ArgumentException)
         {
-            
+            ViewBag.Error = "User with this username already exists!";
+            return View();
         }
-            
-        ViewBag.Error = "User with this username already exists!";
-        return View();
     }
     
     
