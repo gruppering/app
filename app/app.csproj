@@ -5,7 +5,11 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-  </PropertyGroup>
+
+        <!-- Add this line to silence the warning -->
+        <GenerateProgramFile>false</GenerateProgramFile>
+
+    </PropertyGroup>
 
     <ItemGroup>
       <Content Include="..\.dockerignore">
