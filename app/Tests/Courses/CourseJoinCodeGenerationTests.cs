@@ -23,4 +23,11 @@ public class CourseJoinCodeGenerationTests
         Assert.That(result,Does.StartWith("<svg").And.EndsWith("</svg>"));
     }
     
+    [Test]
+    public void EnsureJoinCodeQrCodeGenerationFailsWhenPassingEmptyUrl()
+    {
+        string qrCodeUrl = "";
+        Assert.Throws<ArgumentException>(() => JoinCodeUtils.GenerateJoinCodeSvg(qrCodeUrl));
+    }
+    
 }

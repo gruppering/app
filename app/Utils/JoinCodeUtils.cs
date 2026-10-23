@@ -29,6 +29,7 @@ public static class JoinCodeUtils
 
     public static string GenerateJoinCodeSvg(string url)
     {
+        if (url.IsWhiteSpace() || url.Length == 0) throw new ArgumentException("Url cannot be empty");
         using var qrCodeData = QRCodeGenerator.GenerateQrCode(new PayloadGenerator.Url(url));
         var svgRenderer = new SvgQRCode(qrCodeData);
         return svgRenderer.GetGraphic();
