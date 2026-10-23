@@ -40,21 +40,24 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
         
     }
     
-    /**
-     * Gets all the users from the specified course id.
-     */
+    /// <summary>
+    /// Gets all users from a course by its id.
+    /// </summary>
+    /// <param name="courseId">The id of the course</param>
+    /// <returns>A list of users</returns>
+    /// <exception cref="ArgumentException">Thrown if a course with the specified id is not found</exception>
     public async Task<List<GrupperingUser>> GetAllUsersFromCourseById(Guid courseId)
     {
-        var course = await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).FirstOrDefaultAsync(c => c.Id == courseId);
-        if (course is not null) return course.Members;
+        var members = await typeContext.Courses.Include(c => c.Members).Where(c => c.Id == courseId).Select(c => c.Members).FirstOrDefaultAsync();
+        if (members is not null) return members;
         _logger.LogWarning((string)"A Course with id: {courseId} was not found",courseId);
-        throw new ArgumentException("A course with that name was not found.");
+        throw new ArgumentException("A course with that id was not found.");
     }
 
 
     public async Task<List<Course>> GetAllPublicCoursesAsync()
     {
-        return await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).Where(c => c.IsPublic).ToListAsync();
+        return await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).AsNoTracking().Where(c => c.IsPublic).ToListAsync();
     }
     
     public async Task<List<Course>> GetAllCoursesWithMemberAsync(GrupperingUser member)
