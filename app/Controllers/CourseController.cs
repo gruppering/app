@@ -4,7 +4,6 @@ using app.DTO.Course;
 using app.Services;
 using app.Utils;
 using app.ViewModel;
-using QRCoder;
 
 namespace app.Controllers;
 public class CourseController(CourseService courseService,GroupService groupService, UserService userService,ChatMessageService chatMessageService) : Controller
