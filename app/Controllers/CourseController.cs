@@ -20,7 +20,7 @@ public class CourseController(CourseService courseService,GroupService groupServ
             var publicCourses = await courseService.GetAllPublicCoursesAsync();
 
             var uId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-            var user = userService.GetUserById(uId);
+            var user = await userService.GetUserByIdAsync(uId);
             var memberOfCourse = await courseService.GetAllCoursesWithMemberAsync(user);
             var courseViewModel = new CourseViewModel(publicCourses, memberOfCourse);
             return View(courseViewModel);
