@@ -16,6 +16,12 @@ public class UserService(IUserRepository userRepository)
     {
         return userRepository.GetUserById(id) ?? throw new ArgumentException("User with this id was not found");
     }
+    
+    public async Task<GrupperingUser> GetUserByIdAsync(string id)
+    {
+        return await userRepository.GetUserByIdAsync(id) ?? throw new ArgumentException("User with this id was not found");
+    }
+
 
     
     /**

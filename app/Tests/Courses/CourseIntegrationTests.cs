@@ -69,7 +69,7 @@ public class CourseIntegrationTests
         var courseDto = new CourseCreationDto("testAddition3", "...", true);
         await _courseService.CreateNewCourseAsync(courseDto, _testUser!);
         await _courseService.DeleteCourseAsync(courseDto.CourseName, _testUser!);
-        Assert.ThrowsAsync<ArgumentException>(async () => await _courseService.GetCourseByNameAsync("testAddition3"));
+        await Assert.ThrowsAsync<ArgumentException>(async () => await _courseService.GetCourseByNameAsync("testAddition3"));
     }
 
     
