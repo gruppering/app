@@ -239,9 +239,10 @@
         })
         
         connection.on("MessageDeleted", (messageId) => {
-            console.log("Deleting message: " + messageId);
             
             let elem = document.getElementById("message:" + messageId);
+            // Necessary, or else bootstrap will throw an error.
+            elem.getElementsByClassName("dropdown").item(0).remove(); 
             elem.parentNode.removeChild(elem);
         })
 
