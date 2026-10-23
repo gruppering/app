@@ -68,7 +68,7 @@ public class CourseController(CourseService courseService,GroupService groupServ
             // Checking if the current user based on name is the same as the creator of a course
             var isOwner = course.Owner.Id.ToString() == User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             if (isOwner) return RedirectToAction("Error", "Home",new {code=500,description="You are the owner of this course"});
-            await courseService.AddUserToCourseAsync(course.DisplayName, User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            await courseService.AddUserToCourseAsync(course.Id, User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             
             return RedirectToAction("Details","Course",new {courseName=course.DisplayName});
         }
