@@ -57,7 +57,7 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
 
     public async Task<List<Course>> GetAllPublicCoursesAsync()
     {
-        return await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).AsNoTracking().Where(c => c.IsPublic).ToListAsync();
+        return await typeContext.Courses.Include(c => c.Owner).AsNoTracking().Where(c => c.IsPublic).ToListAsync();
     }
     
     public async Task<List<Course>> GetAllCoursesWithMemberAsync(GrupperingUser member)
