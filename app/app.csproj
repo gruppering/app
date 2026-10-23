@@ -6,7 +6,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 
-        <!-- Add this line to silence the warning -->
+        <!-- Disables automatic generation of entrypoint for testing, 
+        as we do this manually with ApplicationFactory. -->
         <GenerateProgramFile>false</GenerateProgramFile>
 
     </PropertyGroup>
