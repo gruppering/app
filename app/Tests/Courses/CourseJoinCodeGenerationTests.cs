@@ -14,5 +14,13 @@ public class CourseJoinCodeGenerationTests
         
         Assert.That(code.Length,Is.EqualTo(4));
     }
+
+    [Test]
+    public void EnsureJoinCodeQrCodeIsSvgHtmlElement()
+    {
+        string qrCodeUrl = "https://gruppering.no/join?joinCode=TEST";
+        var result = JoinCodeUtils.GenerateJoinCodeSvg(qrCodeUrl);
+        Assert.That(result,Does.StartWith("<svg").And.EndsWith("</svg>"));
+    }
     
 }
