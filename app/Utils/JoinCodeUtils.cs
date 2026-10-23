@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Html;
+using QRCoder;
+
 namespace app.Utils;
 
 public static class JoinCodeUtils
@@ -23,5 +26,13 @@ public static class JoinCodeUtils
         } while (overview.Contains(joinCode));
         
         return joinCode;
+    }
+
+    public static string GenerateJoinCodeSvg(string url)
+    {
+        using var qrCodeData = QRCodeGenerator.GenerateQrCode(new PayloadGenerator.Url(url));
+        var svgRenderer = new SvgQRCode(qrCodeData);
+        return svgRenderer.GetGraphic();
+
     }
 }

@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using app.DTO.Course;
 using app.Services;
+using app.Utils;
 using app.ViewModel;
 using QRCoder;
 
@@ -44,14 +45,11 @@ public class CourseController(CourseService courseService,GroupService groupServ
             var users = await courseService.GetAllUsersFromCourseByIdAsync(course.Id);
             var groups = await groupService.GetAllGroupsByCourse(course.Id);
             
-            var qrCodeUrl = new PayloadGenerator.Url($"{Request.Scheme}://{Request.Host}{Request.PathBase}/courses/join?joinCode={course.JoinCode}");
-            using var qrCodeData = QRCodeGenerator.GenerateQrCode(qrCodeUrl);
-            var svgRenderer = new SvgQRCode(qrCodeData);
-            string svg = svgRenderer.GetGraphic();
-
+            var qrCode = JoinCodeUtils.GenerateJoinCodeSvg($"{Request.Scheme}://{Request.Host}{Request.PathBase}/courses/join?joinCode={course.JoinCode}");
+            
             var chatMessages = await chatMessageService.GetAllChatMessagesInChannel($"course:{course.JoinCode}");
             
-            var detailCourseViewModel = new CourseDetailViewModel(course, isOwner, users,groups, svg, chatMessages);
+            var detailCourseViewModel = new CourseDetailViewModel(course, isOwner, users,groups, qrCode, chatMessages);
         
             return View(detailCourseViewModel);
         }
