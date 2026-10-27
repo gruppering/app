@@ -14,33 +14,44 @@ public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepositor
             .ToListAsync();
     }
 
-    /**
-     * Gets a group by the specified name and course.
-     */
+    /// <summary>
+    /// Gets a group by course id and group name
+    /// </summary>
+    /// <param name="name">The group name</param>
+    /// <param name="courseId">The course id</param>
+    /// <returns>A group</returns>
     public Group GetGroupByNameAndCourseId(string name, Guid courseId)
     {
         return typeContext.Groups.Include(g => g.Members).First(g => g.GroupName == name && g.CourseId == courseId);
     }
     
-    /**
-     * Gets all groups by the given prefix in a specific course.
-     */
+    /// <summary>
+    /// Gets all groups in the specified course by the specified prefix
+    /// </summary>
+    /// <param name="namePrefix">The prefix to search for</param>
+    /// <param name="courseId">The course id</param>
+    /// <returns>A list of groups with the given name prefix</returns>
     public async Task<List<Group>> GetGroupsByNamePrefixAndCourseId(string namePrefix, Guid courseId)
     {
         return await typeContext.Groups.Where(g => g.GroupName.StartsWith(namePrefix) && g.CourseId == courseId).ToListAsync();
     }
 
-    /**
-     * Self-explanatory...
-     */
+    /// <summary>
+    /// Gets a group by the course id and group id.
+    /// </summary>
+    /// <param name="groupId">the id of the group</param>
+    /// <param name="courseId">the course id</param>
+    /// <returns>a group</returns>
     public async Task<Group> GetGroupByCourseIdAndId(int groupId, Guid courseId)
     {
         return await typeContext.Groups.FirstAsync(g => g.Id == groupId && g.CourseId == courseId);
     }
 
-    /**
-     * Self-explanatory...
-     */
+    /// <summary>
+    /// Gets all groups from the specified course.
+    /// </summary>
+    /// <param name="courseId">The course id</param>
+    /// <returns>A list of groups</returns>
     public async Task<List<Group>> GetAllGroupsByCourse(Guid courseId)
     {
         return await typeContext.Groups.Include(g => g.Members).Where(g => g.CourseId == courseId).ToListAsync();
