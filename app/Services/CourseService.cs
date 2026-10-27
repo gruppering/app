@@ -67,7 +67,7 @@ public class CourseService
     /// <returns>A list of user detail dtos</returns>
     public async Task<List<UserDetailsDto>> GetAllUsersFromCourseAsync(string courseName)
     {
-        var users = await _courseRepository.GetAllUsersFromCourse(courseName);
+        var users = await _courseRepository.GetAllUsersFromCourseAsync(courseName);
         var dto = users.Select(item => new UserDetailsDto(item.Username));
         
         return dto.ToList();
@@ -80,7 +80,7 @@ public class CourseService
     /// <returns>a list of the users in a course.</returns>
     public async Task<List<UserDetailsDto>> GetAllUsersFromCourseByIdAsync(Guid courseId)
     {
-        var users = await _courseRepository.GetAllUsersFromCourseById(courseId);
+        var users = await _courseRepository.GetAllUsersFromCourseByIdAsync(courseId);
         var dto = users.Select(item => new UserDetailsDto(item.Username));
         
         return dto.ToList();
