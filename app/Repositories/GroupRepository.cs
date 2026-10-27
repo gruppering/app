@@ -91,10 +91,12 @@ public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepositor
         }
     }
 
-    /**
-     * Creates a new group with the given name, in the specified course.
-     * As names are not required to be unique.
-     */
+    /// <summary>
+    /// Creates a new group in the specified course with the specified name, as names aren't required to be unique.
+    /// </summary>
+    /// <param name="name">The name of the new group</param>
+    /// <param name="course">The course to add the new group to</param>
+    /// <returns>The newly created group</returns>
     public async Task<Group> CreateNewGroupAsync(string name, Course course)
     {
         // If there already exists groups connected to the given course, it returns the largest id.
@@ -114,12 +116,16 @@ public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepositor
         await typeContext.SaveChangesAsync();
         return resultGroup.Entity;
     }
-
-    /**
-     * Creates the specified number of groups with the given name prefix,
-     * for instance, with the prefix 'Group', the resulting group name would then be in the range of 'Group 1' - 'Group 50'.
-     * Returns the newly created groups.
-     */
+    
+    /// <summary>
+    /// Creates the specified number of groups with the given name prefix,
+    /// for instance, with the prefix 'Group', the resulting group name would then be in the range of 'Group 1' - 'Group 50'.
+    /// Returns the newly created groups. 
+    /// </summary>
+    /// <param name="namePrefix">The prefix</param>
+    /// <param name="amount">the number of groups to create</param>
+    /// <param name="course">the course to create the groups in</param>
+    /// <returns>a list of the newly created groups</returns>
     public async Task<List<Group>> CreateNewGroupsAsync(string namePrefix,int amount, Course course)
     {
         var nextId =  await typeContext.Groups
@@ -144,29 +150,37 @@ public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepositor
         return groups;
     }
 
-    /**
-     * Adds the specified user to the specified group,
-     * throws an ArgumentException if user is already a part of the group.
-     */
+    /// <summary>
+    /// Adds a user to the specified group.
+    /// </summary>
+    /// <param name="user">the user to add</param>
+    /// <param name="groupId">the id of the group</param>
+    /// <param name="course">the course</param>
+    /// <returns>the group the user was added to</returns>
+    /// <exception cref="UserAlreadyExistsException">Thrown if the user already is a part of a group</exception>
     public async Task<Group> AddUserToGroup(GrupperingUser user, int groupId, Course course)
     {
         var group = await typeContext.Groups.Include(g => g.Members).FirstAsync(g => g.Id == groupId && g.CourseId == course.Id);
         if (group.Members.Contains(user))
-            throw new ArgumentException("User is already a part of this group");
+            throw new UserAlreadyExistsException("User is already a part of this group");
         group.Members.Add(user);
         await typeContext.SaveChangesAsync();
         return group;
     }
 
-    /**
-     * Removes the specified user from the specified group,
-     * throws an ArgumentException if user isn't part of the group.
-     */
+    /// <summary>
+    /// Removes a user from the specified group
+    /// </summary>
+    /// <param name="user">the user to remove</param>
+    /// <param name="groupId">the id of the group to remove the user from</param>
+    /// <param name="course">the course</param>
+    /// <returns></returns>
+    /// <exception cref="UserNotFoundException">Thrown if the user is not a part of this group</exception>
     public async Task<Group> RemoveUserFromGroup(GrupperingUser user, int groupId, Course course)
     {
         var group = await typeContext.Groups.Include(g => g.Members).FirstAsync(g => g.Id == groupId && g.CourseId == course.Id);
         if (!group.Members.Contains(user))
-            throw new ArgumentException("User is not a part of this group!");
+            throw new UserNotFoundException("User is not a part of this group!");
         group.Members.Remove(user);
         await typeContext.SaveChangesAsync();
         return group;
