@@ -8,6 +8,11 @@ namespace app.Repositories;
 public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepository
 {
     
+    /// <summary>
+    /// Gets all the groups of a user by their username
+    /// </summary>
+    /// <param name="userName">the username of the user</param>
+    /// <returns>a list of the groups the user is a member of</returns>
     public async Task<List<Group>> GetUserGroups(string userName)
     {
         return await typeContext.Groups.Include(g => g.Members)
