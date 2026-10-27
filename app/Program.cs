@@ -129,7 +129,7 @@ using (var scope = app.Services.CreateScope())
 
         }
     }
-    catch(ArgumentException)
+    catch(ArgumentException) // As all the custom extensions extend ArgumentException, we don't have to change this.
     {
         logger.LogWarning("Assuming seeding has already been done, skipping.");
     }

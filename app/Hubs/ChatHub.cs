@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using app.DTO.Chat;
+using app.Exceptions;
 using app.Models;
 using app.Services;
 using Microsoft.AspNetCore.SignalR;
@@ -44,7 +45,7 @@ public class ChatHub(ChatMessageService messageService): Hub
 
             await Clients.Groups(channel).SendAsync("MessageUpdated", messageId, message);
         }
-        catch (ArgumentException)
+        catch (UserNotAuthorizedException)
         {
             // TODO, should add logging in the case of a user trying to change someone else's message.
             await Clients.Client(Context.ConnectionId).SendAsync("NefariousIntent","What are you trying to do?");
@@ -64,7 +65,7 @@ public class ChatHub(ChatMessageService messageService): Hub
             await Clients.Groups(channel).SendAsync("MessageDeleted", messageId);
 
         }
-        catch (ArgumentException)
+        catch (UserNotAuthorizedException)
         {
             // TODO, should add logging in this case as well.
             await Clients.Client(Context.ConnectionId).SendAsync("NefariousIntent","What are you trying to do?");

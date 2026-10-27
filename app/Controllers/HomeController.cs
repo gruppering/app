@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Security.Claims;
+using app.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using app.Models;
 using app.Services;
@@ -13,6 +14,8 @@ namespace app.Controllers;
 
 public class HomeController(UserService userService): Controller
 {
+    private static readonly ILoggerFactory Factory = LoggerFactory.Create(builder => builder.AddConsole());
+    private readonly ILogger _logger = Factory.CreateLogger("General");
     
     [HttpGet("/")]
     public IActionResult Index()
@@ -45,14 +48,20 @@ public class HomeController(UserService userService): Controller
 
                 return RedirectToAction("Index", "Home");
             }
-        }
-        catch (ArgumentException)
-        {
-            ViewBag.Error = "Invalid username or password";
+            ViewBag.Error = "Incorrect username or password";
             return View();
         }
+        catch (UserNotFoundException)
+        {
+            ViewBag.Error = "Incorrect username or password";
+            return View();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Something went terribly wrong; {errorMessage} - {errorLocation}",e.Message,e.TargetSite);
+            return RedirectToAction("Error","Home",new {code = 500,description="Something went wrong."});
+        }
         
-        return RedirectToAction("Error","Home",new {code = 500,description="Something went wrong."});
     }
     
     [HttpGet("signup")]
@@ -69,7 +78,7 @@ public class HomeController(UserService userService): Controller
             var claims = new List<Claim>
             {
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new(ClaimTypes.Name,user.Username),
+                new(ClaimTypes.Name, user.Username),
                 new(ClaimTypes.Role, "ROLE_USER")
             };
 
@@ -81,9 +90,14 @@ public class HomeController(UserService userService): Controller
 
             return RedirectToAction("Index", "Home");
         }
-        catch (ArgumentException)
+        catch (UserAlreadyExistsException uae)
         {
-            ViewBag.Error = "User with this username already exists!";
+            ViewBag.Error = uae.Message;
+            return View();
+        }
+        catch (IllegalArgumentException ia) // Handles both an invalid username or password
+        {
+            ViewBag.Error = ia.Message;
             return View();
         }
     }
