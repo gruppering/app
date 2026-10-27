@@ -1,4 +1,5 @@
 using app.DAL;
+using app.Exceptions;
 using app.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,9 +21,17 @@ public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepositor
     /// <param name="name">The group name</param>
     /// <param name="courseId">The course id</param>
     /// <returns>A group</returns>
+    /// <exception cref="GroupNotFoundException">Thrown if a group with this name was not found in the specified course</exception>
     public Group GetGroupByNameAndCourseId(string name, Guid courseId)
     {
-        return typeContext.Groups.Include(g => g.Members).First(g => g.GroupName == name && g.CourseId == courseId);
+        try
+        {
+            return typeContext.Groups.Include(g => g.Members).First(g => g.GroupName == name && g.CourseId == courseId);
+        }
+        catch (ArgumentNullException)
+        {
+            throw new GroupNotFoundException("A group with this name in this course was not found");
+        }
     }
     
     /// <summary>
@@ -31,9 +40,18 @@ public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepositor
     /// <param name="namePrefix">The prefix to search for</param>
     /// <param name="courseId">The course id</param>
     /// <returns>A list of groups with the given name prefix</returns>
+    /// <exception cref="GroupNotFoundException">Thrown if no groups with this prefix was found</exception>
     public async Task<List<Group>> GetGroupsByNamePrefixAndCourseId(string namePrefix, Guid courseId)
     {
-        return await typeContext.Groups.Where(g => g.GroupName.StartsWith(namePrefix) && g.CourseId == courseId).ToListAsync();
+        try
+        {
+            return await typeContext.Groups.Where(g => g.GroupName.StartsWith(namePrefix) && g.CourseId == courseId)
+                .ToListAsync();
+        }
+        catch (ArgumentNullException)
+        {
+            throw new GroupNotFoundException("Groups with this name prefix was not found");
+        }
     }
 
     /// <summary>
@@ -42,9 +60,17 @@ public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepositor
     /// <param name="groupId">the id of the group</param>
     /// <param name="courseId">the course id</param>
     /// <returns>a group</returns>
+    /// <exception cref="GroupNotFoundException">Thrown if a group with this id was not found</exception>
     public async Task<Group> GetGroupByCourseIdAndId(int groupId, Guid courseId)
     {
-        return await typeContext.Groups.FirstAsync(g => g.Id == groupId && g.CourseId == courseId);
+        try
+        {
+            return await typeContext.Groups.FirstAsync(g => g.Id == groupId && g.CourseId == courseId);
+        }
+        catch (ArgumentNullException)
+        {
+            throw new GroupNotFoundException("A group in this course with this id was not found");
+        }
     }
 
     /// <summary>
@@ -52,9 +78,17 @@ public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepositor
     /// </summary>
     /// <param name="courseId">The course id</param>
     /// <returns>A list of groups</returns>
+    /// <exception cref="CourseNotFoundException">Thrown if the course doesn't exist or if it has no groups</exception>
     public async Task<List<Group>> GetAllGroupsByCourse(Guid courseId)
     {
-        return await typeContext.Groups.Include(g => g.Members).Where(g => g.CourseId == courseId).ToListAsync();
+        try
+        {
+            return await typeContext.Groups.Include(g => g.Members).Where(g => g.CourseId == courseId).ToListAsync();
+        }
+        catch (ArgumentNullException)
+        {
+            throw new CourseNotFoundException("This course does not exist, or this course has no groups.");
+        }
     }
 
     /**
