@@ -1,3 +1,3 @@
 ﻿namespace app.Exceptions;
 
-public class UserDoesNotExistException(string? message = null): ArgumentException(message);
+public sealed class UserDoesNotExistException(string? message = null): ArgumentException(message);

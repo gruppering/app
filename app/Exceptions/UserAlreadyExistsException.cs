@@ -1,3 +1,3 @@
 ﻿namespace app.Exceptions;
 
-public class UserAlreadyExistsException(string? message = null): ArgumentException(message);
+public sealed class UserAlreadyExistsException(string? message = null): ArgumentException(message);
