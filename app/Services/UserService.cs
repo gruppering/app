@@ -63,18 +63,18 @@ public class UserService(IUserRepository userRepository)
     /// <returns>The created user</returns>
     /// <exception cref="ArgumentException">Thrown if the username is empty</exception>
     /// <exception cref="UserNotFoundException">Thrown if a user with this username already exists</exception>
-    /// <exception cref="PasswordNotMeetingCriteriaException">Thrown if the password does not meet signup criteria</exception>
+    /// <exception cref="IllegalArgumentException">Thrown if the password or username does not meet signup criteria</exception>
     public async Task<GrupperingUser> Signup(string username,string email, string password)
     {
         if (username.IsWhiteSpace())
-            throw new ArgumentException("Username is an empty string");
+            throw new IllegalArgumentException("Username is an empty string");
         
         if (userRepository.UserExistsWithUsername(username))
-            throw new UserNotFoundException("User with this username already exists.");
+            throw new UserAlreadyExistsException("User with this username already exists.");
 
         if (password.Length == 0 || password.IsWhiteSpace())
         {
-            throw new PasswordNotMeetingCriteriaException("Password is an empty string");
+            throw new IllegalArgumentException("Password is an empty string");
         }
         
         var user = new GrupperingUser

@@ -78,7 +78,7 @@ public class HomeController(UserService userService): Controller
             var claims = new List<Claim>
             {
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new(ClaimTypes.Name,user.Username),
+                new(ClaimTypes.Name, user.Username),
                 new(ClaimTypes.Role, "ROLE_USER")
             };
 
@@ -90,9 +90,14 @@ public class HomeController(UserService userService): Controller
 
             return RedirectToAction("Index", "Home");
         }
-        catch (ArgumentException)
+        catch (UserAlreadyExistsException uae)
         {
-            ViewBag.Error = "User with this username already exists!";
+            ViewBag.Error = uae.Message;
+            return View();
+        }
+        catch (IllegalArgumentException ia) // Handles both an invalid username or password
+        {
+            ViewBag.Error = ia.Message;
             return View();
         }
     }
