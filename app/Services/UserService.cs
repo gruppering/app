@@ -57,7 +57,7 @@ public class UserService(IUserRepository userRepository)
     /// <summary>
     /// Creates a user with the given required parameters.
     /// </summary>
-    /// <param name="username">the user name of the new user</param>
+    /// <param name="username">the username of the new user</param>
     /// <param name="email">the email of the new user</param>
     /// <param name="password">the password of the new user</param>
     /// <returns>The created user</returns>
