@@ -1,3 +1,3 @@
 ﻿namespace app.Errors;
 
-public sealed class CourseDoesNotExistException(string message): ArgumentException(message);
+public sealed class CourseDoesNotExistException(string? message = null): ArgumentException(message);
