@@ -37,7 +37,7 @@ public class CourseService
     /// </summary>
     /// <param name="joinCode">The join code of a course</param>
     /// <returns>A course</returns>
-    /// <exception cref="ArgumentException">Throws if a course with the specified join code was not found</exception>
+    /// <exception cref="CourseNotFoundException">Throws if a course with the specified join code was not found</exception>
     public async Task<Course> GetCourseByJoinCodeAsync(string joinCode)
     {
         if (_joinCodeOverview.TryGetValue(joinCode, out Guid id))
@@ -114,11 +114,11 @@ public class CourseService
     /// </summary>
     /// <param name="courseId">The id of the course </param>
     /// <param name="userId">The id of the user to add</param>
-    /// <exception cref="ArgumentException">Throws if a user with that id was not found or is already in the course.</exception>
+    /// <exception cref="UserAlreadyExistsException">Throws if a user with that id was not found or is already in the course.</exception>
     public async Task AddUserToCourseAsync(Guid courseId,string userId)
     {
         var course = await _courseRepository.GetCourseByIdAsync(courseId);
-        if (course.Members.Any(u => u.Id.ToString() == userId)) throw new ArgumentException("A user with that name already is a member of this course.");
+        if (course.Members.Any(u => u.Id.ToString() == userId)) throw new UserAlreadyExistsException("A user with that name already is a member of this course.");
         
         var user = await _userRepository.GetUserByIdAsync(userId);
         if (user is null) throw new UserNotFoundException();

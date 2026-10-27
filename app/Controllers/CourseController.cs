@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using app.DTO.Course;
+using app.Exceptions;
 using app.Services;
 using app.Utils;
 using app.ViewModel;
@@ -25,7 +26,7 @@ public class CourseController(CourseService courseService,GroupService groupServ
             var courseViewModel = new CourseViewModel(publicCourses, memberOfCourse);
             return View(courseViewModel);
         }
-        catch (ArgumentException)
+        catch (CourseNotFoundException)
         {
             return RedirectToAction("Error","Home",new {code = 404,description="Could not find courses"});
         }
@@ -52,10 +53,10 @@ public class CourseController(CourseService courseService,GroupService groupServ
         
             return View(detailCourseViewModel);
         }
-        catch(ArgumentException)
+        catch(CourseNotFoundException)
         {
             _logger.LogError("No course with course code: {code} was found",code);
-            return RedirectToAction("Error","Home",new {code = 404,description="A Course with that code was not found"});
+            return RedirectToAction("Error","Home",new {code = 404,description="A course with that code was not found"});
         }
     }
     
@@ -67,15 +68,24 @@ public class CourseController(CourseService courseService,GroupService groupServ
             var course = await courseService.GetCourseByJoinCodeAsync(joinCode);
             // Checking if the current user based on name is the same as the creator of a course
             var isOwner = course.Owner.Id.ToString() == User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-            if (isOwner) return RedirectToAction("Error", "Home",new {code=500,description="You are the owner of this course"});
+            if (isOwner)
+                return RedirectToAction("Error", "Home",
+                    new { code = 500, description = "You are the owner of this course" });
             await courseService.AddUserToCourseAsync(course.Id, User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            
-            return RedirectToAction("Details","Course",new {courseName=course.DisplayName});
+
+            return RedirectToAction("Details", "Course", new { courseName = course.DisplayName });
         }
-        catch(ArgumentException)
+        catch (CourseNotFoundException)
         {
-            _logger.LogError("No course with join code: {joinCode} was found",joinCode);
-            return RedirectToAction("Error","Home",new {code = 404,description="Could not find course with join code"});
+            _logger.LogError("No course with join code: {joinCode} was found", joinCode);
+            return RedirectToAction("Error", "Home",
+                new { code = 404, description = "Could not find course with join code" });
+        }
+        catch (UserAlreadyExistsException)
+        {
+            _logger.LogError("User is already a part of this course");
+            return RedirectToAction("Error", "Home",
+                new { code = 403, description = "You are already a part of this course" });
         }
     }
     
