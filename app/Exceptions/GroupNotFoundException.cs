@@ -1,3 +1,3 @@
 ﻿namespace app.Exceptions;
 
-public class GroupNotFoundException(string? message = null): ArgumentException(message);
+public sealed class GroupNotFoundException(string? message = null): ArgumentException(message);
