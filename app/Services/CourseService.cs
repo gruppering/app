@@ -1,5 +1,6 @@
 using app.DTO.Course;
 using app.DTO.User;
+using app.Exceptions;
 using app.Models;
 using app.Repositories;
 using app.Utils;
@@ -41,7 +42,7 @@ public class CourseService
     {
         if (_joinCodeOverview.TryGetValue(joinCode, out Guid id))
             return await _courseRepository.GetCourseByIdAsync(id);
-        throw new ArgumentException("A course with this join code was not found.");
+        throw new CourseNotFoundException("A course with this join code was not found.");
     }
 
     // Self-explanatory.
@@ -120,7 +121,7 @@ public class CourseService
         if (course.Members.Any(u => u.Id.ToString() == userId)) throw new ArgumentException("A user with that name already is a member of this course.");
         
         var user = await _userRepository.GetUserByIdAsync(userId);
-        if (user is null) throw new ArgumentException("A user with that name was not found"); // TODO, find better way of handling this
+        if (user is null) throw new UserNotFoundException();
         
         course.Members.Add(user);
         await _courseRepository.UpdateAsync(course);
@@ -143,12 +144,13 @@ public class CourseService
     /// </summary>
     /// <param name="courseName">The name of the course to remove the user from</param>
     /// <param name="userToRemove">The user to remove</param>
-    /// <exception cref="ArgumentException">Throws if either the course or user wasn't found</exception>
+    /// <exception cref="CourseNotFoundException">Throws if the course wasn't found</exception>
+    /// <exception cref="UserNotFoundException">Throws if the  user wasn't found</exception>
     public async Task RemoveUserFromCourseAsync(string courseName,GrupperingUser userToRemove)
     {
         var course = await _courseRepository.GetCourseByNameAsync(courseName);
         var user = course.Members.Find(u => u.Id == userToRemove.Id);
-        if (user is null) throw new ArgumentException("User was not found as a member of this course.");
+        if (user is null) throw new UserNotFoundException("User was not found as a member of this course.");
         course.Members.Remove(user);
         await _courseRepository.UpdateAsync(course);
     }
@@ -158,12 +160,13 @@ public class CourseService
     /// </summary>
     /// <param name="courseName">The name of the course to remove the user from</param>
     /// <param name="usernameToRemove">The username of the user to remove</param>
-    /// <exception cref="ArgumentException">Throws if either the course or user wasn't found</exception>
+    /// <exception cref="CourseNotFoundException">Throws if the course wasn't found</exception>
+    /// <exception cref="UserNotFoundException">Throws if the  user wasn't found</exception>
     public async Task RemoveUserFromCourseAsync(string courseName,string usernameToRemove)
     {
         var course = await _courseRepository.GetCourseByNameAsync(courseName);
         var user = course.Members.Find(u => u.Username == usernameToRemove);
-        if (user is null) throw new ArgumentException("User was not found as a member of this course.");
+        if (user is null) throw new UserNotFoundException("User was not found as a member of this course.");
         course.Members.Remove(user);
         await _courseRepository.UpdateAsync(course);
     }
@@ -200,11 +203,12 @@ public class CourseService
     /// <param name="courseName">The course to deleted</param>
     /// <param name="requestor">The user requesting the deletion</param>
     /// <returns>The deleted course</returns>
-    /// <exception cref="ArgumentException">Throws if the specified course wasn't found</exception>
+    /// <exception cref="UserNotAuthorizedException">Throws if the user isn't authorized to delete this course</exception>
+    /// <exception cref="CourseNotFoundException">Throws if the specified course wasn't found</exception>
     public async Task<Course> DeleteCourseAsync(string courseName,GrupperingUser requestor)
     {
         if (requestor.Roles.Any(r => r.Role == "ROLE_ADMIN"))
-            throw new ArgumentException("User is not authorized to complete this action.");
+            throw new UserNotAuthorizedException("User is not authorized to complete this action.");
         var course = await _courseRepository.GetCourseByNameAsync(courseName);
         _joinCodeOverview.Remove(course.JoinCode);
         return await _courseRepository.DeleteAsync(course);
