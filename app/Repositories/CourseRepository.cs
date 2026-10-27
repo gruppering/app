@@ -73,10 +73,18 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
     
     public async Task<List<Course>> GetAllCoursesWithMemberAsync(GrupperingUser member)
     {
-        return await typeContext.Courses
-            .Include(c => c.Owner)
-            .Include(c => c.Members)
-            .Where(c => c.Members.Any(g => g.Id == member.Id)).ToListAsync();
+        try
+        {
+            return await typeContext.Courses
+                .Include(c => c.Owner)
+                .Include(c => c.Members)
+                .Where(c => c.Members.Any(g => g.Id == member.Id)).ToListAsync();
+        }
+        catch (ArgumentNullException)
+        {
+            throw new CourseNotFoundException("Somehow, the supplied user does not exist?");
+        }
+        
     }
     
     public async Task<Course> SaveAsync(Course course)
