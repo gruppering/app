@@ -13,7 +13,7 @@ jobs:
       - name: Publish Image
         uses: matootie/github-docker@v3.1.0
         with:
-          context: ./app
+          context: .
           accessToken: ${{ github.token }}
           tag: |
             latest
