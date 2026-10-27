@@ -49,7 +49,7 @@ public class GroupService(IGroupRepository groupRepository,ICourseRepository cou
     {
         var course = await courseRepository.GetCourseByIdAsync(courseId);
         var groups = await groupRepository.GetAllGroupsByCourse(courseId);
-        var users = await courseRepository.GetAllUsersFromCourseById(courseId);
+        var users = await courseRepository.GetAllUsersFromCourseByIdAsync(courseId);
         int usersPerGroup = users.Count / groups.Count;
         int stragglers = users.Count % groups.Count;
         
@@ -87,7 +87,7 @@ public class GroupService(IGroupRepository groupRepository,ICourseRepository cou
     {
         var course = await courseRepository.GetCourseByIdAsync(courseId);
         var groups = await groupRepository.CreateNewGroupsAsync(groupPrefix,amount, course);
-        var users = await courseRepository.GetAllUsersFromCourseById(courseId);
+        var users = await courseRepository.GetAllUsersFromCourseByIdAsync(courseId);
         var usersToAdd = users;
         int usersPerGroup = users.Count / amount;
         int stragglers = users.Count % amount;
