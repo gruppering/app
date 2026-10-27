@@ -1,4 +1,5 @@
 using app.DTO.Chat;
+using app.Exceptions;
 using app.Models;
 using app.Repositories;
 
@@ -42,6 +43,7 @@ public class ChatMessageService(IChatMessageRepository chatMessageRepository)
     /// <param name="messageId">The id of the message to update</param>
     /// <param name="userId">The id of the user sending the request</param>
     /// <param name="updatedMessage">the new message contents</param>
+    /// <exception cref="UserNotAuthorizedException">Thrown if the user isn't authorized to update this message</exception>
     public async Task UpdateMessage(Guid messageId,Guid userId, string updatedMessage)
     {
         var message = chatMessageRepository.GetChatMessageById(messageId);
@@ -50,7 +52,7 @@ public class ChatMessageService(IChatMessageRepository chatMessageRepository)
             message.Message = updatedMessage;
             await chatMessageRepository.UpdateChatMessage(message);
         }
-        else throw new ArgumentException("User is not the sender of the message");
+        else throw new UserNotAuthorizedException("User is not the sender of the message");
 
         
     }
@@ -60,12 +62,13 @@ public class ChatMessageService(IChatMessageRepository chatMessageRepository)
     /// </summary>
     /// <param name="messageId">The message id</param>
     /// <param name="ownerId">The id of the owner, acquired from the http context object, so someone can't send a request to delete another user's message.</param>
+    /// <exception cref="UserNotAuthorizedException">Thrown if the user isn't authorized to delete this message</exception>
     public async Task DeleteMessage(Guid messageId,Guid ownerId)
     {
         if (chatMessageRepository.GetChatMessageById(messageId).UserId.Equals(ownerId))
         {
             await chatMessageRepository.DeleteMessage(messageId);
         }
-        else throw new ArgumentException("User is not the sender of the message");
+        else throw new UserNotAuthorizedException("User is not the sender of the message");
     }
 }
