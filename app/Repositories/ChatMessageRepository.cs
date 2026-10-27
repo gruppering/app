@@ -1,5 +1,6 @@
 using app.DAL;
 using app.DTO.Chat;
+using app.Exceptions;
 using app.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,11 +14,11 @@ public class ChatMessageRepository(GrupperingTypeContext typeContext): IChatMess
     /// </summary>
     /// <param name="messageId">The id of the message</param>
     /// <returns></returns>
-    /// <exception cref="ArgumentException">Throws when a message with this id is not found.</exception>
+    /// <exception cref="MessageNotFoundException">Throws when a message with this id is not found.</exception>
     public ChatMessage GetChatMessageById(Guid messageId)
     {
         var message =  typeContext.ChatMessages.Find(messageId);
-        return message ?? throw new ArgumentException("Message with this id does not exist");
+        return message ?? throw new MessageNotFoundException("Message with this id does not exist");
     }
 
     /// <summary>
@@ -26,9 +27,18 @@ public class ChatMessageRepository(GrupperingTypeContext typeContext): IChatMess
     /// </summary>
     /// <param name="channel">The channel name, either in the form of "course:FOOH", or "FOOH:1" for a group</param>
     /// <returns>A list of all chat messages for this channel.</returns>
+    /// <exception cref="ChatChannelNotFoundException">Thrown if the channel could not be found</exception>
     public async Task<List<ChatMessageDto>> GetAllChatMessagesByChannel(string channel)
     {
-        return await typeContext.ChatMessages.Where(cm => cm.Channel == channel).OrderBy(cm => cm.Id).AsNoTracking().Select(c => new ChatMessageDto(c.Id,c.UserId,c.Username,c.Message)).ToListAsync();
+        try
+        {
+            return await typeContext.ChatMessages.Where(cm => cm.Channel == channel).OrderBy(cm => cm.Id).AsNoTracking()
+                .Select(c => new ChatMessageDto(c.Id, c.UserId, c.Username, c.Message)).ToListAsync();
+        }
+        catch (ArgumentNullException)
+        {
+            throw new ChatChannelNotFoundException("A channel with this channel name was not found");
+        }
     }
 
     /// <summary>
@@ -66,10 +76,11 @@ public class ChatMessageRepository(GrupperingTypeContext typeContext): IChatMess
     /// Deletes the message with the given id, or throws an argument exception.
     /// </summary>
     /// <param name="messageId">The id of the message.</param>
+    /// <exception cref="MessageNotFoundException">Thrown if the specified message is not found</exception>
     public async Task DeleteMessage(Guid messageId)
     {
         var message = await typeContext.ChatMessages.FindAsync(messageId);
-        if (message is null) throw new ArgumentException("This message does not exist.");
+        if (message is null) throw new MessageNotFoundException("This message does not exist.");
         typeContext.ChatMessages.Remove(message);
         await typeContext.SaveChangesAsync();
     }
