@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using app.DTO.Auth.GitHub;
+using app.DTO.User;
 using app.Exceptions;
 using app.Models;
 using app.Repositories;
@@ -42,6 +43,13 @@ public class UserService(IUserRepository userRepository)
         return await userRepository.GetUserByIdAsync(id) ?? throw new UserNotFoundException("User with this id was not found");
     }
 
+    // This method returns a DTO check app/DTO/user for the DTO constructor
+    public UserPageDto GetUserByIdDto(string id)
+    {
+        var user = userRepository.GetUserById(id) ?? throw new ArgumentException("User with this id was not found");
+        var userPageDto = new UserPageDto(user.Username, user.Email);
+        return userPageDto;
+    }
     
     /// <summary>
     /// Verifies the supplied password matches the password from the supplied user.
@@ -164,14 +172,27 @@ public class UserService(IUserRepository userRepository)
         await userRepository.SaveRangeAsync(users);
         return users;
     }
-
+    // Deleting user and returning true or false depending on success or not
+    // TODO Create Unit tests 
     public async Task<bool> DeleteUser(GrupperingUser? user)
     {
         if (user != null &&  userRepository.UserExistsWithUsername(user.Username))
         {
-            await DeleteUser(user); 
+            await userRepository.DeleteUser(user); 
             return true;
         }
         return false;
+    }   
+    
+        // Updates the info and the user does have to exist in the DB
+    public async Task UpdateUserInfoAsync(string userId,UserPageDto dto)
+    {
+        var user = userRepository.GetUserById(userId);
+        if (user != null &&  userRepository.UserExistsWithUsername(user.Username))
+        {
+            user.Username = dto.Username;
+            user.Email = dto.Email;
+            await userRepository.UpdateUser(user);
+        }
     }
 }
