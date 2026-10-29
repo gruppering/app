@@ -5,7 +5,12 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-  </PropertyGroup>
+
+        <!-- Disables automatic generation of entrypoint for testing, 
+        as we do this manually with ApplicationFactory. -->
+        <GenerateProgramFile>false</GenerateProgramFile>
+
+    </PropertyGroup>
 
     <ItemGroup>
       <Content Include="..\.dockerignore">

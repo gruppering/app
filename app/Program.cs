@@ -1,5 +1,6 @@
 using app.DAL;
 using app.DTO.Course;
+using app.Hubs;
 using app.Repositories;
 using app.Services;
 using app.Utils;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,6 +59,11 @@ builder.Services.AddScoped<CourseService>();
 builder.Services.AddScoped<IGroupRepository,GroupRepository>();
 builder.Services.AddScoped<GroupService>();
 
+builder.Services.AddScoped<IChatMessageRepository, ChatMessageRepository>();
+builder.Services.AddScoped<ChatMessageService>();
+
+// SignalR Hubs
+builder.Services.AddSignalR();
 
 // Feature Flags
 builder.Configuration["FeatureManagement:GoogleSignin"] = Environment.GetEnvironmentVariable("GOOGLE_SIGNIN_ENABLED"); // As we use a .env file, we set this manually, instead of having to update it in appsettings as well.
@@ -80,6 +87,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     opt.Cookie.SameSite = SameSiteMode.Lax;
     opt.Cookie.IsEssential = true;
 });
+
+builder.Services.AddAuthorization();
 
 
 var app = builder.Build();
@@ -120,7 +129,7 @@ using (var scope = app.Services.CreateScope())
 
         }
     }
-    catch(ArgumentException)
+    catch(ArgumentException) // As all the custom extensions extend ArgumentException, we don't have to change this.
     {
         logger.LogWarning("Assuming seeding has already been done, skipping.");
     }
@@ -131,9 +140,12 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseCookiePolicy();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseStaticFiles();
+
+app.MapHub<ChatHub>("chat");
 
 app.MapControllers().WithStaticAssets();
 

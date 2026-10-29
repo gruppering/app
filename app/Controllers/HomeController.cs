@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Security.Claims;
+using app.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using app.Models;
 using app.Services;
@@ -13,6 +14,8 @@ namespace app.Controllers;
 
 public class HomeController(UserService userService): Controller
 {
+    private static readonly ILoggerFactory Factory = LoggerFactory.Create(builder => builder.AddConsole());
+    private readonly ILogger _logger = Factory.CreateLogger("General");
     
     [HttpGet("/")]
     public IActionResult Index()
@@ -28,22 +31,37 @@ public class HomeController(UserService userService): Controller
     [AllowAnonymous]
     public async Task<IActionResult> Login( [FromForm]string username, [FromForm]string password)
     {
-        var user = userService.GetUserByUsername(username);
-        if (user is not null && userService.VerifyPasswordMatches(user, password))
+        try
         {
-            List<Claim> claims = user.Roles.ConvertAll(role => new Claim(ClaimTypes.Role, role.Role));
-            claims.Add(new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()));
-            
-            var claimsIdentity = new ClaimsIdentity(claims, "cookie");
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-            
-            if (HttpContext.Request.Query.TryGetValue("ReturnUrl",out var redirectUrl) && !redirectUrl.Equals(""))
-                return Redirect(redirectUrl!);
-            
-            return RedirectToAction("Index", "Home");
+            var user = userService.GetUserByUsername(username);
+            if (userService.VerifyPasswordMatches(user, password))
+            {
+                List<Claim> claims = user.Roles.ConvertAll(role => new Claim(ClaimTypes.Role, role.Role));
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+                claims.Add(new Claim(ClaimTypes.Name, user.Username));
+                var claimsIdentity = new ClaimsIdentity(claims, "cookie");
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity));
+
+                if (HttpContext.Request.Query.TryGetValue("ReturnUrl", out var redirectUrl) && !redirectUrl.Equals(""))
+                    return Redirect(redirectUrl!);
+
+                return RedirectToAction("Index", "Home");
+            }
+            ViewBag.Error = "Incorrect username or password";
+            return View();
         }
-        ViewBag.Error = "Invalid username or password";
-        return View();
+        catch (UserNotFoundException)
+        {
+            ViewBag.Error = "Incorrect username or password";
+            return View();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Something went terribly wrong; {errorMessage} - {errorLocation}",e.Message,e.TargetSite);
+            return RedirectToAction("Error","Home",new {code = 500,description="Something went wrong."});
+        }
+        
     }
     
     [HttpGet("signup")]
@@ -60,6 +78,7 @@ public class HomeController(UserService userService): Controller
             var claims = new List<Claim>
             {
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new(ClaimTypes.Name, user.Username),
                 new(ClaimTypes.Role, "ROLE_USER")
             };
 
@@ -71,13 +90,16 @@ public class HomeController(UserService userService): Controller
 
             return RedirectToAction("Index", "Home");
         }
-        catch (ArgumentException)
+        catch (UserAlreadyExistsException uae)
         {
-            
+            ViewBag.Error = uae.Message;
+            return View();
         }
-            
-        ViewBag.Error = "User with this username already exists!";
-        return View();
+        catch (IllegalArgumentException ia) // Handles both an invalid username or password
+        {
+            ViewBag.Error = ia.Message;
+            return View();
+        }
     }
     
     
@@ -101,6 +123,7 @@ public class HomeController(UserService userService): Controller
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Name,user.Username),
             new(ClaimTypes.Role, "ROLE_USER")
         };
 
@@ -126,6 +149,7 @@ public class HomeController(UserService userService): Controller
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name,user.Username),
             new(ClaimTypes.Role, "ROLE_USER")
         };
 

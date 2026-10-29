@@ -6,6 +6,8 @@ public interface IUserRepository
 { 
     GrupperingUser? GetUserByUsername(string username);
     GrupperingUser? GetUserById(string id);
+    Task<GrupperingUser?> GetUserByIdAsync(string id);
+
 
     bool UserExistsWithUsername(string username);
     GrupperingUser? GetUserByIssuerAndSubject(string issuer,string subject);

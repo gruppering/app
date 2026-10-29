@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using app.DTO.Auth.GitHub;
 using app.DTO.User;
+using app.Exceptions;
 using app.Models;
 using app.Repositories;
 
@@ -9,13 +10,37 @@ namespace app.Services;
 public class UserService(IUserRepository userRepository)
 {
 
+    /// <summary>
+    /// Gets a user by their username
+    /// </summary>
+    /// <param name="username">The username</param>
+    /// <returns></returns>
+    /// <exception cref="UserNotFoundException">Thrown if the specified user wasn't found</exception>
     public GrupperingUser GetUserByUsername(string username)
     {
-        return userRepository.GetUserByUsername(username) ?? throw new ArgumentException("User with this username was not found");
+        return userRepository.GetUserByUsername(username) ?? throw new UserNotFoundException("User with this username was not found");
     }
+    
+    /// <summary>
+    /// Gets a user by their id
+    /// </summary>
+    /// <param name="id">The id of the user</param>
+    /// <returns></returns>
+    /// <exception cref="UserNotFoundException">Thrown if the specified user wasn't found</exception>
     public GrupperingUser GetUserById(string id)
     {
-        return userRepository.GetUserById(id) ?? throw new ArgumentException("User with this id was not found");
+        return userRepository.GetUserById(id) ?? throw new UserNotFoundException("User with this id was not found");
+    }
+    
+    /// <summary>
+    /// Gets a user by their id
+    /// </summary>
+    /// <param name="id">The id of the user</param>
+    /// <returns></returns>
+    /// <exception cref="UserNotFoundException">Thrown if the specified user wasn't found</exception>
+    public async Task<GrupperingUser> GetUserByIdAsync(string id)
+    {
+        return await userRepository.GetUserByIdAsync(id) ?? throw new UserNotFoundException("User with this id was not found");
     }
 
     // This method returns a DTO check app/DTO/user for the DTO constructor
@@ -26,25 +51,38 @@ public class UserService(IUserRepository userRepository)
         return userPageDto;
     }
     
-    /**
-     * Verifies if the password matches the password with the supplied user.
-     */
+    /// <summary>
+    /// Verifies the supplied password matches the password from the supplied user.
+    /// </summary>
+    /// <param name="user">The user object to get the password hash from</param>
+    /// <param name="passwordToCheck">the password to compare</param>
+    /// <returns>A bool representing whether the password matched</returns>
     public bool VerifyPasswordMatches(GrupperingUser user,string passwordToCheck)
     {
         return BCrypt.Net.BCrypt.Verify(passwordToCheck,user.PasswordHash);
     }
 
-    /**
-     * Creates a new user and adds them to the db, returns null if username already exists.
-     */
+    /// <summary>
+    /// Creates a user with the given required parameters.
+    /// </summary>
+    /// <param name="username">the username of the new user</param>
+    /// <param name="email">the email of the new user</param>
+    /// <param name="password">the password of the new user</param>
+    /// <returns>The created user</returns>
+    /// <exception cref="ArgumentException">Thrown if the username is empty</exception>
+    /// <exception cref="UserNotFoundException">Thrown if a user with this username already exists</exception>
+    /// <exception cref="IllegalArgumentException">Thrown if the password or username does not meet signup criteria</exception>
     public async Task<GrupperingUser> Signup(string username,string email, string password)
     {
+        if (username.IsWhiteSpace())
+            throw new IllegalArgumentException("Username is an empty string");
+        
         if (userRepository.UserExistsWithUsername(username))
-            throw new ArgumentException("User with this username already exists.");
+            throw new UserAlreadyExistsException("User with this username already exists.");
 
         if (password.Length == 0 || password.IsWhiteSpace())
         {
-            throw new ArgumentException("Password is empty");
+            throw new IllegalArgumentException("Password is an empty string");
         }
         
         var user = new GrupperingUser

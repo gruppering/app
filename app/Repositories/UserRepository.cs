@@ -15,6 +15,12 @@ public class UserRepository(GrupperingTypeContext typeContext): IUserRepository
     {
         return typeContext.Users.Include(u => u.Roles).FirstOrDefault(u => u.Id.ToString() == id);
     }
+    
+    public async Task<GrupperingUser?> GetUserByIdAsync(string id)
+    {
+        return await typeContext.Users.Include(u => u.Roles).FirstOrDefaultAsync(u => u.Id.ToString() == id);
+    }
+
 
 
     public bool UserExistsWithUsername(string username)

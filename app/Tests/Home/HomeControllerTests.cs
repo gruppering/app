@@ -5,8 +5,8 @@ namespace app.Tests.Home;
 
 public class HomeControllerTests
 {
-    private GrupperingTestApplicationFactory _factory;
-    private HttpClient _client;
+    private readonly GrupperingTestApplicationFactory _factory;
+    private readonly HttpClient _client;
 
 
     public HomeControllerTests()
@@ -25,6 +25,7 @@ public class HomeControllerTests
     }
 
 
+    // This WILL fail by design, as the auth middleware will redirect to the login page.
     [Test]
     public async Task ExampleIntegrationTest()
     {

@@ -1,4 +1,5 @@
 using app.DAL;
+using app.Exceptions;
 using app.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,12 +10,19 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
     private static readonly ILoggerFactory Factory = LoggerFactory.Create(builder => builder.AddConsole());
     private readonly ILogger _logger = Factory.CreateLogger("Courses");
     
+    
+    /// <summary>
+    /// Gets a course by its name
+    /// </summary>
+    /// <param name="courseName">The name of the course</param>
+    /// <returns>A course</returns>
+    /// <exception cref="CourseNotFoundException">Throws if the specified course was not found</exception>
     public async Task<Course> GetCourseByNameAsync(string courseName)
     {
         var course = await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).FirstOrDefaultAsync(c => c.DisplayName == courseName);
         if (course is not null) return course;
         _logger.LogWarning("A Course with name: {CourseName} was not found", courseName);   
-        throw new ArgumentException("A course with that name was not found.");
+        throw new CourseNotFoundException("A course with that name was not found.");
     }
     
     public async Task<Course> GetCourseByIdAsync(Guid id)
@@ -23,46 +31,60 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
         if (course is not null) return course;
         
         _logger.LogWarning((string)"A Course with id: {id} was not found",id);
-        throw new ArgumentException("A course with that id was not found.");
+        throw new CourseNotFoundException("A course with that id was not found.");
     }
 
 
-    /**
-     * Gets all users from the specified course.
-     */
-    public async Task<List<GrupperingUser>> GetAllUsersFromCourse(string courseName)
+    /// <summary>
+    /// Gets all users from a course by its name.
+    /// </summary>
+    /// <param name="courseName">The name of the course</param>
+    /// <returns>A list of users</returns>
+    /// <exception cref="CourseNotFoundException">Thrown if a course with the specified id is not found</exception>
+    public async Task<List<GrupperingUser>> GetAllUsersFromCourseAsync(string courseName)
     {
-        var course = await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).FirstOrDefaultAsync(c => c.DisplayName == courseName);
-        if (course is not null) return course.Members;
+        var members = await typeContext.Courses.Include(c => c.Members).Where(c => c.DisplayName == courseName).Select(c => c.Members).FirstOrDefaultAsync();
+        if (members is not null) return members;
         
         _logger.LogWarning((string)"A Course with name: {courseName} was not found",courseName);
-        throw new ArgumentException("A course with that name was not found.");
+        throw new CourseNotFoundException("A course with that name was not found.");
         
     }
     
-    /**
-     * Gets all the users from the specified course id.
-     */
-    public async Task<List<GrupperingUser>> GetAllUsersFromCourseById(Guid courseId)
+    /// <summary>
+    /// Gets all users from a course by its id.
+    /// </summary>
+    /// <param name="courseId">The id of the course</param>
+    /// <returns>A list of users</returns>
+    /// <exception cref="CourseNotFoundException">Thrown if a course with the specified id is not found</exception>
+    public async Task<List<GrupperingUser>> GetAllUsersFromCourseByIdAsync(Guid courseId)
     {
-        var course = await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).FirstOrDefaultAsync(c => c.Id == courseId);
-        if (course is not null) return course.Members;
+        var members = await typeContext.Courses.Include(c => c.Members).Where(c => c.Id == courseId).Select(c => c.Members).FirstOrDefaultAsync();
+        if (members is not null) return members;
         _logger.LogWarning((string)"A Course with id: {courseId} was not found",courseId);
-        throw new ArgumentException("A course with that name was not found.");
+        throw new CourseNotFoundException("A course with that id was not found.");
     }
 
 
     public async Task<List<Course>> GetAllPublicCoursesAsync()
     {
-        return await typeContext.Courses.Include(c => c.Owner).Include(c => c.Members).Where(c => c.IsPublic).ToListAsync();
+        return await typeContext.Courses.Include(c => c.Owner).AsNoTracking().Where(c => c.IsPublic).ToListAsync();
     }
     
     public async Task<List<Course>> GetAllCoursesWithMemberAsync(GrupperingUser member)
     {
-        return await typeContext.Courses
-            .Include(c => c.Owner)
-            .Include(c => c.Members)
-            .Where(c => c.Members.Any(g => g.Id == member.Id)).ToListAsync();
+        try
+        {
+            return await typeContext.Courses
+                .Include(c => c.Owner)
+                .Include(c => c.Members)
+                .Where(c => c.Members.Any(g => g.Id == member.Id)).ToListAsync();
+        }
+        catch (ArgumentNullException)
+        {
+            throw new CourseNotFoundException("Somehow, the supplied user does not exist?");
+        }
+        
     }
     
     public async Task<Course> SaveAsync(Course course)

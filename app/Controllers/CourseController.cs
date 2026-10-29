@@ -1,12 +1,13 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using app.DTO.Course;
+using app.Exceptions;
 using app.Services;
+using app.Utils;
 using app.ViewModel;
-using QRCoder;
 
 namespace app.Controllers;
-public class CourseController(CourseService courseService,GroupService groupService, UserService userService) : Controller
+public class CourseController(CourseService courseService,GroupService groupService, UserService userService,ChatMessageService chatMessageService) : Controller
 {
     private static readonly ILoggerFactory Factory = LoggerFactory.Create(builder => builder.AddConsole());
     private readonly ILogger _logger = Factory.CreateLogger("Groups");
@@ -20,12 +21,12 @@ public class CourseController(CourseService courseService,GroupService groupServ
             var publicCourses = await courseService.GetAllPublicCoursesAsync();
 
             var uId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-            var user = userService.GetUserById(uId);
+            var user = await userService.GetUserByIdAsync(uId);
             var memberOfCourse = await courseService.GetAllCoursesWithMemberAsync(user);
             var courseViewModel = new CourseViewModel(publicCourses, memberOfCourse);
             return View(courseViewModel);
         }
-        catch (ArgumentException)
+        catch (CourseNotFoundException)
         {
             return RedirectToAction("Error","Home",new {code = 404,description="Could not find courses"});
         }
@@ -33,30 +34,29 @@ public class CourseController(CourseService courseService,GroupService groupServ
 
     // Gets the course that is called and sends the user to a descriptive page of the course
     [HttpGet("/course")]
-    public async Task<IActionResult> Details([FromQuery] string courseName)
+    public async Task<IActionResult> Details([FromQuery] string code)
     {
         try
         {
-            var course = await courseService.GetCourseByNameAsync(courseName);
+            var course = await courseService.GetCourseByJoinCodeAsync(code);
             // Checking if the current user based on name is the same as the creator of a course
             // This can be used to make the course details content differ depending on ownership
             var isOwner = course.Owner.Id.ToString() == User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-            var users = await courseService.GetAllUsersFromCourseAsync(courseName);
+            var users = await courseService.GetAllUsersFromCourseByIdAsync(course.Id);
             var groups = await groupService.GetAllGroupsByCourse(course.Id);
             
-            var qrCodeUrl = new PayloadGenerator.Url($"{Request.Scheme}://{Request.Host}{Request.PathBase}/courses/join?joinCode={course.JoinCode}");
-            using var qrCodeData = QRCodeGenerator.GenerateQrCode(qrCodeUrl);
-            var svgRenderer = new SvgQRCode(qrCodeData);
-            string svg = svgRenderer.GetGraphic();
+            var qrCode = JoinCodeUtils.GenerateJoinCodeSvg($"{Request.Scheme}://{Request.Host}{Request.PathBase}/courses/join?joinCode={course.JoinCode}");
             
-            var detailCourseViewModel = new CourseDetailViewModel(course, isOwner, users,groups, svg);
+            var chatMessages = await chatMessageService.GetAllChatMessagesInChannel($"course:{course.JoinCode}");
+            
+            var detailCourseViewModel = new CourseDetailViewModel(course, isOwner, users,groups, qrCode, chatMessages);
         
             return View(detailCourseViewModel);
         }
-        catch(ArgumentException)
+        catch(CourseNotFoundException)
         {
-            _logger.LogError("No course with name: {courseName} was found",courseName);
-            return RedirectToAction("Error","Home",new {code = 404,description="A Course with that name was not found"});
+            _logger.LogError("No course with course code: {code} was found",code);
+            return RedirectToAction("Error","Home",new {code = 404,description="A course with that code was not found"});
         }
     }
     
@@ -68,15 +68,24 @@ public class CourseController(CourseService courseService,GroupService groupServ
             var course = await courseService.GetCourseByJoinCodeAsync(joinCode);
             // Checking if the current user based on name is the same as the creator of a course
             var isOwner = course.Owner.Id.ToString() == User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-            if (isOwner) return RedirectToAction("Error", "Home",new {code=500,description="You are the owner of this course"});
-            await courseService.AddUserToCourseAsync(course.DisplayName, User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-            
-            return RedirectToAction("Details","Course",new {courseName=course.DisplayName});
+            if (isOwner)
+                return RedirectToAction("Error", "Home",
+                    new { code = 500, description = "You are the owner of this course" });
+            await courseService.AddUserToCourseAsync(course.Id, User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            return RedirectToAction("Details", "Course", new { courseName = course.DisplayName });
         }
-        catch(ArgumentException)
+        catch (CourseNotFoundException)
         {
-            _logger.LogError("No course with join code: {joinCode} was found",joinCode);
-            return RedirectToAction("Error","Home",new {code = 404,description="Could not find course with join code"});
+            _logger.LogError("No course with join code: {joinCode} was found", joinCode);
+            return RedirectToAction("Error", "Home",
+                new { code = 404, description = "Could not find course with join code" });
+        }
+        catch (UserAlreadyExistsException)
+        {
+            _logger.LogError("User is already a part of this course");
+            return RedirectToAction("Error", "Home",
+                new { code = 403, description = "You are already a part of this course" });
         }
     }
     
@@ -87,7 +96,7 @@ public class CourseController(CourseService courseService,GroupService groupServ
         try
         {
             var uId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-            var creator = userService.GetUserById(uId);
+            var creator = await userService.GetUserByIdAsync(uId);
 
             await courseService.CreateNewCourseAsync(dto, creator);
 

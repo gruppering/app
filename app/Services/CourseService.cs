@@ -1,5 +1,6 @@
 using app.DTO.Course;
 using app.DTO.User;
+using app.Exceptions;
 using app.Models;
 using app.Repositories;
 using app.Utils;
@@ -31,14 +32,17 @@ public class CourseService
         }
     }
     
-    /**
-     * Gets a course by the specified join code by using the lookup dictionary we populate on service creation.
-     */
+    /// <summary>
+    /// Gets a course by the specified join code
+    /// </summary>
+    /// <param name="joinCode">The join code of a course</param>
+    /// <returns>A course</returns>
+    /// <exception cref="CourseNotFoundException">Throws if a course with the specified join code was not found</exception>
     public async Task<Course> GetCourseByJoinCodeAsync(string joinCode)
     {
         if (_joinCodeOverview.TryGetValue(joinCode, out Guid id))
             return await _courseRepository.GetCourseByIdAsync(id);
-        throw new ArgumentException("A course with this join code was not found.");
+        throw new CourseNotFoundException("A course with this join code was not found.");
     }
 
     // Self-explanatory.
@@ -47,60 +51,87 @@ public class CourseService
         return await _courseRepository.GetCourseByNameAsync(courseName);
     }
 
-    /**
-     * Gets all public courses, and returns a list.
-     * TODO, should probably return a public DTO or something similar, to make user info, nor internal Ids are leaked.
-     */
+    /// <summary>
+    /// Gets all the public courses
+    /// </summary>
+    /// <returns>A list of all public courses</returns>
     public async Task<List<Course>> GetAllPublicCoursesAsync()
     {
         return await _courseRepository.GetAllPublicCoursesAsync();
     }
 
-    /**
-    * Gets all users from a course, and returns a list of them.
-    * TODO, same case as method above, should return a list of public DTO, withholding sensitive info.
-    */
+    /// <summary>
+    /// Gets all the users from the specified course
+    /// </summary>
+    /// <param name="courseName">The name of the course</param>
+    /// <returns>A list of user detail dtos</returns>
     public async Task<List<UserDetailsDto>> GetAllUsersFromCourseAsync(string courseName)
     {
-        var users = await _courseRepository.GetAllUsersFromCourse(courseName);
+        var users = await _courseRepository.GetAllUsersFromCourseAsync(courseName);
+        var dto = users.Select(item => new UserDetailsDto(item.Username));
+        
+        return dto.ToList();
+    }
+    
+    /// <summary>
+    /// Same as the method above, but uses the id so we can take advantage of the db index.
+    /// </summary>
+    /// <param name="courseId">The id of the course</param>
+    /// <returns>a list of the users in a course.</returns>
+    public async Task<List<UserDetailsDto>> GetAllUsersFromCourseByIdAsync(Guid courseId)
+    {
+        var users = await _courseRepository.GetAllUsersFromCourseByIdAsync(courseId);
         var dto = users.Select(item => new UserDetailsDto(item.Username));
         
         return dto.ToList();
     }
 
-    /**
-     * Gets all courses where the specified user is a member.
-     */
+    /// <summary>
+    /// Gets all courses the user is a member in
+    /// </summary>
+    /// <param name="user">The user to look for</param>
+    /// <returns>A list of all the courses the user is in</returns>
     public async Task<List<Course>> GetAllCoursesWithMemberAsync(GrupperingUser user)
     {
         return await _courseRepository.GetAllCoursesWithMemberAsync(user);
     }
 
     
-    /**
-     * Adds the specified user to the specified course. Throws an ArgumentException if a course with the given name wasn't found.
-     */
+    /// <summary>
+    /// Adds a user to the specified course
+    /// </summary>
+    /// <param name="courseName">The name of the course</param>
+    /// <param name="userToAdd">The user to add</param>
     public async Task AddUserToCourseAsync(string courseName,GrupperingUser userToAdd)
     {
         var course = await _courseRepository.GetCourseByNameAsync(courseName);
         course.Members.Add(userToAdd);
         await _courseRepository.UpdateAsync(course);
     }
-    /**
-    * Adds the user with the specified username to the specified course. Throws an ArgumentException if a course or a user with the given name wasn't found.
-    */
-    public async Task AddUserToCourseAsync(string courseName,string userId)
+    
+    /// <summary>
+    /// Adds the specified user to a course
+    /// </summary>
+    /// <param name="courseId">The id of the course </param>
+    /// <param name="userId">The id of the user to add</param>
+    /// <exception cref="UserAlreadyExistsException">Throws if a user with that id was not found or is already in the course.</exception>
+    public async Task AddUserToCourseAsync(Guid courseId,string userId)
     {
-        var course = await _courseRepository.GetCourseByNameAsync(courseName);
-        if (course.Members.Any(u => u.Id.ToString() == userId)) throw new ArgumentException("A user with that name already is a member of this course.");
-        var user = _userRepository.GetUserById(userId);
-        if (user is null) throw new ArgumentException("A user with that name was not found"); // TODO, find better way of handling this
+        var course = await _courseRepository.GetCourseByIdAsync(courseId);
+        if (course.Members.Any(u => u.Id.ToString() == userId)) throw new UserAlreadyExistsException("A user with that name already is a member of this course.");
+        
+        var user = await _userRepository.GetUserByIdAsync(userId);
+        if (user is null) throw new UserNotFoundException();
+        
         course.Members.Add(user);
         await _courseRepository.UpdateAsync(course);
     }
-    /**
-     * Adds the specified users to the specified course. Throws an ArgumentException if a course with the given name wasn't found.
-     */
+    
+    /// <summary>
+    /// Adds a list of users to a course
+    /// </summary>
+    /// <param name="courseId">The course id to add users to</param>
+    /// <param name="usersToAdd">The list of users to add to a course</param>
     public async Task AddUsersToCourseAsync(Guid courseId,List<GrupperingUser> usersToAdd)
     {
         var course = await _courseRepository.GetCourseByIdAsync(courseId);
@@ -108,32 +139,44 @@ public class CourseService
         await _courseRepository.UpdateAsync(course);
     }
 
-    /**
-     * Removes the specified user from the specified course. Throws an ArgumentException if a course with the given name wasn't found or the user isn't a member of the specified course.
-     */
+    /// <summary>
+    /// Removes the given user from the course, by the name of the course and the user.
+    /// </summary>
+    /// <param name="courseName">The name of the course to remove the user from</param>
+    /// <param name="userToRemove">The user to remove</param>
+    /// <exception cref="CourseNotFoundException">Throws if the course wasn't found</exception>
+    /// <exception cref="UserNotFoundException">Throws if the  user wasn't found</exception>
     public async Task RemoveUserFromCourseAsync(string courseName,GrupperingUser userToRemove)
     {
         var course = await _courseRepository.GetCourseByNameAsync(courseName);
         var user = course.Members.Find(u => u.Id == userToRemove.Id);
-        if (user is null) throw new ArgumentException("User was not found as a member of this course.");
-        course.Members.Remove(user);
-        await _courseRepository.UpdateAsync(course);
-    }
-    /**
-     * Removes the specified user from the specified course. Throws an ArgumentException if a course or user with the given name wasn't found.
-     */
-    public async Task RemoveUserFromCourseAsync(string courseName,string usernameToRemove)
-    {
-        var course = await _courseRepository.GetCourseByNameAsync(courseName);
-        var user = course.Members.Find(u => u.Username == usernameToRemove);
-        if (user is null) throw new ArgumentException("User was not found as a member of this course.");
+        if (user is null) throw new UserNotFoundException("User was not found as a member of this course.");
         course.Members.Remove(user);
         await _courseRepository.UpdateAsync(course);
     }
     
-    /**
-     * Creates a new course given the creationDto and a creator, envisioned to be the user making the request.
-     */
+    /// <summary>
+    /// Removes the given user from the course, by the name of the course and the username of the user.
+    /// </summary>
+    /// <param name="courseName">The name of the course to remove the user from</param>
+    /// <param name="usernameToRemove">The username of the user to remove</param>
+    /// <exception cref="CourseNotFoundException">Throws if the course wasn't found</exception>
+    /// <exception cref="UserNotFoundException">Throws if the  user wasn't found</exception>
+    public async Task RemoveUserFromCourseAsync(string courseName,string usernameToRemove)
+    {
+        var course = await _courseRepository.GetCourseByNameAsync(courseName);
+        var user = course.Members.Find(u => u.Username == usernameToRemove);
+        if (user is null) throw new UserNotFoundException("User was not found as a member of this course.");
+        course.Members.Remove(user);
+        await _courseRepository.UpdateAsync(course);
+    }
+    
+    /// <summary>
+    /// Creates a new course.
+    /// </summary>
+    /// <param name="creationDto">The Dto from the request.</param>
+    /// <param name="creator">The user creating the course, acquired from the request as well</param>
+    /// <returns>The newly created course</returns>
     public async Task<Course> CreateNewCourseAsync(CourseCreationDto creationDto,GrupperingUser creator)
     {
         var guid = Guid.CreateVersion7();
@@ -152,15 +195,20 @@ public class CourseService
         _joinCodeOverview.Add(joinCode,savedCourse.Id);
         return savedCourse;
     }
-    
-    /**
-     * Deletes a course with the given name, given that the user is authorized to do so, throws an ArgumentException if the specified course wasn't found.
-     * If the user requesting the deletion isn't authorized to do that, an ArgumentException is thrown.
-     */
+
+    /// <summary>
+    /// Deletes a course with the given name, given that the user is authorized to do so.
+    /// If the user requesting the deletion isn't authorized to do that, an ArgumentException is thrown.
+    /// </summary>
+    /// <param name="courseName">The course to deleted</param>
+    /// <param name="requestor">The user requesting the deletion</param>
+    /// <returns>The deleted course</returns>
+    /// <exception cref="UserNotAuthorizedException">Throws if the user isn't authorized to delete this course</exception>
+    /// <exception cref="CourseNotFoundException">Throws if the specified course wasn't found</exception>
     public async Task<Course> DeleteCourseAsync(string courseName,GrupperingUser requestor)
     {
         if (requestor.Roles.Any(r => r.Role == "ROLE_ADMIN"))
-            throw new ArgumentException("User is not authorized to complete this action.");
+            throw new UserNotAuthorizedException("User is not authorized to complete this action.");
         var course = await _courseRepository.GetCourseByNameAsync(courseName);
         _joinCodeOverview.Remove(course.JoinCode);
         return await _courseRepository.DeleteAsync(course);
