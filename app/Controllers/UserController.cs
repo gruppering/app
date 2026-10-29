@@ -16,8 +16,7 @@ public class UserController(UserService userService, CourseService courseService
         var uId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
         var user = userService.GetUserByIdDto(uId);
         
-        var viewModel = new UserProfileModel(user);
-        return View(viewModel);
+        return View(user);
     }
     
     // Delete user functionality with the required input of confirming of the action 
