@@ -157,3 +157,70 @@ nav a span {
 .sb-expanded aside .bx-chevrons-left{
   rotate: 180deg;
 } 
+
+/* Home-Index css start */
+.banner h1{
+  font-size: 3rem;
+  text-align: left;
+}
+
+.home-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.join-section,
+.groups-section {
+  height: 50vh;
+  box-sizing: border-box;
+}
+
+.join-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.groups-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+}
+.join-section {
+  position: relative;
+  height: 50vh;
+  box-sizing: border-box;
+}
+
+.join-section > h1 {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.join-form {
+  position: absolute;
+  top: 65%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.home-page {
+  min-height: calc(100vh - 60px);
+}
+
+.join-section,
+.groups-section {
+  height: calc((100vh - 60px) / 2);
+}
+.screen-divider {
+  position: fixed;
+  top: 50vh;
+  left: 0;
+  width: 100%;
+  border-top: 1px solid #404639;
+  z-index: 10;
+}

@@ -20,6 +20,7 @@ public class HomeController(UserService userService): Controller
     [HttpGet("/")]
     public IActionResult Index()
     { 
+        
         return View();
     }
     

@@ -2,17 +2,27 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Join a course here!</p>
-    
-    <form id="joinForm" asp-controller="Course" asp-action="Join" method="get">
-        <legend>Enter code:</legend>
-        <fieldset>
-            <input id="joinCode" name="joinCode" type="text" minlength="4" maxlength="4" placeholder="ABCD" required/>
-            <button id="joinButton" type="submit">Join</button>
-        </fieldset>
-    </form>
+<h1 class="banner">Gruppering</h1>
+<div class="home-page text-center">
+    <section class="join-section">
+        <div>
+            <h2>Join a course here!</h2>
+            <form id="joinForm" asp-controller="Course" asp-action="Join" method="get">
+                <legend>Enter code:</legend>
+                <fieldset>
+                    <input id="joinCode" name="joinCode" type="text" minlength="4" maxlength="4" placeholder="ABCD" required/>
+                    <button id="joinButton" type="submit">Join</button>
+                </fieldset>
+            </form>
+        </div>
+    </section>
+    <div class="screen-divider"></div>
+    <section class="groups-section">
+        <h2>My Groups:</h2>
+        <div class="groups-list">
+            
+        </div>
+    </section>
 </div>
 
 <div class="text-center">
