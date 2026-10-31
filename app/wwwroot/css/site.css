@@ -189,6 +189,16 @@ nav a span {
   align-items: center;
   padding-top: 20px;
 }
+
+.groups-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+  padding: 30px;
+  box-sizing: border-box;
+}
+
 .join-section {
   position: relative;
   height: 50vh;
@@ -289,4 +299,82 @@ nav a span {
 
 #joinButton:hover {
   background-color: #59634f;
+}
+
+/* Partial view GroupCard styling */
+
+.group-card {
+  position: relative;
+
+  width: 208px;
+  height: 186px;
+  box-sizing: border-box;
+
+  background-color: #41483a;
+  color: #ffffff;
+
+  border-radius: 4px;
+  padding: 12px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* Group information */
+
+.group-card-info h3 {
+  font-size: 18px;
+  font-weight: 400;
+  margin: 0;
+}
+
+.group-card-info p {
+  font-size: 12px;
+  margin: 2px 0 0;
+}
+
+/* Status indicator */
+
+.group-card-status {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+
+  width: 10px;
+  height: 10px;
+
+  background-color: #ffffff;
+  border-radius: 50%;
+}
+
+/* Buttons */
+
+.group-card-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.group-card-button {
+  flex: 1;
+  text-align: center;
+
+  padding: 4px 3px;
+
+  color: #ffffff;
+  border: 1px solid #ffffff;
+  border-radius: 3px;
+
+  font-size: 10px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.group-card-button:hover {
+  background-color: #ffffff;
+  color: #41483a;
+}
+
+.group-card-actions {
+  margin-top: auto;
 }
