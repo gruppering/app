@@ -224,3 +224,69 @@ nav a span {
   border-top: 1px solid #404639;
   z-index: 10;
 }
+.join-fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+}
+
+.join-fieldset legend {
+  text-align: center;
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.code-inputs {
+  display: grid;
+  grid-template-columns: repeat(4, 56px);
+  gap: 24px;
+
+  background-color: #41483a;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.code-character {
+  width: 56px;
+  height: 65px;
+  box-sizing: border-box;
+
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid white;
+  border-radius: 0;
+
+  color: white;
+  font-family: monospace;
+  font-size: 32px;
+  text-align: center;
+
+  outline: none;
+  caret-color: white;
+}
+
+.code-character:focus {
+  border-bottom-color: white;
+}
+
+#joinButton {
+  width: 100%;
+  height: 55px;
+
+  background-color: #41483a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+
+  font-size: 24px;
+  cursor: pointer;
+}
+
+#joinButton:hover {
+  background-color: #59634f;
+}
