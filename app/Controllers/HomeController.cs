@@ -23,9 +23,9 @@ public class HomeController(UserService userService, GroupService groupService):
     {
         try
         {   
-            var uId = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (uId == null) return BadRequest();
-            var username = await userService.GetUserByIdAsync(uId.Value);
+            var uId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            var username = await userService.GetUserByIdAsync(uId);
+            Console.WriteLine(username.Username);
             var groups = await groupService.GetUserGroups(username.Username);
             return View(groups);
         }
