@@ -44,9 +44,9 @@ public class UserService(IUserRepository userRepository)
     }
 
     // This method returns a DTO check app/DTO/user for the DTO constructor
-    public UserPageDto GetUserByIdDto(string id)
+    public async Task<UserPageDto> GetUserByIdDtoAsync(string id)
     {
-        var user = userRepository.GetUserById(id) ?? throw new ArgumentException("User with this id was not found");
+        var user = await userRepository.GetUserByIdAsync(id) ?? throw new ArgumentException("User with this id was not found");
         var userPageDto = new UserPageDto(user.Username, user.Email);
         return userPageDto;
     }
@@ -176,18 +176,15 @@ public class UserService(IUserRepository userRepository)
     // TODO Create Unit tests 
     public async Task<bool> DeleteUser(GrupperingUser? user)
     {
-        if (user != null &&  userRepository.UserExistsWithUsername(user.Username))
-        {
-            await userRepository.DeleteUser(user); 
-            return true;
-        }
-        return false;
+        if (user == null || !userRepository.UserExistsWithUsername(user.Username)) return false;
+        await userRepository.DeleteUser(user); 
+        return true;
     }   
     
         // Updates the info and the user does have to exist in the DB
     public async Task UpdateUserInfoAsync(string userId,UserPageDto dto)
     {
-        var user = userRepository.GetUserById(userId);
+        var user = await userRepository.GetUserByIdAsync(userId);
         if (user != null &&  userRepository.UserExistsWithUsername(user.Username))
         {
             user.Username = dto.Username;
