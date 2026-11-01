@@ -22,8 +22,10 @@ public class HomeController(UserService userService, GroupService groupService):
     public async Task<IActionResult> Index()
     {
         try
-        {
-            var username = await userService.GetUserByIdAsync(ClaimTypes.NameIdentifier);
+        {   
+            var uId = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (uId == null) return BadRequest();
+            var username = await userService.GetUserByIdAsync(uId.Value);
             var groups = await groupService.GetUserGroups(username.Username);
             return View(groups);
         }
