@@ -5,48 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"] - app</title>
     <script type="importmap"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.4/css/boxicons.css" integrity="sha512-QfIHmk801WHltfFladAvS+dCN5LtI5Aco+OhtYzaAtmt/JWm2YiXwNL24wKs41XSrK2r0UTqmJ9RgbdKDpWhYQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
 </head>
-<body>
+<body class="">
 <header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-        <div class="container-fluid">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                <img src="~/images/pear.png" alt="Pear Logo" width="50px" height="60px"/>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Course" asp-action="Courses">Courses</a>
-                    </li>
-                </ul>
-            </div>
-            
+</header>
+<aside class="color-theme">
+    <nav>
+        <ul>
+            <li>
+                <a href="#" class="nav-item-link" data-resize-btn>
+                    <i class="bx bx-menu" style="color:#ffffff;" title="Expand"></i>
+                    <span>Expand</span>
+                </a>
+            </li>
+            <li>
+                <a class="nav-item-link" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="nav-icon home-box-icon" title="Home"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a class="nav-item-link" asp-area="" asp-controller="Course" asp-action="Courses">
+                    <i class="nav-icon bx bx-book" style="color:#ffffff;" title="Course"></i>
+                    <span>Courses</span>
+                </a>
+            </li>
+            <li>
+                <a class="nav-item-link" asp-area="" asp-controller="User" asp-action="Profile">
+                    <i class="nav-icon bx bx-user-circle" style="color:#ffffff;" title="Profile"></i>
+                    <span>Profile</span>
+                </a>
+            </li>
             @if (User.Identity is not null && User.Identity.IsAuthenticated)
             {
-            <div>
-                <ul class="navbar-nav ms-auto">
-                    <li nav-item>
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Logout">Logout</a>
-                    </li>
-                </ul>
-            </div>  
+                <li>
+                    <a class="nav-item-link" asp-area="" asp-controller="Home" asp-action="Logout">
+                        <i class="bx bx-exit" style="color:#ffffff;" title="Logout"></i>
+                        <span>Logout</span>
+                    </a>
+                </li>
             }
-            
-        </div>
+        </ul>
     </nav>
-</header>
+</aside>
 <div class="container">
     <main role="main" class="pb-3">
         @RenderBody()
@@ -62,6 +66,15 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js" integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
+
+<script>
+    const resizeBtn = document.querySelector("[data-resize-btn]");
+    
+    resizeBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        document.body.classList.toggle("sb-expanded");
+    })
+</script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

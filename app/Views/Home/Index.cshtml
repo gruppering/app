@@ -2,17 +2,45 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Join a course here!</p>
-    
-    <form id="joinForm" asp-controller="Course" asp-action="Join" method="get">
-        <legend>Enter code:</legend>
-        <fieldset>
-            <input id="joinCode" name="joinCode" type="text" minlength="4" maxlength="4" placeholder="ABCD" required/>
-            <button id="joinButton" type="submit">Join</button>
-        </fieldset>
-    </form>
+<h1 class="banner">Gruppering</h1>
+<div class="home-page text-center">
+    <section class="join-section">
+        <div class="join-content">
+            <h2>Join a course here!</h2>
+
+            <form id="joinForm"
+                  asp-controller="Course"
+                  asp-action="Join"
+                  method="get">
+
+                <fieldset class="join-fieldset">
+                    <legend>Enter code:</legend>
+
+                    <div class="code-inputs">
+                        @for (int i = 0; i < 4; i++)
+                        {
+                            <input class="code-character"
+                                   type="text"
+                                   maxlength="1"
+                                   aria-label="Code character @(i + 1)"
+                                   autocomplete="off" />
+                        }
+                    </div>
+
+                    <input type="hidden" id="joinCode" name="joinCode" />
+
+                    <button id="joinButton" type="submit">Join</button>
+                </fieldset>
+            </form>
+        </div>
+    </section>
+    <div class="screen-divider"></div>
+    <section class="groups-section">
+        <h2>My Groups:</h2>
+        <div class="groups-list">
+            <partial name="_GroupCard" />
+        </div>
+    </section>
 </div>
 
 <div class="text-center">
@@ -22,5 +50,68 @@
 <script defer>
     document.getElementById("joinButton").addEventListener("click",() => {
         document.getElementById("joinForm").setAttribute("asp-route-joinCode",document.getElementById("joinCode").value);
+    });
+</script>
+<script defer>
+    const codeInputs = document.querySelectorAll(".code-character");
+    const joinCode = document.getElementById("joinCode");
+    const joinForm = document.getElementById("joinForm");
+
+    codeInputs.forEach((input, index) => {
+
+        input.addEventListener("input", () => {
+            input.value = input.value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+
+            if (input.value && index < 3) {
+                codeInputs[index + 1].focus();
+            }
+
+            updateJoinCode();
+        });
+
+        input.addEventListener("keydown", (event) => {
+            if (event.key === "Backspace" && !input.value && index > 0) {
+                codeInputs[index - 1].focus();
+            }
+        });
+
+        input.addEventListener("paste", (event) => {
+            event.preventDefault();
+
+            const pasted = event.clipboardData
+                .getData("text")
+                .replace(/[^a-zA-Z0-9]/g, "")
+                .toUpperCase()
+                .slice(0, 4);
+
+            pasted.split("").forEach((char, i) => {
+                codeInputs[i].value = char;
+            });
+
+            updateJoinCode();
+
+            const nextEmpty = [...codeInputs].find(input => !input.value);
+
+            if (nextEmpty) {
+                nextEmpty.focus();
+            } else {
+                codeInputs[3].blur();
+            }
+        });
+    });
+
+    function updateJoinCode() {
+        joinCode.value = [...codeInputs]
+            .map(input => input.value)
+            .join("");
+    }
+
+    joinForm.addEventListener("submit", (event) => {
+        updateJoinCode();
+
+        if (joinCode.value.length !== 4) {
+            event.preventDefault();
+            codeInputs[[...codeInputs].findIndex(input => !input.value)].focus();
+        }
     });
 </script>

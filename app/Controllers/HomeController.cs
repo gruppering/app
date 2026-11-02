@@ -9,18 +9,30 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.FeatureManagement.Mvc;
+using Microsoft.VisualBasic;
 
 namespace app.Controllers;
 
-public class HomeController(UserService userService): Controller
+public class HomeController(UserService userService, GroupService groupService): Controller
 {
     private static readonly ILoggerFactory Factory = LoggerFactory.Create(builder => builder.AddConsole());
     private readonly ILogger _logger = Factory.CreateLogger("General");
     
     [HttpGet("/")]
-    public IActionResult Index()
-    { 
-        return View();
+    public async Task<IActionResult> Index()
+    {
+        try
+        {   
+            var uId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            var username = await userService.GetUserByIdAsync(uId);
+            Console.WriteLine(username.Username);
+            var groups = await groupService.GetUserGroups(username.Username);
+            return View(groups);
+        }
+        catch (UserNotFoundException)
+        {
+            return BadRequest();
+        }
     }
     
     [HttpGet("login")]
