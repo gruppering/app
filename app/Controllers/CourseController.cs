@@ -73,7 +73,7 @@ public class CourseController(CourseService courseService,GroupService groupServ
                     new { code = 500, description = "You are the owner of this course" });
             await courseService.AddUserToCourseAsync(course.Id, User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-            return RedirectToAction("Details", "Course", new { courseName = course.DisplayName });
+            return RedirectToAction("Details", "Course", new { code = course.JoinCode });
         }
         catch (CourseNotFoundException)
         {
