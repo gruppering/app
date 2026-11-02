@@ -1,6 +1,6 @@
 ﻿services:
   app:
-    image: gruppering/app
+    image: ghcr.io/gruppering/mvc
     container_name: gruppering-app
     restart: unless-stopped
     env_file:
