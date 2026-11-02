@@ -44,7 +44,7 @@ body.sb-expanded {
 .color-theme{
   background-color: #404639;
 }
-
+/* Sidebar */
 nav ul li {
   height: 70px;
   width: 85px;
@@ -309,8 +309,7 @@ nav a span {
   width: 208px;
   height: 186px;
   box-sizing: border-box;
-
-  background-color: #41483a;
+  
   color: #ffffff;
 
   border-radius: 4px;
@@ -378,3 +377,6 @@ nav a span {
 .group-card-actions {
   margin-top: auto;
 }
+
+/* Login and Signup styling */
+
