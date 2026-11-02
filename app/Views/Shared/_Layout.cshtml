@@ -13,45 +13,48 @@
 <header>
     <h1 class="banner">Gruppering</h1>
 </header>
-<aside class="color-theme">
-    <nav>
-        <ul>
-            <li>
-                <a href="#" class="nav-item-link" data-resize-btn>
-                    <i class="bx bx-menu" style="color:#ffffff;" title="Expand"></i>
-                    <span>Expand</span>
-                </a>
-            </li>
-            <li>
-                <a class="nav-item-link" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="nav-icon home-box-icon" title="Home"></i>
-                    <span>Home</span>
-                </a>
-            </li>
-            <li>
-                <a class="nav-item-link" asp-area="" asp-controller="Course" asp-action="Courses">
-                    <i class="nav-icon bx bx-book" style="color:#ffffff;" title="Course"></i>
-                    <span>Courses</span>
-                </a>
-            </li>
-            <li>
-                <a class="nav-item-link" asp-area="" asp-controller="User" asp-action="Profile">
-                    <i class="nav-icon bx bx-user-circle" style="color:#ffffff;" title="Profile"></i>
-                    <span>Profile</span>
-                </a>
-            </li>
-            @if (User.Identity is not null && User.Identity.IsAuthenticated)
-            {
+@if (ViewBag.HideSidebar == null)
+{
+    <aside class="color-theme">
+        <nav>
+            <ul>
                 <li>
-                    <a class="nav-item-link" asp-area="" asp-controller="Home" asp-action="Logout">
-                        <i class="bx bx-exit" style="color:#ffffff;" title="Logout"></i>
-                        <span>Logout</span>
+                    <a href="#" class="nav-item-link" data-resize-btn>
+                        <i class="bx bx-menu" style="color:#ffffff;" title="Expand"></i>
+                        <span>Expand</span>
                     </a>
                 </li>
-            }
-        </ul>
-    </nav>
-</aside>
+                <li>
+                    <a class="nav-item-link" asp-area="" asp-controller="Home" asp-action="Index">
+                        <i class="nav-icon home-box-icon" title="Home"></i>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-item-link" asp-area="" asp-controller="Course" asp-action="Courses">
+                        <i class="nav-icon bx bx-book" style="color:#ffffff;" title="Course"></i>
+                        <span>Courses</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-item-link" asp-area="" asp-controller="User" asp-action="Profile">
+                        <i class="nav-icon bx bx-user-circle" style="color:#ffffff;" title="Profile"></i>
+                        <span>Profile</span>
+                    </a>
+                </li>
+                @if (User.Identity is not null && User.Identity.IsAuthenticated)
+                {
+                    <li>
+                        <a class="nav-item-link" asp-area="" asp-controller="Home" asp-action="Logout">
+                            <i class="bx bx-exit" style="color:#ffffff;" title="Logout"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </aside>
+}
 <div class="container">
     <main role="main" class="pb-3">
         @RenderBody()
