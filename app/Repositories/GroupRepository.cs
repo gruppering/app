@@ -15,7 +15,7 @@ public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepositor
     /// <returns>a list of the groups the user is a member of</returns>
     public async Task<List<Group>> GetUserGroups(string userName)
     {
-        return await typeContext.Groups.Include(g => g.Members)
+        return await typeContext.Groups.Include(g => g.Members).Include(g => g.Course)
             .Where(g => g.Members.Any(gu => gu.Username == userName ))
             .ToListAsync();
     }

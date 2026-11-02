@@ -7,9 +7,9 @@
 
         <div class="group-card-info">
             <h3>@group.GroupName</h3>
-            <p>Part of: @group.Course</p>
+            <p>Part of: @group.Course.DisplayName</p>
         </div>
-
+        
         <div class="group-card-actions">
             <a asp-controller="Course"
                asp-action="Details"
@@ -19,6 +19,7 @@
 
             <a asp-controller="Course"
                asp-action="Details"
+               asp-route-code="@group.Course.JoinCode"
                class="group-card-button">
                 Go to Course
             </a>
