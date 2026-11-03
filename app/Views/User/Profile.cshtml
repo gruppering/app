@@ -1,3 +1,42 @@
 @model app.DTO.User.UserPageDto;
 
-<p>Hello: @Model.Username</p>
+<section id="user-info">
+    <h1>Your account</h1>
+    <p><b>Username:</b> @Model.Username</p>
+    <p><b>Email:</b> @Model.Email</p>
+</section>
+
+<section id="update-user-info">
+    <form asp-controller="User"
+          asp-action="EditUser"
+          method="post">
+        
+        <label for="Username" class="form-label">Username</label>
+        
+        <input id="Username" name="Username"
+               class="form-control"
+               placeholder="Username"/>
+        <span asp-validation-for="Username"
+              class="text-danger"></span>
+        
+        <label for="Email" class="form-label">Email</label>
+        
+        <input id="Email" name="Email"
+               type="email"
+               class="form-control"
+               placeholder="Email"/>
+        <span asp-validation-for="Email"
+              class="text-danger"></span>
+        
+        <!-- No password field. The HttpPost endpoint checks 
+        if the user is who they claim to be in the form data. -->
+        
+        <button type="submit" class="btn btn-primary mt-4">
+            Update account
+        </button>
+    </form>
+</section>
+    
+
+
+
