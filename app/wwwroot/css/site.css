@@ -471,7 +471,7 @@ nav a span {
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 }
 
-.login-submit-button {
+.submit-button {
   padding: 6px 18px;
 
   background: transparent;
@@ -482,7 +482,7 @@ nav a span {
   cursor: pointer;
 }
 
-.login-submit-button:hover {
+.submit-button:hover {
   background: rgba(255, 255, 255, 0.4);
 }
 
@@ -522,9 +522,14 @@ nav a span {
   margin-bottom: 24px;
 }
 
-.login-submit-button {
+.submit-button {
   display: block;
   margin: 40px auto 0;
+}
+
+.signup{
+  color: black;
+  text-decoration: none;
 }
 
 @media (max-width: 600px) {
