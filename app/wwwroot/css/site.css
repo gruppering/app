@@ -530,7 +530,27 @@ nav a span {
 .signup{
   color: black;
   text-decoration: none;
+  display: inline-block;
 }
+
+/* Signup-specific spacing */
+.traditional-login-form .login-methods {
+  margin-top: 40px;
+}
+
+.traditional-login-form .traditional-login {
+  gap: 0;
+}
+
+.traditional-login-form .login-form-group {
+  margin-bottom: 12px;
+}
+
+/* Center the signup button beneath both columns */
+.traditional-login-form .submit-button {
+  margin: 40px auto 0;
+}
+
 
 @media (max-width: 600px) {
   .login-methods {
