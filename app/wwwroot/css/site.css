@@ -8,6 +8,12 @@ html {
   }
 }
 
+@media (max-width:1100px) {
+  #banner-svg {
+    width: 90vw;
+  }
+}
+
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
@@ -110,7 +116,6 @@ aside {
 
 nav {
   height: 100%;
-  margin-left:2px;
 }
 
 nav li:last-child{
@@ -159,15 +164,19 @@ nav a span {
 }
 
 /* Home-Index css start */
-.banner h1{
+.banner h1 {
   font-size: 3rem;
   text-align: left;
+}
+#banner-svg {
+  margin-top: 2rem;
 }
 
 .home-page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 .join-section,
@@ -180,7 +189,6 @@ nav a span {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-around;
 }
 
 .groups-section {
@@ -247,8 +255,7 @@ nav a span {
 
 .join-fieldset legend {
   text-align: center;
-  font-size: 28px;
-  margin-bottom: 20px;
+  font-size: 2rem;
 }
 
 .code-inputs {

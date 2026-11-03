@@ -2,8 +2,24 @@
     ViewData["Title"] = "Home Page";
 }
 
-<h1 class="banner">Gruppering</h1>
+<header>
+    <h1>Gruppering</h1>
+</header>
+
 <div class="home-page text-center">
+    <svg id="banner-svg" 
+        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 750 200" width="900">
+        <defs>
+            <path id="logoCurve"
+                  d="M 100 380 C 100 150, 230 60, 375 60 C 520 60, 650 150, 650 380"/>
+        </defs>
+
+        <text font-size="79" font-weight="bold" text-anchor="middle">
+            <textPath xlink:href="#logoCurve" startOffset="51%">
+                GRUPPERING!
+            </textPath>
+        </text>
+    </svg>
     <section class="join-section">
         <div class="join-content">
             <h2>Join a course here!</h2>
@@ -27,18 +43,18 @@
                         }
                     </div>
 
-                    <input type="hidden" id="joinCode" name="joinCode" />
+                    <input type="hidden" id="joinCode" name="joinCode"/>
 
                     <button id="joinButton" type="submit">Join</button>
                 </fieldset>
             </form>
         </div>
     </section>
-    <div class="screen-divider"></div>
+    <!--<div class="screen-divider"></div>-->
     <section class="groups-section">
         <h2>My Groups:</h2>
         <div class="groups-list">
-            <partial name="_GroupCard" />
+            <partial name="_GroupCard"/>
         </div>
     </section>
 </div>
