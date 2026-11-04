@@ -2,8 +2,8 @@
 
 <section id="user-info">
     <h1>Your account</h1>
-    <p><b>Username:</b> @Model.Username</p>
-    <p><b>Email:</b> @Model.Email</p>
+    <p><b>Username:</b>@Model.Username</p>
+    <p><b>Email:</b>@Model.Email</p>
 </section>
 
 <section id="update-user-info">
@@ -15,7 +15,8 @@
         
         <input id="Username" name="Username"
                class="form-control"
-               placeholder="Username"/>
+               placeholder="Username"
+               value="@Model.Username"/>
         <span asp-validation-for="Username"
               class="text-danger"></span>
         
@@ -24,7 +25,8 @@
         <input id="Email" name="Email"
                type="email"
                class="form-control"
-               placeholder="Email"/>
+               placeholder="Email"
+               value="@Model.Email"/>
         <span asp-validation-for="Email"
               class="text-danger"></span>
         
