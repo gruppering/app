@@ -5,33 +5,80 @@
         returnUrl = $"?ReturnUrl={Context.Request.Query["ReturnUrl"]}";
     }
 }
-<div class="text-center">
-    @if(ViewBag.Error != null)
+<div class="login-page">
+    @if (ViewBag.Error != null)
     {
         <span>@ViewBag.Error</span>
     }
+
     <h1 class="display-4">Login</h1>
-    <div>
-        @if (Environment.GetEnvironmentVariable("GOOGLE_SIGNIN_ENABLED")!.Equals("true"))
-        {
-            <a href="" id="loginGoogleUrl">Login with Google</a>
-        }
-        @if (Environment.GetEnvironmentVariable("GITHUB_SIGNIN_ENABLED")!.Equals("true"))
-        {
-            <a href="" id="loginGithubUrl">Login with Github</a>
-        }
-    </div>
-    <a href="@("/signup" + returnUrl)">Signup instead</a>
-    <form action="@("/login" + returnUrl)" method="post">
-        <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
-            <input type="text" class="form-control" id="username" aria-describedby="username" name="username">
+
+    <a class="submit-button signup" href="@("/signup" + returnUrl)">
+        Or Sign Up
+    </a>
+
+    <form action="@("/login" + returnUrl)" method="post" class="login-form">
+
+        <div class="login-methods">
+
+            <!-- Traditional login -->
+            <div class="traditional-login">
+                <h2>Traditional:</h2>
+
+                <div class="login-form-group">
+                    <label for="username">Username:</label>
+                    <input type="text"
+                           id="username"
+                           name="username"
+                           class="login-input">
+                </div>
+
+                <div class="login-form-group">
+                    <label for="password">Password:</label>
+                    <input type="password"
+                           id="password"
+                           name="password"
+                           class="login-input">
+                </div>
+            </div>
+
+            <!-- Social login -->
+            <div class="login-providers">
+                <h2>Or Sign In With:</h2>
+
+                <ul class="login-provider-list">
+                    <li>
+                        @if (Environment.GetEnvironmentVariable("GOOGLE_SIGNIN_ENABLED")!.Equals("true"))
+                        {
+                            <a href="" id="loginGoogleUrl" class="login-provider">
+                                <img src="~/images/google-icon-logo-svgrepo-com.svg"
+                                     title="Login with Google account"
+                                     alt="Google icon" />
+                                <span>Google</span>
+                            </a>
+                        }
+                    </li>
+
+                    <li>
+                        @if (Environment.GetEnvironmentVariable("GITHUB_SIGNIN_ENABLED")!.Equals("true"))
+                        {
+                            <a href="" id="loginGithubUrl" class="login-provider">
+                                <img src="~/images/github-icon-1-logo-svgrepo-com.svg"
+                                     title="Login with GitHub account"
+                                     alt="GitHub icon" />
+                                <span>GitHub</span>
+                            </a>
+                        }
+                    </li>
+                </ul>
+            </div>
+
         </div>
-        <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" name="password">
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+
+        <button type="submit" class="submit-button">
+            Sign In
+        </button>
+
     </form>
 </div>
 @if (Environment.GetEnvironmentVariable("GOOGLE_SIGNIN_ENABLED")!.Equals("true"))
