@@ -34,10 +34,14 @@ public class HomeController(UserService userService, GroupService groupService):
             return BadRequest();
         }
     }
-    
+
     [HttpGet("login")]
     [AllowAnonymous]
-    public IActionResult Login() => View();
+    public IActionResult Login()
+    {
+        ViewBag.HideSidebar = true;
+        return View();
+    }
 
     [HttpPost("login")]
     [AllowAnonymous]
@@ -60,11 +64,13 @@ public class HomeController(UserService userService, GroupService groupService):
 
                 return RedirectToAction("Index", "Home");
             }
+            ViewBag.HideSidebar = true;
             ViewBag.Error = "Incorrect username or password";
             return View();
         }
         catch (UserNotFoundException)
         {
+            ViewBag.HideSidebar = true;
             ViewBag.Error = "Incorrect username or password";
             return View();
         }
@@ -78,7 +84,10 @@ public class HomeController(UserService userService, GroupService groupService):
     
     [HttpGet("signup")]
     [AllowAnonymous]
-    public IActionResult Signup() => View();
+    public IActionResult Signup(){
+        ViewBag.HideSidebar = true;
+        return View();
+    }
 
     [HttpPost("signup")]
     [AllowAnonymous]
@@ -104,11 +113,13 @@ public class HomeController(UserService userService, GroupService groupService):
         }
         catch (UserAlreadyExistsException uae)
         {
+            ViewBag.HideSidebar = true;
             ViewBag.Error = uae.Message;
             return View();
         }
         catch (IllegalArgumentException ia) // Handles both an invalid username or password
         {
+            ViewBag.HideSidebar = true;
             ViewBag.Error = ia.Message;
             return View();
         }
