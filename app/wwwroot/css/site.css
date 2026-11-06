@@ -308,6 +308,27 @@ nav a span {
   background-color: #59634f;
 }
 
+/* User profile view styling */
+
+#user-info {
+  margin:0 15%;
+}
+
+#profile-form {
+  margin:0 auto;
+  max-width:30rem;
+}
+
+.profile-control {
+  
+}
+
+.profile-edit-button {
+  display: block;
+  margin: 0 0.2rem;
+  text-align: right;
+}
+
 /* Partial view GroupCard styling */
 
 .group-card {

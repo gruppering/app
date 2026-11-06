@@ -1,43 +1,51 @@
 @model app.DTO.User.UserPageDto;
 
-<section id="user-info">
-    <h1>Your account</h1>
-    <p><b>Username:</b>@Model.Username</p>
-    <p><b>Email:</b>@Model.Email</p>
-</section>
+<header>
+    <h1><b>GRUPPERING</b></h1>
+</header>
 
-<section id="update-user-info">
-    <form asp-controller="User"
+<section id="user-info">
+    <form id="profile-form"
+          asp-controller="User"
           asp-action="EditUser"
           method="post">
+        <h1>Your account</h1>
         
         <label for="Username" class="form-label">Username</label>
-        
+
         <input id="Username" name="Username"
-               class="form-control"
+               type="text"
+               class="form-control profile-control"
                placeholder="Username"
-               value="@Model.Username"/>
+               value="@Model.Username"
+               disabled/>
+        <small class="profile-edit-button"><a href="">Edit</a></small>
         <span asp-validation-for="Username"
               class="text-danger"></span>
-        
+
         <label for="Email" class="form-label">Email</label>
-        
+
         <input id="Email" name="Email"
                type="email"
-               class="form-control"
+               inputmode="email"
+               class="form-control profile-control"
                placeholder="Email"
-               value="@Model.Email"/>
+               value="@Model.Email"
+               disabled/>
+        <small class="profile-edit-button"><a href="">Edit</a></small>
         <span asp-validation-for="Email"
               class="text-danger"></span>
-        
+
         <!-- No password field. The HttpPost endpoint checks 
         if the user is who they claim to be in the form data. -->
-        
-        <button type="submit" class="btn btn-primary mt-4">
+
+        <button type="submit" class="btn btn-primary">
             Update account
         </button>
     </form>
 </section>
+
+<script src="~/js/update_profile.js" defer></script>
     
 
 

@@ -17,13 +17,6 @@ public class UserController(UserService userService) : Controller // Could remov
             var uId = User.FindFirst(ClaimTypes.NameIdentifier);
             if (uId == null) return BadRequest();
             var user = await userService.GetUserDtoByIdAsync(uId.Value);
-
-            /* TODO Remove these console output statements. */
-            /* Inspecting the ClaimTypes class. Development only  */
-            Console.WriteLine(".NameIdentifier = " + User.FindFirst(ClaimTypes.NameIdentifier));
-            Console.WriteLine(".Name = " + User.FindFirst(ClaimTypes.Name));
-            Console.WriteLine(".Role = " + User.FindFirst(ClaimTypes.Role));
-            Console.WriteLine("UserDto = " + user);
             
             return View(user);
         }
