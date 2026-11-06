@@ -57,7 +57,7 @@
 
 @foreach(var user in Model.UsersInCourse)
 {
-    <p>@user.username</p>
+    <p>@user.Username</p>
     
 }
 <h3>Chat Messages</h3>
@@ -128,7 +128,7 @@
         const groupAmount = document.getElementById("groupAmount");
         const groupPrefix = document.getElementById("groupPrefix");
         let groupingData;
-        document.addEventListener("submit",async (e) => {
+        document.addEventListener("submit", async (e) => {
             e.preventDefault();
             
             fetch("/course/@Model.Course.DisplayName/groups/new",{

@@ -1,3 +1,52 @@
 @model app.DTO.User.UserPageDto;
 
-<p>Hello: @Model.Username</p>
+<header>
+    <h1><b>GRUPPERING</b></h1>
+</header>
+
+<section id="user-info">
+    <form id="profile-form"
+          asp-controller="User"
+          asp-action="EditUser"
+          method="post">
+        <h1>Your account</h1>
+        
+        <label for="Username" class="form-label">Username</label>
+
+        <input id="Username" name="Username"
+               type="text"
+               class="form-control profile-control"
+               placeholder="Username"
+               value="@Model.Username"
+               disabled/>
+        <small class="profile-edit-button"><a href="">Edit</a></small>
+        <span asp-validation-for="Username"
+              class="text-danger"></span>
+
+        <label for="Email" class="form-label">Email</label>
+
+        <input id="Email" name="Email"
+               type="email"
+               inputmode="email"
+               class="form-control profile-control"
+               placeholder="Email"
+               value="@Model.Email"
+               disabled/>
+        <small class="profile-edit-button"><a href="">Edit</a></small>
+        <span asp-validation-for="Email"
+              class="text-danger"></span>
+
+        <!-- No password field. The HttpPost endpoint checks 
+        if the user is who they claim to be in the form data. -->
+
+        <button type="submit" class="btn btn-primary">
+            Update account
+        </button>
+    </form>
+</section>
+
+<script src="~/js/update_profile.js" defer></script>
+    
+
+
+
