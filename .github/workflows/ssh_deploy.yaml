@@ -16,7 +16,7 @@ jobs:
           host: ${{ secrets.GRUPPERING_NO_SSH_HOST }}
           username: ${{ secrets.GRUPPERING_NO_SSH_USER }}
           key: ${{ secrets.GRUPPERING_NO_SSH_SECRET_KEY }}
-          port: ${{ secrets.GRUPPERING_NO_SSH_PORT }}
+          port: 22
           script: |
             cd gruppering/mvc
             docker compose pull
