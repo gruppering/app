@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build
+    name: Deploy
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to Remote Server
@@ -17,8 +17,8 @@ jobs:
           user: ${{ secrets.GRUPPERING_NO_SSH_USER }}
           private_key: ${{ secrets.GRUPPERING_NO_SSH_SECRET_KEY }}
           command: |
-            cd gruppering/mvc
-            docker compose pull
+            cd gruppering/mvc && 
+            docker compose pull &&
             docker compose up -d
 
 
