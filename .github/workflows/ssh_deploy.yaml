@@ -1,0 +1,24 @@
+name: Deploy to Remote Server
+on:
+  workflow_run:
+    workflows: ["Build Docker Image"]
+    types:
+      - completed
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Docker Image on Remote
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.GRUPPERING_NO_SSH_HOST }}
+          username: ${{ secrets.GRUPPERING_NO_SSH_USER }}
+          key: ${{ secrets.GRUPPERING_NO_SSH_SECRET_KEY }}
+          port: ${{ secrets.GRUPPERING_NO_SSH_PORT }}
+          script: |
+            cd gruppering/mvc
+            docker compose pull
+            docker compose up -d
+
