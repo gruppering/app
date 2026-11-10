@@ -8,6 +8,12 @@ html {
   }
 }
 
+@media (max-width:1100px) {
+  #banner-svg {
+    width: 90vw;
+  }
+}
+
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
@@ -46,10 +52,8 @@ body.sb-expanded {
 }
 
 nav ul li {
-  height: 70px;
-  width: 85px;
-  display: flex;
-  align-items: center;
+  height: 4rem;
+  width: auto;
 }
 
 nav ul li a {
@@ -57,14 +61,15 @@ nav ul li a {
   align-items: center;
   width: 100%;
   height: 100%;
-  gap: 10px;
-  padding: 0 12px;
+  
+  padding: 0;
 }
 
 .nav-item-link {
   display: flex;
   align-items: center;
-  gap: 10px;
+ 
+  flex: 0 1 min-content;
 }
 
 .nav-icon {
@@ -82,15 +87,14 @@ nav ul li a {
 
 .home-box-icon {
   display: block;
-  width: 22px;
-  height: 22px;
+  width: 25px;
   background-image: url("../images/pear.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
 }
 
-header p{
+header p {
   top: 0;
   left: 0;
   padding-left: 3rem;
@@ -107,13 +111,11 @@ aside {
   bottom: 0;
   padding: 1rem;
   width: var(--sb-width);
-  transition: width 0.5s ease-in-out;
+  transition: width 400ms ease-in-out;
 }
-
 
 nav {
   height: 100%;
-  
 }
 
 nav li:last-child{
@@ -121,13 +123,14 @@ nav li:last-child{
 }
 nav ul {
   
-  align-items: center;
   list-style: none;
   width: 100%;
   height: 100%;
   display: flex;
   flex-flow: column;
+  align-items: start;
   gap: 0.25rem;
+  padding: 0 !important;
 }
 
 nav a {
@@ -139,35 +142,41 @@ nav a {
   line-height: 1;
   color: #ffffff;
   text-decoration: none;
-  transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
+  transition: background-color 400ms ease-in-out, color 400ms ease-in-out;
 }
 
 nav a span {
   font-size: 0.875rem;
   opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  padding-left:0.25rem;
+  display: none;
+  transition: all 400ms allow-discrete;
 }
 
 .sb-expanded nav a span {
   opacity: 1;
-  visibility: visible;
+  display: inline;
+  transition: all 400ms allow-discrete;
 }
 
 .sb-expanded aside .bx-chevrons-left{
   rotate: 180deg;
-} 
+}
 
 /* Home-Index css start */
-.banner h1{
+.banner h1 {
   font-size: 3rem;
   text-align: left;
+}
+#banner-svg {
+  margin-top: 2rem;
 }
 
 .home-page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 .join-section,
@@ -180,7 +189,6 @@ nav a span {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-around;
 }
 
 .groups-section {
@@ -247,8 +255,7 @@ nav a span {
 
 .join-fieldset legend {
   text-align: center;
-  font-size: 28px;
-  margin-bottom: 20px;
+  font-size: 2rem;
 }
 
 .code-inputs {
@@ -299,6 +306,27 @@ nav a span {
 
 #joinButton:hover {
   background-color: #59634f;
+}
+
+/* User profile view styling */
+
+#user-info {
+  margin:0 15%;
+}
+
+#profile-form {
+  margin:0 auto;
+  max-width:30rem;
+}
+
+.profile-control {
+  
+}
+
+.profile-edit-button {
+  display: block;
+  margin: 0 0.2rem;
+  text-align: right;
 }
 
 /* Partial view GroupCard styling */
