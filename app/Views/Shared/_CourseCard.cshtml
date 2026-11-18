@@ -1,0 +1,15 @@
+@model Course 
+<div class="card color-theme">
+    
+        <div class="card-info">
+            <h5>@Model.DisplayName</h5>
+            <p>@Model.Description</p>
+        </div>
+        <div class="card-actions">
+            <a asp-controller="Course"
+               asp-action="Details"
+               asp-route-code="@Model.JoinCode"
+               class="card-button">Go to course page</a>
+        </div>
+    
+</div>
