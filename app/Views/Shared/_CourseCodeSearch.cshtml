@@ -86,3 +86,9 @@
         }
     });
 </script>
+
+<script defer>
+    document.getElementById("joinButton").addEventListener("click",() => {
+        document.getElementById("joinForm").setAttribute("asp-route-joinCode",document.getElementById("joinCode").value);
+    });
+</script>
