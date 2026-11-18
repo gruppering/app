@@ -1,3 +1,4 @@
+@model app.DTO.Course.CourseCreationDto
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Create a course</h5>
@@ -15,7 +16,7 @@
                        class="form-control"
                        placeholder="Enter course name" />
 
-                <span asp-validation-for="CreateCourse.CourseName"
+                <span asp-validation-for="CourseName"
                       class="text-danger"></span>
             </div>
 
@@ -29,7 +30,7 @@
                           rows="4"
                           placeholder="Describe your course"></textarea>
 
-                <span asp-validation-for="CreateCourse.Description"
+                <span asp-validation-for="Description"
                       class="text-danger"></span>
             </div>
 
