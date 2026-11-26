@@ -16,8 +16,8 @@ public class UserController(UserService userService) : Controller // Could remov
         {
             var uId = User.FindFirst(ClaimTypes.NameIdentifier);
             if (uId == null) return BadRequest();
-            var user = await userService.GetUserByIdDtoAsync(uId.Value);
-
+            var user = await userService.GetUserDtoByIdAsync(uId.Value);
+            
             return View(user);
         }
         catch (ArgumentException)
@@ -26,6 +26,25 @@ public class UserController(UserService userService) : Controller // Could remov
         }
     }
     
+    // Update user info functionality I think that front-end checks is sufficient 
+        [HttpPost("/user/edit")]
+        public async Task<IActionResult> EditUser(UserPageDto dto)
+        {
+            try
+            {
+                var uid = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (uid == null) return BadRequest();
+                
+                await userService.UpdateUserInfoAsync(User.FindFirst(ClaimTypes.NameIdentifier)!.Value, dto);
+                
+                return RedirectToAction("Profile");
+            }
+            catch (ArgumentException)
+            {
+                return BadRequest();
+            }
+        }
+        
     // Delete user functionality with the required input of confirming of the action 
     [HttpPost("/user/delete")]
     public async Task<IActionResult> Delete([FromBody] string confirm)
@@ -39,21 +58,6 @@ public class UserController(UserService userService) : Controller // Could remov
             return RedirectToAction("Index", "Home");
         }
         catch(ArgumentException)
-        {
-            return BadRequest();
-        }
-    }
-
-    // Update user info functionality I think that front-end checks is sufficient 
-    [HttpPost("/user/edit")]
-    public async Task<IActionResult> Edit(UserPageDto dto)
-    {
-        try
-        {
-            await userService.UpdateUserInfoAsync(User.FindFirst(ClaimTypes.NameIdentifier)!.Value, dto);
-            return RedirectToAction("Profile");
-        }
-        catch (ArgumentException)
         {
             return BadRequest();
         }

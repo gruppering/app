@@ -3,8 +3,13 @@
     ViewData["Title"] = "Course";
     
 }
+
+<header>
+    <h1><b>GRUPPERING</b></h1>
+</header>
+
 <!-- Form to create a new course -->
-<div class="card">
+<div class="card mt-3">
     <div class="card-body">
         <h5 class="card-title">Create a course</h5>
 
@@ -13,9 +18,7 @@
               method="post">
 
             <div class="mb-3">
-                <label for="CourseName" class="form-label">
-                    Course name
-                </label>
+                <label for="CourseName" class="form-label">Course name</label>
 
                 <input id="CourseName" name="CourseName"
                        class="form-control"
@@ -63,7 +66,7 @@
 <!-- Card display for every course where the user is a member of NOTE: the structure html is not done -->
 @foreach (var memberOfCourse in Model.MemberOfCourses)
 {
-    <div class="card" style="width: 18rem;">
+    <div class="card mt-3" style="width: 18rem;">
         <div class="card-body">
             <h5 class="card-title">@memberOfCourse.DisplayName</h5>
             <p class="card-text">@memberOfCourse.Description</p>
@@ -80,7 +83,7 @@
 <!-- Card display for all courses that are public NOTE: add paging -->
 @foreach (var publicCourse in Model.PublicCourses)
 {
-    <div class="card" style="width: 18rem;">
+    <div class="card mt-3" style="width: 18rem;">
         <div class="card-body">
             <h5 class="card-title">@publicCourse.DisplayName</h5>
             <p class="card-text">@publicCourse.Description</p>

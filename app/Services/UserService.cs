@@ -44,7 +44,7 @@ public class UserService(IUserRepository userRepository)
     }
 
     // This method returns a DTO check app/DTO/user for the DTO constructor
-    public async Task<UserPageDto> GetUserByIdDtoAsync(string id)
+    public async Task<UserPageDto> GetUserDtoByIdAsync(string id)
     {
         var user = await userRepository.GetUserByIdAsync(id) ?? throw new ArgumentException("User with this id was not found");
         var userPageDto = new UserPageDto(user.Username, user.Email);
@@ -185,7 +185,7 @@ public class UserService(IUserRepository userRepository)
     public async Task UpdateUserInfoAsync(string userId,UserPageDto dto)
     {
         var user = await userRepository.GetUserByIdAsync(userId);
-        if (user != null &&  userRepository.UserExistsWithUsername(user.Username))
+        if (user != null)
         {
             user.Username = dto.Username;
             user.Email = dto.Email;
