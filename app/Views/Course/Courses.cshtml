@@ -3,11 +3,11 @@
     ViewData["Title"] = "Course";
     
 }
-<div>
+<div class="join-section">
     <partial name="_CourseCodeSearch"/>
 </div>
 
-
+<h2>Joined courses</h2>
 @foreach (var memberOfCourse in Model.MemberOfCourses)
 {
     <partial name="_CourseCard" model="memberOfCourse"/>
