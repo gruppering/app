@@ -7,23 +7,30 @@
 <h1>@Model.Course.DisplayName</h1>
 <h2>Join Code: @Model.Course.JoinCode</h2>
 <p>@Model.Course.Description</p>
-<a asp-controller="Course" asp-action="Join"
-   asp-route-joinCode="@Model.Course.JoinCode">Join course</a>
 <div style="max-width: 20%">
     @Model.QrCode
 </div>
-<a asp-controller=""
-   asp-action="Grupper"
-   asp-route-gruppeId=""
->Grupper</a>
 
+<!-- TODO: Make the join course link a be in a div. And make a button to copy the QR code URL to clipboard. -->
+<a asp-controller="Course" asp-action="Join" 
+   asp-route-joinCode="@Model.Course.JoinCode">Join course</a>
+
+<h2>Groups</h2>
 <div id="groups">
+    
     @foreach (var group in Model.GroupsInCourse)
     {
-        <div class="card" style="width: 18rem;">
-            <div class="card-body">
-                <h5 class="card-title">@group.GroupName</h5>
-                <ul>
+        <div class="card">
+            <div class="card-body group-item-body">
+                <div class="group-title-header">
+                    <h3 class="card-title">@group.GroupName</h3>
+                    <span>
+<!-- TODO: Make ASP evaluate href attributes to the groups shown to the user -->
+                        <a href="">View</a>
+                    </span>
+                </div>
+                
+                <ul class="group-member-list">
                     @foreach (var member in group.Members)
                     {
                         <li>
@@ -51,15 +58,8 @@
             <button type="submit">Generate Random Groups</button>
         </form>
     </div>
-     
 }
 
-
-@foreach(var user in Model.UsersInCourse)
-{
-    <p>@user.Username</p>
-    
-}
 <h3>Chat Messages</h3>
 <section id="chatMessages">
     @foreach (var chatMessage in Model.ChatMessages)

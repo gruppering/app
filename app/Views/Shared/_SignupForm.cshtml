@@ -12,19 +12,13 @@
     }
 
     <h1 class="display-4">Signup</h1>
-
-    <a class="submit-button signup" href="@("/login" + returnUrl)">
-        Or Login
-    </a>
-
-    <form action="@("/signup" + returnUrl)" method="post" class="traditional-login-form">
+    
+    <form action="@("/signup" + returnUrl)" method="post" class="login-form">
 
         <div class="login-methods">
 
             <!-- Traditional signup -->
             <div class="traditional-login">
-                <h2>Traditional:</h2>
-
                 <div class="login-form-group">
                     <label for="email">E-Mail:</label>
                     <input type="email"
@@ -48,11 +42,13 @@
                            name="password"
                            class="login-input">
                 </div>
+                
+                <button type="submit" class="submit-button">Sign Up</button>
             </div>
 
             <!-- Social signup -->
             <div class="login-providers">
-                <h2>Or Sign Up With:</h2>
+                <h2>Sign Up With</h2>
 
                 <ul class="login-provider-list">
                     <li>
@@ -81,10 +77,7 @@
             </div>
 
         </div>
-
-        <button type="submit" class="submit-button">
-            Sign Up
-        </button>
-
     </form>
+    
+    <a class="submit-button signup" href="@("/login" + returnUrl)">Back To Login</a>
 </div>

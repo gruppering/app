@@ -4,14 +4,10 @@
     
 }
 
-<header>
-    <h1><b>GRUPPERING</b></h1>
-</header>
-
 <!-- Form to create a new course -->
-<div class="card mt-3">
+<div class="card mt-4">
     <div class="card-body">
-        <h5 class="card-title">Create a course</h5>
+        <h2 class="card-title">Create a course</h2>
 
         <form asp-controller="Course"
               asp-action="CreateCourse"
@@ -64,33 +60,46 @@
 <!-- This is the card view with the routiong helper to go to the corrosponding course -->
 
 <!-- Card display for every course where the user is a member of NOTE: the structure html is not done -->
-@foreach (var memberOfCourse in Model.MemberOfCourses)
-{
+
+<div class="card mt-4">
+    <div class="card-body">
+        <h2>Your Courses</h2>
+        @foreach (var memberOfCourse in Model.MemberOfCourses)
+        {
     <div class="card mt-3" style="width: 18rem;">
         <div class="card-body">
             <h5 class="card-title">@memberOfCourse.DisplayName</h5>
             <p class="card-text">@memberOfCourse.Description</p>
-            <a asp-controller="Course" 
+            <a asp-controller="Course"
                asp-action="Details"
-               asp-route-code="@memberOfCourse.JoinCode" 
+               asp-route-code="@memberOfCourse.JoinCode"
                class="card-link">Go to course page</a>
         </div>
     </div>
-}
+        }
+    </div>
+    
+</div>
 
-
-<h2>Public Courses</h2>
-<!-- Card display for all courses that are public NOTE: add paging -->
-@foreach (var publicCourse in Model.PublicCourses)
-{
+<div class="card mt-4">
+    <div class="card-body">
+        <h2>Public Courses</h2>
+        <!-- Card display for all courses that are public NOTE: add paging -->
+        @foreach (var publicCourse in Model.PublicCourses)
+         {
     <div class="card mt-3" style="width: 18rem;">
         <div class="card-body">
             <h5 class="card-title">@publicCourse.DisplayName</h5>
             <p class="card-text">@publicCourse.Description</p>
-            <a asp-controller="Course" 
+            <a asp-controller="Course"
                asp-action="Details"
-               asp-route-code="@publicCourse.JoinCode" 
+               asp-route-code="@publicCourse.JoinCode"
                class="card-link">Go to course page</a>
         </div>
     </div>
-}
+        }
+    </div>
+    
+</div>
+
+
