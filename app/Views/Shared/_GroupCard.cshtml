@@ -2,11 +2,11 @@
 <!-- For now this loop does go through all the groups the user is in NOTE: add a breaking point if we want -->
 @foreach (var group in Model)
 {
-    <div class="card color-theme">
+    <div class="card card-background color-theme">
         <span class="card-status"></span>
 
         <div class="card-info">
-            <h3>@group.GroupName</h3>
+            <h3><b>@group.GroupName</b></h3>
             <p>Part of: @group.Course.DisplayName</p>
         </div>
         

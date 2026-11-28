@@ -7,68 +7,77 @@
     <partial name="_CourseCodeSearch"/>
 </div>
 <!-- Form to create a new course -->
-<div class="card mt-4">
-    <div class="card-body">
-        <h2 class="card-title">Create a course</h2>
-
-        <form asp-controller="Course"
-              asp-action="CreateCourse"
-              method="post">
-
-            <div class="mb-3">
-                <label for="CourseName" class="form-label">Course name</label>
-
-                <input id="CourseName" name="CourseName"
-                       class="form-control"
-                       placeholder="Enter course name" />
-
-                <span asp-validation-for="CreateCourse.CourseName"
-                      class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label for="Description" class="form-label">
-                    Description
-                </label>
-
-                <textarea id="Description" name="Description"
-                          class="form-control"
-                          rows="4"
-                          placeholder="Describe your course"></textarea>
-
-                <span asp-validation-for="CreateCourse.Description"
-                      class="text-danger"></span>
-            </div>
-
-            <div class="form-check mb-3">
-                <input name="IsPublic"
-                       id="IsPublic"
-                       type="checkbox"
-                       class="form-check-input" value="true" />
-                <input name="IsPublic" type="hidden" value="false"/>
-                
-                <label for="IsPublic" 
-                       class="form-check-label">
-                    Public course
-                </label>
-            </div>
-
-            <button type="submit" class="btn btn-primary">
-                Create course
-            </button>
-        </form>
+<div id="courses-grid-container" class="mt-4">
+    <div class="card card-background">
+        <div class="card-body">
+            <h2>Your courses</h2>
+            @foreach (var memberOfCourse in Model.MemberOfCourses)
+            {
+        <partial name="_CourseCard" model="memberOfCourse"/>
+            }
+        </div>
+    </div>
+    
+    <div class="card card-background">
+        <div class="card-body">
+            <h2>Public Courses</h2>
+            @foreach (var publicCourse in Model.PublicCourses)
+            {
+        <partial name="_CourseCard" model="publicCourse"/>
+                }
+        </div>
     </div>
 
+    <div id="courses-create-course" class="card card-background">
+        <div class="card-body">
+            <h2 class="card-title">Create a course</h2>
 
-<h2>Your courses</h2>
-@foreach (var memberOfCourse in Model.MemberOfCourses)
-{
-    <partial name="_CourseCard" model="memberOfCourse"/>
-}
+            <form asp-controller="Course"
+                  asp-action="CreateCourse"
+                  method="post">
 
+                <div class="mb-3">
+                    <label for="CourseName" class="form-label">Course name</label>
 
-<h2>Public Courses</h2>
-@foreach (var publicCourse in Model.PublicCourses)
-{
-    <partial name="_CourseCard" model="publicCourse"/>
-}
+                    <input id="CourseName" name="CourseName"
+                           class="form-control"
+                           placeholder="Enter course name"/>
+
+                    <span asp-validation-for="CreateCourse.CourseName"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label for="Description" class="form-label">
+                        Description
+                    </label>
+
+                    <textarea id="Description" name="Description"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Describe your course"></textarea>
+
+                    <span asp-validation-for="CreateCourse.Description"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input name="IsPublic"
+                           id="IsPublic"
+                           type="checkbox"
+                           class="form-check-input" value="true"/>
+                    <input name="IsPublic" type="hidden" value="false"/>
+
+                    <label for="IsPublic"
+                           class="form-check-label">
+                        Public course
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary card-button">
+                    Create course
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
