@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using app.DTO.Course;
 using app.Exceptions;
+using app.Models;
 using app.Services;
 using app.Utils;
 using app.ViewModel;
@@ -109,4 +110,11 @@ public class CourseController(CourseService courseService,GroupService groupServ
             return RedirectToAction("Error","Home",new {code = 404,description="Could not create the course"});
         }
     }
+
+    [HttpGet("/courses/search")]
+    public async Task<List<Course>> Search([FromForm] string courseName, [FromForm] string courseDescription)
+    {
+        return await courseService.GetMatchingCoursesAsync(courseName, courseDescription);
+    }
+    
 }
