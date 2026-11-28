@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace app.Models;
 
-
 [PrimaryKey("Id")]
 public class Course
 {
@@ -15,5 +14,4 @@ public class Course
     [MaxLength(8)] public string JoinCode { get; set; } = string.Empty; 
     public required GrupperingUser Owner { get; set; }
     public List<GrupperingUser> Members { get; set; } = [];
-
 }

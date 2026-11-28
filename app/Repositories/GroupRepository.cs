@@ -27,15 +27,53 @@ public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepositor
     /// <param name="courseId">The course id</param>
     /// <returns>A group</returns>
     /// <exception cref="GroupNotFoundException">Thrown if a group with this name was not found in the specified course</exception>
-    public Group GetGroupByNameAndCourseId(string name, Guid courseId)
+    public async Task<Group> GetGroupByNameAndCourseId(string name, Guid courseId)
     {
         try
         {
-            return typeContext.Groups.Include(g => g.Members).First(g => g.GroupName == name && g.CourseId == courseId);
+            return await typeContext.Groups.Include(g => g.Members).FirstAsync(g => g.GroupName == name && g.CourseId == courseId);
         }
         catch (ArgumentNullException)
         {
             throw new GroupNotFoundException("A group with this name in this course was not found");
+        }
+    }
+
+    /// <summary>
+    /// Gets a group by join code and group name
+    /// </summary>
+    /// <param name="name">The group name</param>
+    /// <param name="joinCode">The course join code</param>
+    /// <returns>A group</returns>
+    /// <exception cref="GroupNotFoundException">Thrown if a group with this name was not found in the specified course</exception>
+    public async Task<Group> GetGroupByNameAndJoinCode(string name, string joinCode)
+    {
+        try
+        {
+            return await typeContext.Groups.Include(g => g.Members).FirstAsync(g => g.GroupName == name && g.Course.JoinCode == joinCode);
+        }
+        catch (ArgumentNullException)
+        {
+            throw new GroupNotFoundException("A group with this name in this course was not found");
+        }
+    }
+    
+    /// <summary>
+    /// Gets a group by the course id and group id.
+    /// </summary>
+    /// <param name="groupId">the id of the group</param>
+    /// <param name="courseId">the course id</param>
+    /// <returns>a group</returns>
+    /// <exception cref="GroupNotFoundException">Thrown if a group with this id was not found</exception>
+    public async Task<Group> GetGroupByCourseIdAndId(int groupId, Guid courseId)
+    {
+        try
+        {
+            return await typeContext.Groups.FirstAsync(g => g.Id == groupId && g.CourseId == courseId);
+        }
+        catch (ArgumentNullException)
+        {
+            throw new GroupNotFoundException("A group in this course with this id was not found");
         }
     }
     
@@ -59,24 +97,7 @@ public class GroupRepository(GrupperingTypeContext typeContext): IGroupRepositor
         }
     }
 
-    /// <summary>
-    /// Gets a group by the course id and group id.
-    /// </summary>
-    /// <param name="groupId">the id of the group</param>
-    /// <param name="courseId">the course id</param>
-    /// <returns>a group</returns>
-    /// <exception cref="GroupNotFoundException">Thrown if a group with this id was not found</exception>
-    public async Task<Group> GetGroupByCourseIdAndId(int groupId, Guid courseId)
-    {
-        try
-        {
-            return await typeContext.Groups.FirstAsync(g => g.Id == groupId && g.CourseId == courseId);
-        }
-        catch (ArgumentNullException)
-        {
-            throw new GroupNotFoundException("A group in this course with this id was not found");
-        }
-    }
+    
 
     /// <summary>
     /// Gets all groups from the specified course.

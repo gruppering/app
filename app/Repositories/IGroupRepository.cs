@@ -6,7 +6,8 @@ public interface IGroupRepository
 {
     public Task<List<Group>> GetUserGroups(string userName);
     
-    public Group GetGroupByNameAndCourseId(string name,Guid courseId);
+    public Task<Group> GetGroupByNameAndCourseId(string name,Guid courseId);
+    public Task<Group> GetGroupByNameAndJoinCode(string name, string joinCode);
     public Task<Group> GetGroupByCourseIdAndId(int groupId, Guid courseId);
     
     public Task<List<Group>> GetGroupsByNamePrefixAndCourseId(string namePrefix,Guid courseId);

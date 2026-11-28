@@ -51,6 +51,12 @@ public class CourseService
         return await _courseRepository.GetCourseByNameAsync(courseName);
     }
 
+    // Lacks integration testing for now.
+    public async Task<Course> GetCourseByIdAsync(Guid courseId)
+    {
+        return await _courseRepository.GetCourseByIdAsync(courseId);
+    }
+
     /// <summary>
     /// Gets all the public courses
     /// </summary>
