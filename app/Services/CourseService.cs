@@ -216,6 +216,13 @@ public class CourseService
     // Returns a list of courses from course name or description
     public async Task<List<Course>> GetMatchingCoursesAsync(string courseName, string description)
     {
-        return await _courseRepository.GetMatchingCoursesAsync(courseName, description);
+        try
+        {
+            return await _courseRepository.GetMatchingCoursesAsync(courseName, description);
+        }
+        catch (ArgumentException)
+        {
+            return new List<Course>();
+        }
     }
 }
