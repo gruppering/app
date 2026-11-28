@@ -78,7 +78,7 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
             return await typeContext.Courses
                 .Include(c => c.Owner)
                 .Include(c => c.Members)
-                .Where(c => c.Members.Any(g => g.Id == member.Id)).ToListAsync();
+                .Where(c => c.Members.Any(g => g.Id == member.Id) || c.Owner == member).ToListAsync();
         }
         catch (ArgumentNullException)
         {

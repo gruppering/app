@@ -87,7 +87,7 @@ public class CourseService
     }
 
     /// <summary>
-    /// Gets all courses the user is a member in
+    /// Gets all courses the user is a member in or an owner of
     /// </summary>
     /// <param name="user">The user to look for</param>
     /// <returns>A list of all the courses the user is in</returns>
