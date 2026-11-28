@@ -12,19 +12,13 @@
     }
 
     <h1 class="display-4">Login</h1>
-
-    <a class="submit-button signup" href="@("/signup" + returnUrl)">
-        Or Sign Up
-    </a>
-
+    
     <form action="@("/login" + returnUrl)" method="post" class="login-form">
 
         <div class="login-methods">
 
             <!-- Traditional login -->
             <div class="traditional-login">
-                <h2>Traditional:</h2>
-
                 <div class="login-form-group">
                     <label for="username">Username:</label>
                     <input type="text"
@@ -40,11 +34,12 @@
                            name="password"
                            class="login-input">
                 </div>
+                <button type="submit" class="submit-button">Log In</button>
             </div>
 
             <!-- Social login -->
             <div class="login-providers">
-                <h2>Or Sign In With:</h2>
+                <h2>Log In With</h2>
 
                 <ul class="login-provider-list">
                     <li>
@@ -72,14 +67,10 @@
                     </li>
                 </ul>
             </div>
-
         </div>
-
-        <button type="submit" class="submit-button">
-            Sign In
-        </button>
-
     </form>
+    
+    <a class="submit-button signup" href="@("/signup" + returnUrl)">Sign Up</a>
 </div>
 @if (Environment.GetEnvironmentVariable("GOOGLE_SIGNIN_ENABLED")!.Equals("true"))
 {

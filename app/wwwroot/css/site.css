@@ -2,6 +2,28 @@ html {
   font-size: 14px;
 }
 
+#header {
+  padding-top: 1rem;
+}
+
+#header h1 a {
+  text-decoration: none;
+  color: var(--bs-heading-color);
+  padding-bottom: 4rem;
+}
+
+#main {
+  margin: 0 auto;
+  width: 85%;
+  min-height: 90vh;
+}
+
+#grid-container {
+  display: grid;
+  grid-template-columns: 1fr var(--sb-width);
+  transition: all 400ms allow-discrete;
+}
+
 @media (min-width: 768px) {
   html {
     font-size: 16px;
@@ -36,15 +58,8 @@ body.sb-expanded {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
-#groups{
-  width: 100%;
-  display: grid;
-  row-gap: 1rem;
-  grid-auto-columns: 10rem;
-  column-gap: 10rem;
-  grid-template-areas: "a a a";
-  grid-auto-rows: 15rem;
-}
+
+
 
 /* Color code class for the most of the elements */
 .color-theme{
@@ -173,16 +188,9 @@ nav a span {
 }
 
 .home-page {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.join-section,
-.groups-section {
-  height: 50vh;
-  box-sizing: border-box;
 }
 
 .join-section {
@@ -191,11 +199,11 @@ nav a span {
   align-items: center;
 }
 
+
+.join-section,
 .groups-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   padding-top: 20px;
+  box-sizing: border-box;
 }
 
 .groups-list {
@@ -204,12 +212,6 @@ nav a span {
   gap: 20px;
   width: 100%;
   padding: 30px;
-  box-sizing: border-box;
-}
-
-.join-section {
-  position: relative;
-  height: 50vh;
   box-sizing: border-box;
 }
 
@@ -226,14 +228,6 @@ nav a span {
   text-align: center;
 }
 
-.home-page {
-  min-height: calc(100vh - 60px);
-}
-
-.join-section,
-.groups-section {
-  height: calc((100vh - 60px) / 2);
-}
 .screen-divider {
   position: fixed;
   top: 50vh;
@@ -422,7 +416,7 @@ nav a span {
   max-width: 220px;
 
   padding: 0;
-  margin: 0 auto;
+  margin: 0;
   list-style: none;
 }
 
@@ -472,7 +466,7 @@ nav a span {
 .login-form-group {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: fit-content;
   gap: 12px;
 }
 
@@ -530,6 +524,7 @@ nav a span {
 }
 
 .traditional-login {
+  width: fit-content;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -539,7 +534,8 @@ nav a span {
 .login-providers {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: start;
+  justify-content: center;
   border-left: 1px solid #555;
   padding: 0 20px 0 40px;
 }
@@ -552,7 +548,7 @@ nav a span {
 
 .submit-button {
   display: block;
-  margin: 40px auto 0;
+  margin: 1.5rem 0;
 }
 
 .signup{
@@ -562,7 +558,7 @@ nav a span {
 }
 
 /* Signup-specific spacing */
-.traditional-login-form .login-methods {
+.login-methods {
   margin-top: 40px;
 }
 
@@ -573,12 +569,6 @@ nav a span {
 .traditional-login-form .login-form-group {
   margin-bottom: 12px;
 }
-
-/* Center the signup button beneath both columns */
-.traditional-login-form .submit-button {
-  margin: 40px auto 0;
-}
-
 
 @media (max-width: 600px) {
   .login-methods {
@@ -601,4 +591,69 @@ nav a span {
   .login-form-group {
     max-width: 220px;
   }
+}
+
+/* Styling for course overview. Screen where all groups are displayed. */
+
+#groups {
+  margin:0 auto;
+  width: 100% !important;
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: 1rem;
+}
+
+.group-item-body {
+  height:10rem;
+  padding-bottom:0;
+  overflow: hidden;
+  transition: all 400ms allow-discrete;
+}
+
+.group-title-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.group-item-body:hover {
+  height:15rem;
+}
+
+.group-member-list {
+  margin-bottom: 0;
+  max-height:75%;
+  overflow: hidden;
+}
+
+.group-member-list::-webkit-scrollbar {
+  width: 8px;
+}
+.group-member-list::-webkit-scrollbar-button {
+  display: none;
+}
+.group-member-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.group-member-list::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 10px;
+}
+
+.group-member-list:hover {
+  overflow-y: scroll;
+}
+
+.group-member-list::before, .group-member-list::after {
+  content: "";
+  position: absolute;
+  height: 2rem;
+  pointer-events: none;
+}
+
+.group-member-list::after {
+  bottom: 0;
+  left: 5px;
+  right: 40px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
 }

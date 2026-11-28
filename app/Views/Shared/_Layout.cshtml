@@ -11,12 +11,20 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
 </head>
 <body class="">
-<header>
-    <h1 class="banner">Gruppering</h1>
-</header>
-@if (ViewBag.HideSidebar == null)
-{
-    <aside class="color-theme">
+
+
+<div id="grid-container">
+    <main id="main" role="main">
+        <header id="header">
+            <h1 class="banner"><a href="/"><b>GRUPPERING</b></a></h1>
+        </header>
+        
+        @RenderBody()
+        
+    </main>
+    @if (ViewBag.HideSidebar == null)
+    {
+    <aside id="navbar" class="color-theme">
         <nav>
             <ul>
                 <li>
@@ -45,22 +53,19 @@
                 </li>
                 @if (User.Identity is not null && User.Identity.IsAuthenticated)
                 {
-                    <li>
-                        <a class="nav-item-link" asp-area="" asp-controller="Home" asp-action="Logout">
-                            <i class="bx bx-exit" style="color:#ffffff;" title="Logout"></i>
-                            <span>Logout</span>
-                        </a>
-                    </li>
+                <li>
+                    <a class="nav-item-link" asp-area="" asp-controller="Home" asp-action="Logout">
+                        <i class="bx bx-exit" style="color:#ffffff;" title="Logout"></i>
+                        <span>Logout</span>
+                    </a>
+                </li>
                 }
             </ul>
         </nav>
     </aside>
-}
-<div class="container">
-    <main role="main" class="pt-3 pb-3">
-        @RenderBody()
-    </main>
+    }
 </div>
+    
 
 <footer class="border-top footer text-muted">
     <div class="container">
