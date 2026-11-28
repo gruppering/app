@@ -3,7 +3,9 @@
     ViewData["Title"] = "Course";
     
 }
-
+<div class="join-section">
+    <partial name="_CourseCodeSearch"/>
+</div>
 <!-- Form to create a new course -->
 <div class="card mt-4">
     <div class="card-body">
@@ -56,50 +58,17 @@
             </button>
         </form>
     </div>
-</div>
-<!-- This is the card view with the routiong helper to go to the corrosponding course -->
-
-<!-- Card display for every course where the user is a member of NOTE: the structure html is not done -->
-
-<div class="card mt-4">
-    <div class="card-body">
-        <h2>Your Courses</h2>
-        @foreach (var memberOfCourse in Model.MemberOfCourses)
-        {
-    <div class="card mt-3" style="width: 18rem;">
-        <div class="card-body">
-            <h5 class="card-title">@memberOfCourse.DisplayName</h5>
-            <p class="card-text">@memberOfCourse.Description</p>
-            <a asp-controller="Course"
-               asp-action="Details"
-               asp-route-code="@memberOfCourse.JoinCode"
-               class="card-link">Go to course page</a>
-        </div>
-    </div>
-        }
-    </div>
-    
-</div>
-
-<div class="card mt-4">
-    <div class="card-body">
-        <h2>Public Courses</h2>
-        <!-- Card display for all courses that are public NOTE: add paging -->
-        @foreach (var publicCourse in Model.PublicCourses)
-         {
-    <div class="card mt-3" style="width: 18rem;">
-        <div class="card-body">
-            <h5 class="card-title">@publicCourse.DisplayName</h5>
-            <p class="card-text">@publicCourse.Description</p>
-            <a asp-controller="Course"
-               asp-action="Details"
-               asp-route-code="@publicCourse.JoinCode"
-               class="card-link">Go to course page</a>
-        </div>
-    </div>
-        }
-    </div>
-    
-</div>
 
 
+<h2>Your courses</h2>
+@foreach (var memberOfCourse in Model.MemberOfCourses)
+{
+    <partial name="_CourseCard" model="memberOfCourse"/>
+}
+
+
+<h2>Public Courses</h2>
+@foreach (var publicCourse in Model.PublicCourses)
+{
+    <partial name="_CourseCard" model="publicCourse"/>
+}

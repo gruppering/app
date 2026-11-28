@@ -1,4 +1,5 @@
 using app.DTO.Course;
+using app.Exceptions;
 using app.Models;
 using app.Services;
 using NUnit.Framework;
@@ -72,6 +73,13 @@ public class CourseIntegrationTests
         await Assert.ThrowsAsync<ArgumentException>(async () => await _courseService.GetCourseByNameAsync("testAddition3"));
     }
 
+    [Test]
+    public async Task EnsureGettingCoursesByJoinCodeCompletesSuccessfully()
+    {
+        var course = await _courseService.CreateNewCourseAsync(new CourseCreationDto("testAddition4", "...", true), _testUser);
+        await Assert.DoesNotThrowAsync(async () => await _courseService.GetCourseByJoinCodeAsync(course.JoinCode));
+
+    }
     
     
     [OneTimeTearDown]

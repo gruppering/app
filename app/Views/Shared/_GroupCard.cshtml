@@ -2,25 +2,25 @@
 <!-- For now this loop does go through all the groups the user is in NOTE: add a breaking point if we want -->
 @foreach (var group in Model)
 {
-    <div class="group-card color-theme">
-        <span class="group-card-status"></span>
+    <div class="card color-theme">
+        <span class="card-status"></span>
 
-        <div class="group-card-info">
-            <h3 title="Group name">@group.GroupName</h3>
-            <p title="Course name">@group.Course.DisplayName</p>
+        <div class="card-info">
+            <h3>@group.GroupName</h3>
+            <p>Part of: @group.Course.DisplayName</p>
         </div>
         
-        <div class="group-card-actions">
+        <div class="card-actions">
             <a asp-controller="Course"
                asp-action="Details"
-               class="group-card-button">
+               class="card-button">
                 Go to Group
             </a>
 
             <a asp-controller="Course"
                asp-action="Details"
                asp-route-code="@group.Course.JoinCode"
-               class="group-card-button">
+               class="card-button">
                 Go to Course
             </a>
         </div>

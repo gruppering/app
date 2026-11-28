@@ -325,7 +325,7 @@ nav a span {
 
 /* Partial view GroupCard styling */
 
-.group-card {
+.card {
   position: relative;
 
   width: 208px;
@@ -344,20 +344,20 @@ nav a span {
 
 /* Group information */
 
-.group-card-info h3 {
+.card-info h3 {
   font-size: 18px;
   font-weight: 400;
   margin: 0;
 }
 
-.group-card-info p {
+.card-info p {
   font-size: 12px;
   margin: 2px 0 0;
 }
 
 /* Status indicator */
 
-.group-card-status {
+.card-status {
   position: absolute;
   top: 7px;
   right: 7px;
@@ -371,13 +371,13 @@ nav a span {
 
 /* Buttons */
 
-.group-card-actions {
+.card-actions {
   display: flex;
   gap: 10px;
   margin-top: auto;
 }
 
-.group-card-button {
+.card-button {
   flex: 1;
   text-align: center;
 
@@ -392,12 +392,12 @@ nav a span {
   white-space: nowrap;
 }
 
-.group-card-button:hover {
+.card-button:hover {
   background-color: #ffffff;
   color: #41483a;
 }
 
-.group-card-actions {
+.card-actions {
   margin-top: auto;
 }
 
