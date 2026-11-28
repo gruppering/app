@@ -24,6 +24,24 @@ html {
   transition: all 400ms allow-discrete;
 }
 
+#courses-grid-container {
+  container-type: inline-size;
+  margin:0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+}
+
+#courses-create-course {
+  grid-column: span 2;
+}
+
+@container (width < 600px) {
+  #courses-create-course {
+    grid-column: span 1;
+  }
+}
+
 @media (min-width: 768px) {
   html {
     font-size: 16px;
@@ -197,6 +215,7 @@ nav a span {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-bottom:6rem;
 }
 
 
@@ -325,21 +344,14 @@ nav a span {
 
 /* Partial view GroupCard styling */
 
-.card {
-  position: relative;
-
-  width: 208px;
-  height: 186px;
+.card-background {
   box-sizing: border-box;
 
   background-color: #41483a;
   color: #ffffff;
 
   border-radius: 4px;
-  padding: 12px;
-
-  display: flex;
-  flex-direction: column;
+  padding: 0.75rem;
 }
 
 /* Group information */
@@ -352,7 +364,7 @@ nav a span {
 
 .card-info p {
   font-size: 12px;
-  margin: 2px 0 0;
+  
 }
 
 /* Status indicator */
@@ -381,13 +393,14 @@ nav a span {
   flex: 1;
   text-align: center;
 
-  padding: 4px 3px;
+  padding: 0.35rem 2rem;
 
+  background-color: #41483a;
   color: #ffffff;
   border: 1px solid #ffffff;
   border-radius: 3px;
 
-  font-size: 10px;
+  font-size: 0.75rem;
   text-decoration: none;
   white-space: nowrap;
 }
