@@ -23,9 +23,14 @@ public class GroupService(IGroupRepository groupRepository,ICourseRepository cou
     /// <param name="courseId">The course id</param>
     /// <returns>A group</returns>
     /// <exception cref="GroupNotFoundException">Thrown if a group with this name was not found in the specified course</exception>
-    public Group GetGroupByNameAndCourseId(string name, Guid courseId)
+    public async Task<Group> GetGroupByNameAndCourseId(string name, Guid courseId)
     {
-        return groupRepository.GetGroupByNameAndCourseId(name, courseId);
+        return await groupRepository.GetGroupByNameAndCourseId(name, courseId);
+    }
+
+    public async Task<Group> GetGroupByNameAndJoinCode(string name, string joinCode)
+    {
+        return await groupRepository.GetGroupByNameAndJoinCode(name, joinCode);
     }
 
     /// <summary>
@@ -39,7 +44,7 @@ public class GroupService(IGroupRepository groupRepository,ICourseRepository cou
     {
         return await groupRepository.GetGroupByCourseIdAndId(groupId, courseId);
     }
-
+    
     /// <summary>
     /// Gets all groups in the specified course by the specified prefix
     /// </summary>

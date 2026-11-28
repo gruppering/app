@@ -5,7 +5,7 @@
 }
 <!-- ATM just consceptual structure of detailed view -->
 <h1>@Model.Course.DisplayName</h1>
-<h2>Join Code: @Model.Course.JoinCode</h2>
+<h2>Join Code: <span id="joinCode">@Model.Course.JoinCode</span></h2>
 <p>@Model.Course.Description</p>
 <div style="max-width: 20%">
     @Model.QrCode
@@ -25,8 +25,8 @@
                 <div class="group-title-header">
                     <h3 class="card-title">@group.GroupName</h3>
                     <span>
-<!-- TODO: Make ASP evaluate href attributes to the groups shown to the user -->
-                        <a href="">View</a>
+        <!-- TODO: Restructure this href attribute, so that it doesn't break when endpoints get renamed. -->
+                        <a href="/course/@Model.Course.JoinCode/group/@group.GroupName">View</a>
                     </span>
                 </div>
                 
@@ -131,7 +131,7 @@
         document.addEventListener("submit", async (e) => {
             e.preventDefault();
             
-            fetch("/course/@Model.Course.DisplayName/groups/new",{
+            fetch("/course/@Model.Course.Id/group/new",{
                 method: "POST",
                 credentials:"same-origin",
                 body: JSON.stringify({
@@ -156,8 +156,72 @@
             processElement(group)
         })
     }
-    function processElement(element){
-            let wrapper = document.createElement("div");
+    
+    const cardStructure = `
+        <div class="card">
+            <div class="card-body group-item-body">
+                <div class="group-title-header">
+                    <h3 class="card-title">${group}</h3>
+                    <span>
+                        <a href="/course/${joinCode}/group/${groupName}">View</a>
+                    </span>
+                </div>
+                
+                <ul class="group-member-list">
+                   <li>
+                        <span>
+                            ${member}
+                        </span>
+                   </li>
+                </ul>
+            </div>
+        </div>`;
+    
+    function processElement(element) {
+        const joinCode = document.querySelector("#joinCode");
+        const card = document.createElement("div");
+        card.classList.add("card");
+        
+        const cardBody = document.createElement("div");
+        cardBody.classList.add("card-body", "group-item-body");
+        
+        const titleHeader = document.createElement("div");
+        titleHeader.classList.add("group-title-header");
+        
+        const groupTitle = document.createElement("h3");
+        groupTitle.textContent = element.groupName;
+        
+        const groupLinkSpan = document.createElement("span");
+        const groupLink = document.createElement("a");
+        groupLink.textContent = "View";
+        groupLink.href = `/course/${encodeURIComponent(joinCode.textContent)}/group/${encodeURIComponent(element.groupName)}`;
+        
+        groupLinkSpan.append(groupLink);
+        titleHeader.append(groupTitle, groupLinkSpan);
+        
+        const groupMembers = document.createElement("ul");
+        groupMembers.classList.add("group-member-list");
+        
+        element.members.forEach((member) => {
+            const groupMember = document.createElement("li");
+            const groupMemberSpan = document.createElement("span");
+            groupMemberSpan.textContent = member.username;
+            
+            groupMember.append(groupMemberSpan);
+            groupMembers.append(groupMember);
+        });
+        
+        cardBody.append(titleHeader, groupMembers)
+        card.append(cardBody);
+        groupDiv.append(card);
+    }
+        
+    function processElement_Old(element){
+            let card = document.createElement("div");
+            card.classList.add("card");
+            let cardBody = document.createElement("div");
+            cardBody.classList.add("card-body", "group-item-body");
+            
             let groupTitle = document.createElement("h3");
             groupTitle.textContent = element.groupName;
             let groupMembers = document.createElement("ul");
@@ -173,10 +237,10 @@
                 
                 groupMembers.append(groupMember);
             })
-            wrapper.append(groupTitle);
-            wrapper.append(groupMembers);
+            card.append(groupTitle);
+            card.append(groupMembers);
         
-            groupDiv.append(wrapper)
+            groupDiv.append(card)
     }
 </script>
 

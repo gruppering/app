@@ -3,9 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace app.Models;
 
-
 [PrimaryKey("Id","CourseId")]
-
 public class Group
 {
     public int Id { get; init; } 

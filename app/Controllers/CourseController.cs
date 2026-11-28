@@ -8,6 +8,7 @@ using app.Utils;
 using app.ViewModel;
 
 namespace app.Controllers;
+
 public class CourseController(CourseService courseService,GroupService groupService, UserService userService,ChatMessageService chatMessageService) : Controller
 {
     private static readonly ILoggerFactory Factory = LoggerFactory.Create(builder => builder.AddConsole());
