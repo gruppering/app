@@ -111,4 +111,11 @@ public class CourseRepository(GrupperingTypeContext typeContext): ICourseReposit
     {
         return typeContext.Courses.Select(c => new Tuple<string,Guid>(c.JoinCode,c.Id)).ToList();
     }
+
+    public async Task<List<Course>> GetMatchingCoursesAsync(string courseName, string description)
+    {
+        return await typeContext.Courses
+            .Include(c => c.IsPublic)
+            .Where(c => c.DisplayName.Contains(courseName) || c.Description.Contains(description)).ToListAsync();
+    }
 }
