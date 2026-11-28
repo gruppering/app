@@ -213,4 +213,9 @@ public class CourseService
         _joinCodeOverview.Remove(course.JoinCode);
         return await _courseRepository.DeleteAsync(course);
     }
+    // Returns a list of courses from course name or description
+    public async Task<List<Course>> GetMatchingCoursesAsync(string courseName, string description)
+    {
+        return await _courseRepository.GetMatchingCoursesAsync(courseName, description);
+    }
 }
